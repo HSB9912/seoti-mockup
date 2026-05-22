@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>서티 SEOTI · 관리자 변형 C — 노션형 트리</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css" />
+<style>
+  :root{
+    --bg:#fefefc; --paper:#fff; --ink:#202020; --sub:#878680; --faint:#d4d2cd;
+    --line:#ededeb; --line2:#dfddd6; --accent:#a06440; --hover:#f5f4f0;
+    --ok:#3a8a6a; --warn:#b07a2a; --bad:#b03a3a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Pretendard Variable',Pretendard,sans-serif;background:var(--paper);
+    color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.5;font-size:13.5px}
+  a{color:inherit;text-decoration:none}img{display:block;max-width:100%}
+  button,input,select,textarea{font-family:inherit}
+  .en{font-size:.7em;opacity:.42;margin-left:5px;font-weight:500;letter-spacing:.02em;text-transform:none;font-style:normal}
+  .mono{font-family:'SF Mono','Menlo','Consolas',monospace;font-variant-numeric:tabular-nums}
+
+  .app{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+
+  /* TREE SIDEBAR */
+  .sb{background:#f9f8f4;border-right:1px solid var(--line);font-size:13px;
+    display:flex;flex-direction:column}
+  .sb-h{padding:14px 14px 8px;display:flex;align-items:center;gap:8px}
+  .sb-h .av{width:24px;height:24px;border-radius:5px;background:var(--accent);color:#fff;
+    display:grid;place-items:center;font-weight:800;font-size:11px}
+  .sb-h b{font-size:13.5px;font-weight:800}
+  .sb-h small{font-size:11px;color:var(--sub);margin-left:auto}
+  .sb-search{margin:8px 10px 14px;background:var(--paper);border:1px solid var(--line);
+    border-radius:5px;padding:7px 10px;font-size:12.5px;outline:none}
+  .sb-tree{flex:1;overflow-y:auto;padding:0 6px 12px}
+
+  .grp{margin-bottom:4px}
+  .gh{display:flex;align-items:center;gap:5px;padding:5px 8px;cursor:pointer;color:var(--sub);
+    font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+  .gh:hover{color:var(--ink)}
+  .gh .chev{font-size:9px;width:10px;transition:.15s;color:var(--faint)}
+  .grp.open .gh .chev{transform:rotate(90deg)}
+  .gc{display:none}.grp.open .gc{display:block}
+
+  .item{display:flex;align-items:center;gap:8px;padding:5px 8px 5px 22px;cursor:pointer;
+    border-radius:4px;color:var(--sub);font-weight:600;margin:1px 0;font-size:13px}
+  .item:hover{background:var(--hover);color:var(--ink)}
+  .item.on{background:var(--ink);color:#fff}
+  .item .ico{width:14px;text-align:center;font-size:13px;flex:none}
+  .item .badge{margin-left:auto;font-size:10.5px;color:var(--faint);font-weight:700}
+  .item.on .badge{color:rgba(255,255,255,.6)}
+  .item.alert .badge{color:var(--accent);font-weight:800}
+  .item.on.alert .badge{color:#ffd5b8}
+
+  .sb-bot{padding:10px 14px;border-top:1px solid var(--line);display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--sub)}
+  .sb-bot b{color:var(--ink);font-weight:700}
+
+  /* MAIN */
+  .main{display:flex;flex-direction:column;min-width:0}
+  .top{padding:14px 28px;display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--line)}
+  .crumb{font-size:13px;color:var(--sub)}
+  .crumb b{color:var(--ink);font-weight:700}
+  .crumb .sep{color:var(--faint);margin:0 6px}
+  .top .r{margin-left:auto;display:flex;gap:6px;align-items:center;color:var(--sub);font-size:12.5px}
+  .top .r a{padding:6px 10px;border-radius:5px;cursor:pointer}
+  .top .r a:hover{background:var(--hover);color:var(--ink)}
+
+  .content{padding:30px 36px 60px;flex:1;overflow-y:auto;max-width:1320px;width:100%}
+
+  /* page header (minimal, notion-y) */
+  .ph{margin-bottom:24px}
+  .ph .ico{font-size:32px;display:block;line-height:1;margin-bottom:8px;color:var(--accent)}
+  .ph h1{font-size:32px;font-weight:800;letter-spacing:-.02em;line-height:1.15;display:flex;align-items:baseline;gap:14px}
+  .ph h1 small{font-size:12.5px;color:var(--sub);font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+  .ph .desc{font-size:13.5px;color:var(--sub);margin-top:8px;max-width:560px;line-height:1.7}
+  .ph .meta{display:flex;gap:30px;margin-top:16px;padding:12px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);font-size:12.5px}
+  .ph .meta div{display:flex;gap:8px}.ph .meta b{color:var(--sub);font-weight:600}.ph .meta span{color:var(--ink);font-weight:700}
+
+  /* sections */
+  .sect{display:none}.sect.on{display:block}
+
+  /* notion-style block */
+  .blk{margin-bottom:30px}
+  .blk h2{font-size:18px;font-weight:800;margin-bottom:12px;letter-spacing:-.01em;
+    display:flex;align-items:center;gap:8px}
+  .blk h2 .h-cnt{font-size:12px;color:var(--sub);font-weight:600}
+
+  /* inline KPI list */
+  .kpi-list{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+  .kpi-list .ki{padding:18px 22px;border-right:1px solid var(--line)}
+  .kpi-list .ki:last-child{border-right:none}
+  .kpi-list .k{font-size:11.5px;color:var(--sub);font-weight:600}
+  .kpi-list .v{font-size:22px;font-weight:800;margin:5px 0 3px}
+  .kpi-list .d{font-size:11.5px;color:var(--ok);font-weight:700}
+  .kpi-list .d.down{color:var(--bad)}
+  .kpi-list .ki.alert{background:linear-gradient(180deg,#fff8ef,#fff)}
+  .kpi-list .ki.alert .v{color:var(--accent)}
+
+  /* tables (notion style, minimal) */
+  table.t{width:100%;border-collapse:collapse;font-size:13px}
+  .t th{font-size:11px;font-weight:700;color:var(--sub);text-align:left;padding:8px 10px;
+    border-bottom:1px solid var(--line);background:none}
+  .t td{padding:10px;border-bottom:1px solid var(--line)}
+  .t tr:hover td{background:var(--hover)}
+  .t td .thumb{width:24px;height:24px;border-radius:3px;background:var(--hover);overflow:hidden;display:inline-block;vertical-align:middle;margin-right:8px}
+  .t td .thumb img{width:100%;height:100%;object-fit:cover}
+  .t td .nm{font-weight:700;display:inline-block;vertical-align:middle}
+  .tag{display:inline-block;font-size:11px;font-weight:600;padding:2px 7px;border-radius:3px;
+    background:var(--hover);color:var(--sub)}
+  .tag.ok{background:#e7f4ec;color:var(--ok)}
+  .tag.warn{background:#faf0d8;color:var(--warn)}
+  .tag.bad{background:#f9e5e5;color:var(--bad)}
+  .tag.ink{background:var(--ink);color:#fff}
+
+  /* inline sparkline cell */
+  .spark{display:inline-flex;align-items:flex-end;gap:2px;height:16px;margin-left:6px}
+  .spark span{width:3px;background:var(--accent);opacity:.6;border-radius:1px}
+
+  /* product cards row */
+  .prod-row{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px}
+  .prod-row .pc{flex:none;width:160px;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+  .prod-row .pc .ph{aspect-ratio:1;background:var(--hover);overflow:hidden}
+  .prod-row .pc .ph img{width:100%;height:100%;object-fit:cover}
+  .prod-row .pc .bd{padding:9px 11px;font-size:12px}
+  .prod-row .pc b{font-weight:700;display:block;font-size:12.5px}
+  .prod-row .pc small{color:var(--sub)}
+
+  /* notion-like callout */
+  .callout{display:flex;gap:14px;background:#fef5e7;border:1px solid #f0d9a0;border-radius:6px;
+    padding:14px 18px;margin-bottom:24px}
+  .callout .ic{font-size:18px;flex:none}
+  .callout b{font-weight:700;display:block;margin-bottom:3px}
+  .callout p{font-size:12.5px;color:var(--sub);line-height:1.6}
+  .callout.warn{background:#fdf0eb;border-color:#f0c5b3}
+
+  /* buttons */
+  .btn{font-size:12.5px;font-weight:600;padding:6px 12px;border:1px solid var(--line);
+    background:var(--paper);color:var(--ink);cursor:pointer;border-radius:5px}
+  .btn:hover{background:var(--hover)}
+  .btn-p{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .btn-p:hover{background:#3a3a3a}
+  .actions{display:flex;gap:6px;flex-wrap:wrap}
+
+  /* progress bar inline */
+  .pgs{display:flex;gap:8px;align-items:center;font-size:12px}
+  .pgs .pbar{flex:1;height:5px;background:var(--hover);border-radius:99px;overflow:hidden;max-width:160px}
+  .pgs .pbar div{height:100%;background:var(--accent);border-radius:99px}
+  .pgs .pbar.low div{background:var(--accent)}
+  .pgs .pbar.out div{background:var(--bad)}
+
+  /* form (inline notion-style) */
+  .nb{margin-bottom:12px}
+  .nb label{display:block;font-size:11.5px;color:var(--sub);margin-bottom:4px;font-weight:600}
+  .nb input,.nb textarea,.nb select{width:100%;padding:8px 11px;border:1px solid var(--line);
+    border-radius:5px;font-size:13.5px;outline:none;background:var(--paper)}
+  .nb input:focus,.nb textarea:focus,.nb select:focus{border-color:var(--accent)}
+  .nb textarea{min-height:80px;resize:vertical}
+  .frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .img-up{aspect-ratio:1;border:1.5px dashed var(--faint);border-radius:6px;
+    display:grid;place-items:center;color:var(--sub);font-size:12.5px;cursor:pointer;text-align:center;padding:14px}
+  .img-up:hover{border-color:var(--accent);color:var(--accent)}
+
+  /* bulk order rows */
+  .bo-row{display:grid;grid-template-columns:80px 1fr 1fr 100px 130px;gap:14px;
+    padding:12px;border:1px solid var(--line);border-radius:6px;margin-bottom:8px;align-items:center;font-size:13px}
+  .bo-row:hover{background:var(--hover);cursor:pointer}
+  .bo-row .ref{font-weight:800;font-size:13px}
+  .bo-row .who small{color:var(--sub);display:block;margin-top:2px;font-size:11.5px}
+  .bo-row .it{font-size:12.5px;color:var(--sub)}
+
+  /* qna inline */
+  .qn{padding:14px 18px;border:1px solid var(--line);border-radius:6px;margin-bottom:10px}
+  .qn .h{display:flex;gap:8px;align-items:center;margin-bottom:5px;flex-wrap:wrap}
+  .qn h4{font-size:13.5px;font-weight:700;flex:1;min-width:0}
+  .qn .m{font-size:12px;color:var(--sub)}
+  .qn p{font-size:13px;color:var(--sub);margin:7px 0;line-height:1.65}
+  .qn textarea{width:100%;border:1px solid var(--line);border-radius:5px;padding:9px;font-family:inherit;font-size:13px;min-height:65px;outline:none;margin-top:5px;resize:vertical}
+  .qn .ra{display:flex;gap:6px;justify-content:flex-end;margin-top:6px}
+
+  @media(max-width:840px){.app{grid-template-columns:1fr}.sb{display:none}.kpi-list{grid-template-columns:1fr 1fr}.frow{grid-template-columns:1fr}.bo-row{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- TREE SIDEBAR -->
+  <aside class="sb">
+    <div class="sb-h">
+      <div class="av">서</div>
+      <b>SEOTI</b>
+      <small>Admin</small>
+    </div>
+    <input class="sb-search" placeholder="Quick search... ⌘K">
+    <div class="sb-tree">
+      <div class="grp open">
+        <div class="gh"><span class="chev">▸</span>운영<i class="en">Operations</i></div>
+        <div class="gc">
+          <div class="item on" data-go="dash"><span class="ico">▦</span>대시보드<span class="badge"></span></div>
+          <div class="item" data-go="analytics"><span class="ico">📈</span>판매 실적<span class="badge"></span></div>
+        </div>
+      </div>
+      <div class="grp open">
+        <div class="gh"><span class="chev">▸</span>상품<i class="en">Catalog</i></div>
+        <div class="gc">
+          <div class="item" data-go="products"><span class="ico">🏷</span>전체 상품<span class="badge">43</span></div>
+          <div class="item alert" data-go="stock"><span class="ico">📦</span>재고 관리<span class="badge">3</span></div>
+          <div class="item" data-go="add"><span class="ico">＋</span>새 상품 등록</div>
+          <div class="item"><span class="ico">⋯</span>카테고리</div>
+        </div>
+      </div>
+      <div class="grp open">
+        <div class="gh"><span class="chev">▸</span>주문<i class="en">Orders</i></div>
+        <div class="gc">
+          <div class="item"><span class="ico">🚚</span>일반 주문<span class="badge">147</span></div>
+          <div class="item alert" data-go="bulk"><span class="ico">📋</span>대량주문<span class="badge">5</span></div>
+          <div class="item"><span class="ico">↩</span>반품·교환<span class="badge">2</span></div>
+        </div>
+      </div>
+      <div class="grp open">
+        <div class="gh"><span class="chev">▸</span>고객<i class="en">Customer</i></div>
+        <div class="gc">
+          <div class="item alert" data-go="qna"><span class="ico">💬</span>Q&A<span class="badge">8</span></div>
+          <div class="item"><span class="ico">⭐</span>리뷰</div>
+          <div class="item"><span class="ico">👥</span>회원</div>
+        </div>
+      </div>
+      <div class="grp">
+        <div class="gh"><span class="chev">▸</span>설정<i class="en">Settings</i></div>
+        <div class="gc">
+          <div class="item"><span class="ico">🎨</span>스토어 디자인</div>
+          <div class="item"><span class="ico">🚀</span>배송 정책</div>
+          <div class="item"><span class="ico">💳</span>결제 설정</div>
+        </div>
+      </div>
+    </div>
+    <div class="sb-bot">
+      <span style="width:18px;height:18px;background:var(--accent);color:#fff;border-radius:3px;display:grid;place-items:center;font-size:10px;font-weight:800">서</span>
+      <span><b>서티</b> · 관리자</span>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="top">
+      <div class="crumb">
+        <span>운영</span><span class="sep">/</span><b id="crumbNow">대시보드</b>
+      </div>
+      <div class="r">
+        <a>🔔</a><a>⭐</a><a>🔗 공유</a><a>⋯</a>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- 대시보드 -->
+      <section class="sect on" data-s="dash">
+        <div class="ph">
+          <span class="ico">📊</span>
+          <h1>대시보드 <small>2026-05-21 wed</small></h1>
+          <p class="desc">오늘의 운영 현황을 한 페이지에서. 미답변 Q&A·재고 알림 등 주의가 필요한 항목은 좌측에 빨간 숫자로 표시됩니다.</p>
+          <div class="meta">
+            <div><b>최종 동기화</b><span>방금 전</span></div>
+            <div><b>활성 상품</b><span>39 / 43</span></div>
+            <div><b>이번 달</b><span>₩7.2M</span></div>
+            <div><b>상태</b><span class="tag warn">⚠ 재고 3건</span></div>
+          </div>
+        </div>
+
+        <div class="callout warn">
+          <span class="ic">⚠️</span>
+          <div><b>처리가 필요한 항목 3건</b>
+            <p>품절 임박 상품 3개 · 미답변 Q&A 8건 · 견적 대기 대량주문 3건 — 사이드바에서 바로 이동할 수 있어요.</p></div>
+        </div>
+
+        <div class="blk">
+          <h2>오늘 요약 <span class="h-cnt">· 전일 대비</span></h2>
+          <div class="kpi-list">
+            <div class="ki"><div class="k">매출</div><div class="v mono">₩384,500</div><div class="d">▲ 12.3%</div></div>
+            <div class="ki"><div class="k">신규 주문</div><div class="v mono">27</div><div class="d">▲ 4건</div></div>
+            <div class="ki alert"><div class="k">재고 알림</div><div class="v mono">3</div><div class="d down">즉시 확인</div></div>
+            <div class="ki alert"><div class="k">미답변 Q&A</div><div class="v mono">8</div><div class="d down">평균 0.8일</div></div>
+          </div>
+        </div>
+
+        <div class="blk">
+          <h2>품절 임박 ⚠️ <span class="h-cnt">· 안전재고 미만</span></h2>
+          <table class="t">
+            <thead><tr><th>상품</th><th>카테고리</th><th>현재고 / 안전</th><th>상태</th><th>판매 추이</th><th></th></tr></thead>
+            <tbody>
+              <tr><td><span class="thumb"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202512/6df4ff16a044b3cd8dde5d8b78447e35.png"></span><span class="nm">초록책장 스티커</span></td><td>조각</td><td><b class="mono" style="color:var(--accent)">3</b> <span class="mono" style="color:var(--sub)">/ 10</span></td><td><span class="tag warn">⚠ 임박</span></td><td><span class="spark"><span style="height:60%"></span><span style="height:70%"></span><span style="height:50%"></span><span style="height:80%"></span><span style="height:100%"></span></span></td><td><a class="btn">＋ 입고</a></td></tr>
+              <tr><td><span class="thumb"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/a157d261092510f1542550274972a939.png"></span><span class="nm">설탕 눈마을 스티커</span></td><td>메모</td><td><b class="mono" style="color:var(--accent)">6</b> <span class="mono" style="color:var(--sub)">/ 10</span></td><td><span class="tag warn">⚠ 부족</span></td><td><span class="spark"><span style="height:90%"></span><span style="height:100%"></span><span style="height:75%"></span><span style="height:80%"></span><span style="height:95%"></span></span></td><td><a class="btn">＋ 입고</a></td></tr>
+              <tr><td><span class="thumb"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202508/d9342a7de8b65e19f073f6f99139560d.png"></span><span class="nm">선샤인데이 스티커</span></td><td>메모</td><td><b class="mono">9</b> <span class="mono" style="color:var(--sub)">/ 10</span></td><td><span class="tag warn">부족</span></td><td><span class="spark"><span style="height:40%"></span><span style="height:55%"></span><span style="height:70%"></span><span style="height:60%"></span><span style="height:85%"></span></span></td><td><a class="btn">＋ 입고</a></td></tr>
+              <tr><td><span class="thumb"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202503/58dafda9eee23c1a553c073971af033c.png"></span><span class="nm">크레페 말랑 키링</span></td><td>굿즈</td><td><b class="mono" style="color:var(--bad)">0</b> <span class="mono" style="color:var(--sub)">/ 5</span></td><td><span class="tag bad">품절</span></td><td><span class="spark"><span style="height:30%"></span><span style="height:50%"></span><span style="height:40%"></span><span style="height:30%"></span><span style="height:0"></span></span></td><td><a class="btn">＋ 입고</a></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="blk">
+          <h2>이번 달 TOP <span class="h-cnt">· 인기 상품</span></h2>
+          <div class="prod-row">
+            <div class="pc"><div class="ph"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/a157d261092510f1542550274972a939.png"></div><div class="bd"><b>설탕 눈마을</b><small>128개 판매</small></div></div>
+            <div class="pc"><div class="ph"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202508/d9342a7de8b65e19f073f6f99139560d.png"></div><div class="bd"><b>선샤인데이</b><small>94개</small></div></div>
+            <div class="pc"><div class="ph"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/8844055f11daba2bd37b69a6150cdac6.png"></div><div class="bd"><b>학교괴담</b><small>71개</small></div></div>
+            <div class="pc"><div class="ph"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/bc4816b7234830cacfd8e73dbc81ebcb.png"></div><div class="bd"><b>롱 메모팩</b><small>65개</small></div></div>
+            <div class="pc"><div class="ph"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202508/13260f931f04e15ddc8bb56a20dc0e90.png"></div><div class="bd"><b>키스컷 마테 2</b><small>58개</small></div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 상품 -->
+      <section class="sect" data-s="products">
+        <div class="ph">
+          <span class="ico">🏷</span>
+          <h1>전체 상품 <small>43개 · 판매중 39</small></h1>
+          <p class="desc">표 형태로 빠르게 훑고, 셀을 클릭해 인라인 편집할 수 있습니다.</p>
+          <div class="meta">
+            <div><b>판매중</b><span>39</span></div><div><b>품절</b><span>1</span></div>
+            <div><b>비공개</b><span>3</span></div><div><b>이번 달 신상</b><span>5</span></div>
+          </div>
+        </div>
+        <div class="blk">
+          <div style="display:flex;gap:8px;margin-bottom:12px">
+            <input class="nb" style="padding:8px 12px;border:1px solid var(--line);border-radius:5px;width:280px" placeholder="🔍 검색...">
+            <span style="flex:1"></span>
+            <button class="btn">⤓ CSV</button>
+            <button class="btn btn-p" data-go="add">＋ 새 상품</button>
+          </div>
+          <table class="t" id="prodT"></table>
+        </div>
+      </section>
+
+      <!-- 재고 -->
+      <section class="sect" data-s="stock">
+        <div class="ph">
+          <span class="ico">📦</span>
+          <h1>재고 관리 <small>실시간 자동 동기화</small></h1>
+          <p class="desc">현재고가 안전재고 이하로 떨어지면 자동으로 알림과 함께 스토어에 "재고 부족" 배지가 표시됩니다.</p>
+        </div>
+        <div class="blk">
+          <table class="t" id="stockT"></table>
+        </div>
+      </section>
+
+      <!-- 신상등록 -->
+      <section class="sect" data-s="add">
+        <div class="ph">
+          <span class="ico">＋</span>
+          <h1>새 상품 추가</h1>
+          <p class="desc">정보를 입력하면 자동 저장됩니다. <b style="color:var(--ink)">⌘ S</b>로 등록 완료.</p>
+        </div>
+        <div style="display:grid;grid-template-columns:240px 1fr;gap:24px;align-items:flex-start">
+          <div>
+            <div class="img-up">📷<br>대표 이미지<br><small style="color:var(--faint)">1000×1000 권장</small></div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:6px">
+              <div class="img-up" style="aspect-ratio:1;padding:6px;font-size:11px">＋</div>
+              <div class="img-up" style="aspect-ratio:1;padding:6px;font-size:11px">＋</div>
+              <div class="img-up" style="aspect-ratio:1;padding:6px;font-size:11px">＋</div>
+            </div>
+          </div>
+          <div>
+            <div class="nb"><label>상품명</label><input placeholder="예: 서티 설탕 눈마을 스티커"></div>
+            <div class="frow">
+              <div class="nb"><label>카테고리</label><select><option>메모 스티커</option><option>마스킹테이프</option><option>투명스티커</option><option>키링·굿즈</option><option>조각 스티커</option></select></div>
+              <div class="nb"><label>가격 (₩)</label><input type="number" placeholder="3500"></div>
+            </div>
+            <div class="frow">
+              <div class="nb"><label>초기 재고</label><input type="number" placeholder="50"></div>
+              <div class="nb"><label>안전재고</label><input type="number" placeholder="10"></div>
+            </div>
+            <div class="nb"><label>상세 설명</label><textarea placeholder="고객에게 보일 설명..."></textarea></div>
+            <div class="nb"><label>태그</label><input placeholder="다꾸, 메모, 신상"></div>
+            <div class="actions" style="margin-top:14px;justify-content:flex-end">
+              <button class="btn" data-go="products">취소</button>
+              <button class="btn">임시 저장</button>
+              <button class="btn btn-p">＋ 등록</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 대량주문 -->
+      <section class="sect" data-s="bulk">
+        <div class="ph">
+          <span class="ico">📋</span>
+          <h1>대량주문 견적 <small>5건 대기 · 평균 회신 18h</small></h1>
+          <p class="desc">고객이 보낸 견적 요청을 한 줄씩 확인하고, 클릭해서 금액·배송정보를 입력 후 회신할 수 있어요.</p>
+        </div>
+        <div class="blk">
+          <div class="bo-row" style="background:var(--hover)"><span class="ref mono">A4K9</span><div class="who"><b>jenn*</b><small>🇺🇸 US · 인스타 DM · 5월 21 14:23</small></div><div class="it">12품목 · 84개<br><small style="color:var(--sub)">설탕 눈마을 ×10 · 스위티 ×8 · 외 10건</small></div><div><span class="tag warn">견적 대기</span></div><div class="actions"><button class="btn">상세</button><button class="btn btn-p">📧 견적</button></div></div>
+          <div class="bo-row"><span class="ref mono">B8M2</span><div class="who"><b>송*이</b><small>🇰🇷 KR · 카톡 · 5월 21 11:08</small></div><div class="it">5품목 · 40개<br><small style="color:var(--sub)">예상 ₩140,000</small></div><div><span class="tag ink">입금대기</span></div><div class="actions"><button class="btn">상세</button><button class="btn">✓ 입금확인</button></div></div>
+          <div class="bo-row"><span class="ref mono">C3R7</span><div class="who"><b>yui*</b><small>🇯🇵 JP · 이메일 · 5월 21 09:32</small></div><div class="it">8품목 · 56개</div><div><span class="tag warn">견적 대기</span></div><div class="actions"><button class="btn">상세</button><button class="btn btn-p">📧 견적</button></div></div>
+          <div class="bo-row"><span class="ref mono">D1L4</span><div class="who"><b>지혜*</b><small>🇰🇷 KR · 이메일</small></div><div class="it">3품목 · 25개</div><div><span class="tag ok">발송중</span></div><div class="actions"><button class="btn">운송장</button></div></div>
+          <div class="bo-row"><span class="ref mono">E7N0</span><div class="who"><b>mary*</b><small>🇪🇺 EU · 이메일</small></div><div class="it">10품목 · 70개</div><div><span class="tag warn">견적 대기</span></div><div class="actions"><button class="btn">상세</button><button class="btn btn-p">📧 견적</button></div></div>
+        </div>
+      </section>
+
+      <!-- Q&A -->
+      <section class="sect" data-s="qna">
+        <div class="ph">
+          <span class="ico">💬</span>
+          <h1>Q&A 답변 <small>미답변 8건</small></h1>
+          <p class="desc">평일 기준 1~2일 내 답변을 목표로 운영중이에요. 자주쓰는 답변을 등록해두면 클릭으로 삽입 가능합니다.</p>
+        </div>
+        <div class="blk">
+          <div class="qn">
+            <div class="h"><span class="tag warn">대기 5일</span><span class="tag">결제</span><h4>무통장입금 입금자명을 잘못 적었어요</h4><span class="m">jihye* · 2026-05-17</span></div>
+            <p>주문번호 #2026-0517-021 인데 입금자명을 회사명으로 적어버렸어요. 어떻게 해야 하나요?</p>
+            <textarea placeholder="답변을 작성하세요... (⌘+J: 자주쓰는 답변)"></textarea>
+            <div class="ra"><button class="btn">초안</button><button class="btn btn-p">답변 등록</button></div>
+          </div>
+          <div class="qn">
+            <div class="h"><span class="tag warn">대기 7일</span><span class="tag">해외</span><span class="tag bad">🔒</span><h4>콜라보 문의는 어디로 드리면 되나요?</h4><span class="m">agency* · 2026-05-14</span></div>
+            <p>안녕하세요. 캐릭터 콜라보 관련 미팅 요청드리고 싶은데, 담당자 메일을 알려주실 수 있을까요?</p>
+            <textarea placeholder="답변을 작성하세요..."></textarea>
+            <div class="ra"><button class="btn">초안</button><button class="btn btn-p">답변 등록</button></div>
+          </div>
+          <div class="qn">
+            <div class="h"><span class="tag warn">대기 2일</span><span class="tag">배송</span><h4>주문한 게 아직 도착을 안했어요</h4><span class="m">유빈* · 2026-05-19</span></div>
+            <p>#2026-0518-014 주문건인데 운송장 조회가 안돼요...</p>
+            <textarea placeholder="답변을 작성하세요..."></textarea>
+            <div class="ra"><button class="btn">초안</button><button class="btn btn-p">답변 등록</button></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 판매 실적 -->
+      <section class="sect" data-s="analytics">
+        <div class="ph">
+          <span class="ico">📈</span>
+          <h1>판매 실적 <small>이번 달 — May 2026</small></h1>
+          <p class="desc">매출은 전월 대비 18.4% 증가. 신상 5종이 메인 견인. 자세한 항목은 표를 클릭해 드릴다운하세요.</p>
+        </div>
+        <div class="blk">
+          <h2>요약</h2>
+          <div class="kpi-list">
+            <div class="ki"><div class="k">총 매출</div><div class="v mono">₩7,234,500</div><div class="d">▲ 18.4%</div></div>
+            <div class="ki"><div class="k">주문 건수</div><div class="v mono">587</div><div class="d">▲ 22.1%</div></div>
+            <div class="ki"><div class="k">평균 객단가</div><div class="v mono">₩12,260</div><div class="d">▲ ₩340</div></div>
+            <div class="ki"><div class="k">재방문율</div><div class="v mono">42%</div><div class="d">▲ 3.1%p</div></div>
+          </div>
+        </div>
+        <div class="blk">
+          <h2>카테고리별 매출 비중</h2>
+          <div style="font-size:13px">
+            <div class="pgs" style="padding:7px 0"><span style="width:96px;color:var(--sub)">메모 스티커</span><div class="pbar"><div style="width:52%"></div></div><b class="mono">52%</b><span style="color:var(--sub)" class="mono">₩3.7M</span></div>
+            <div class="pgs" style="padding:7px 0"><span style="width:96px;color:var(--sub)">마스킹테이프</span><div class="pbar"><div style="width:24%"></div></div><b class="mono">24%</b><span style="color:var(--sub)" class="mono">₩1.7M</span></div>
+            <div class="pgs" style="padding:7px 0"><span style="width:96px;color:var(--sub)">조각 스티커</span><div class="pbar"><div style="width:14%"></div></div><b class="mono">14%</b><span style="color:var(--sub)" class="mono">₩1.0M</span></div>
+            <div class="pgs" style="padding:7px 0"><span style="width:96px;color:var(--sub)">투명스티커</span><div class="pbar"><div style="width:6%"></div></div><b class="mono">6%</b><span style="color:var(--sub)" class="mono">₩432k</span></div>
+            <div class="pgs" style="padding:7px 0"><span style="width:96px;color:var(--sub)">키링·굿즈</span><div class="pbar"><div style="width:4%"></div></div><b class="mono">4%</b><span style="color:var(--sub)" class="mono">₩293k</span></div>
+          </div>
+        </div>
+        <div class="blk">
+          <h2>국가별 분포</h2>
+          <table class="t">
+            <thead><tr><th>국가</th><th>주문</th><th>매출</th><th>비중</th><th>전월 대비</th></tr></thead>
+            <tbody>
+              <tr><td>🇰🇷 한국</td><td class="mono">432</td><td class="mono">₩5,309,800</td><td class="mono">74%</td><td><span class="tag ok">▲ 14%</span></td></tr>
+              <tr><td>🇯🇵 일본</td><td class="mono">71</td><td class="mono">₩864,400</td><td class="mono">12%</td><td><span class="tag ok">▲ 31%</span></td></tr>
+              <tr><td>🇺🇸 미국</td><td class="mono">44</td><td class="mono">₩648,200</td><td class="mono">9%</td><td><span class="tag ok">▲ 8%</span></td></tr>
+              <tr><td>🇪🇺 유럽</td><td class="mono">22</td><td class="mono">₩324,100</td><td class="mono">4%</td><td><span class="tag ok">▲ 5%</span></td></tr>
+              <tr><td>기타</td><td class="mono">18</td><td class="mono">₩88,000</td><td class="mono">1%</td><td><span>—</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<script>
+const products=[
+ {n:"롱 메모 스티커팩",c:"메모 스티커",p:3500,s:42,safe:10,img:"202602/bc4816b7234830cacfd8e73dbc81ebcb"},
+ {n:"스위티 메모 스티커팩",c:"메모 스티커",p:3500,s:18,safe:10,img:"202602/3d92c3f2ae8a816bb0aaf8374372b46a"},
+ {n:"설탕 눈마을 스티커",c:"메모 스티커",p:3500,s:6,safe:10,img:"202602/a157d261092510f1542550274972a939"},
+ {n:"학교괴담 스티커",c:"메모 스티커",p:3500,s:31,safe:10,img:"202602/8844055f11daba2bd37b69a6150cdac6"},
+ {n:"메모빈티지 스티커팩",c:"메모 스티커",p:2500,s:24,safe:10,img:"202602/3dba9ab4bcc29cf34566d08a48284e13"},
+ {n:"초록책장 스티커",c:"조각 스티커",p:3500,s:3,safe:10,img:"202512/6df4ff16a044b3cd8dde5d8b78447e35"},
+ {n:"다이어리 스티코",c:"메모 스티커",p:3500,s:55,safe:10,img:"202512/cb676b86854d5dc018ea0576b99c897a"},
+ {n:"선샤인데이 스티커",c:"메모 스티커",p:3500,s:9,safe:10,img:"202508/d9342a7de8b65e19f073f6f99139560d"},
+ {n:"키스컷 마테 2",c:"마스킹테이프",p:6500,s:27,safe:10,img:"202508/13260f931f04e15ddc8bb56a20dc0e90"},
+ {n:"마스킹테이프 4type",c:"마스킹테이프",p:4500,s:36,safe:10,img:"202508/383bee900dbacb6369f996fc668c0f42"},
+ {n:"냠냠만두 투명 스티커",c:"투명스티커",p:3000,s:14,safe:10,img:"202410/e80feba7a57b4fcf1a3364e5cfbb40d6"},
+ {n:"크레페 말랑 키링",c:"키링·굿즈",p:2500,s:0,safe:5,img:"202503/58dafda9eee23c1a553c073971af033c"},
+];
+function statTag(s,safe){
+  if(s===0)return `<span class="tag bad">품절</span>`;
+  if(s<=5)return `<span class="tag warn">⚠ 임박</span>`;
+  if(s<=safe)return `<span class="tag warn">부족</span>`;
+  return `<span class="tag ok">판매중</span>`;
+}
+const trows=h=>`<thead>${h}</thead>`;
+document.getElementById('prodT').innerHTML=`
+ <thead><tr><th></th><th>상품명</th><th>카테고리</th><th>가격</th><th>재고</th><th>판매</th><th>액션</th></tr></thead>
+ <tbody>${products.map(p=>`<tr>
+   <td style="width:32px"><span class="thumb"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/${p.img}.png"></span></td>
+   <td><span class="nm">서티 ${p.n}</span></td>
+   <td>${p.c}</td>
+   <td class="mono">₩${p.p.toLocaleString()}</td>
+   <td class="mono">${p.s}</td>
+   <td>${statTag(p.s,p.safe)}</td>
+   <td><span style="color:var(--sub);font-size:11px">편집 · 복제 · 숨김</span></td>
+ </tr>`).join('')}</tbody>`;
+document.getElementById('stockT').innerHTML=`
+ <thead><tr><th></th><th>상품명</th><th>현재고 / 안전</th><th>게이지</th><th>상태</th><th>최근 변동</th><th></th></tr></thead>
+ <tbody>${products.map(p=>{
+   const pct=Math.min(100,p.s/p.safe*50);
+   const cls=p.s===0?'out':p.s<=p.safe?'low':'';
+   return `<tr>
+   <td style="width:32px"><span class="thumb"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/${p.img}.png"></span></td>
+   <td><span class="nm">서티 ${p.n}</span></td>
+   <td class="mono"><b>${p.s}</b> <span style="color:var(--sub)">/ ${p.safe}</span></td>
+   <td><div class="pgs"><div class="pbar ${cls}" style="max-width:120px"><div style="width:${pct}%"></div></div></div></td>
+   <td>${statTag(p.s,p.safe)}</td>
+   <td><small class="mono" style="color:var(--sub)">${p.s===0?'-2 · 5/18':'-1 · 5/20'}</small></td>
+   <td><button class="btn">＋</button> <button class="btn">−</button></td>
+ </tr>`;}).join('')}</tbody>`;
+
+const labels={dash:"대시보드",products:"상품",stock:"재고 관리",add:"새 상품 등록",
+  bulk:"대량주문",qna:"Q&A",analytics:"판매 실적"};
+document.addEventListener('click',e=>{
+  const gh=e.target.closest('.gh');
+  if(gh){gh.parentElement.classList.toggle('open');return;}
+  const go=e.target.closest('[data-go]');if(!go)return;
+  const k=go.dataset.go;
+  document.querySelectorAll('.sect').forEach(s=>s.classList.toggle('on',s.dataset.s===k));
+  document.querySelectorAll('.item').forEach(a=>a.classList.toggle('on',a.dataset.go===k));
+  document.getElementById('crumbNow').textContent=labels[k]||"";
+  document.querySelector('.content').scrollTop=0;
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>서티 SEOTI · 장바구니·결제 변형 B — 단일 페이지</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css">
+<style>
+:root{--bg:#fafaf7;--paper:#fff;--ink:#161412;--sub:#8c8781;--faint:#bdb8b1;--line:#e7e4df;--accent:#e8503a;--ok:#3aa872}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Pretendard Variable',Pretendard,sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.55}
+img{display:block;max-width:100%}a{color:inherit;text-decoration:none}button,input,select,textarea{font-family:inherit}
+.wrap{max-width:1240px;margin:0 auto;padding:0 30px}
+.en{font-size:.7em;opacity:.45;margin-left:5px;font-weight:500;letter-spacing:.02em;text-transform:none;font-style:normal}
+
+nav{background:#fff;border-bottom:1px solid var(--line);height:60px;display:flex;align-items:center}
+.nav-in{display:flex;align-items:center;gap:30px;width:100%}
+.logo{font-size:20px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
+.nav-r{margin-left:auto;font-size:13px;color:var(--sub);font-weight:600}.nav-r a{margin-left:18px}
+
+.ph{padding:32px 0 24px;border-bottom:1px solid var(--line);background:#fff}
+.ph h1{font-size:30px;font-weight:800;letter-spacing:-.02em}
+.ph p{color:var(--sub);font-size:14px;margin-top:5px}
+
+main{padding:30px 0 90px}
+.grid{display:grid;grid-template-columns:1fr 380px;gap:30px;align-items:flex-start}
+
+/* sticky summary right */
+.summary{background:#fff;border:1px solid var(--line);position:sticky;top:20px;overflow:hidden}
+.summary h3{padding:18px 22px;border-bottom:1px solid var(--line);font-size:15px;font-weight:800;letter-spacing:-.01em;display:flex;justify-content:space-between;align-items:center}
+.summary h3 small{color:var(--sub);font-size:12px;font-weight:600}
+.summary .items{max-height:260px;overflow-y:auto;padding:8px 0}
+.summary .it{display:flex;gap:12px;padding:10px 22px;align-items:center;font-size:13px}
+.summary .it .tn{width:42px;height:42px;background:var(--bg);overflow:hidden;flex:none}
+.summary .it img{width:100%;height:100%;object-fit:cover}
+.summary .it .m{flex:1;min-width:0}
+.summary .it b{font-size:13px;font-weight:700;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.summary .it small{font-size:11.5px;color:var(--sub)}
+.summary .it .pr{font-weight:800;font-size:13px}
+.summary .calc{padding:16px 22px;border-top:1px solid var(--line);font-size:13.5px}
+.summary .calc .row{display:flex;justify-content:space-between;padding:5px 0}
+.summary .calc .row.sub{color:var(--sub)}
+.summary .calc .row.dis{color:var(--accent)}
+.summary .tot{padding:16px 22px;border-top:2px solid var(--ink);display:flex;justify-content:space-between;align-items:flex-end}
+.summary .tot .k{font-size:13px;color:var(--sub)}
+.summary .tot .v{font-size:22px;font-weight:800}
+.summary .pay{display:block;width:100%;background:var(--ink);color:#fff;border:none;padding:18px;
+  font-family:inherit;font-size:14px;font-weight:800;letter-spacing:.04em;cursor:pointer;text-transform:uppercase}
+.summary .pay:hover{background:var(--accent)}
+.summary .pay-info{font-size:11px;color:var(--sub);text-align:center;padding:10px 22px;background:var(--bg);line-height:1.6}
+
+/* sections / panels */
+.panel{background:#fff;border:1px solid var(--line);margin-bottom:14px;padding:24px 28px}
+.panel h2{font-size:15px;font-weight:800;letter-spacing:-.01em;margin-bottom:18px;
+  display:flex;align-items:center;gap:8px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.panel h2 .n{background:var(--ink);color:#fff;width:24px;height:24px;display:grid;place-items:center;font-size:12px;font-weight:800;border-radius:50%}
+.panel h2 small{margin-left:auto;font-size:12px;color:var(--sub);font-weight:600}
+
+/* cart items */
+.cart-it{display:grid;grid-template-columns:24px 70px 1fr auto auto auto;gap:14px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.cart-it:last-child{border-bottom:none}
+.cart-it input[type=checkbox]{width:16px;height:16px;accent-color:var(--ink)}
+.cart-it .tn{width:70px;height:70px;background:var(--bg);overflow:hidden}
+.cart-it .tn img{width:100%;height:100%;object-fit:cover}
+.cart-it .m b{font-size:13.5px;font-weight:700;line-height:1.4}
+.cart-it .m small{font-size:11px;color:var(--sub);display:block;margin-top:3px}
+.cart-it .qty{display:flex;align-items:center;border:1px solid var(--line);height:30px}
+.cart-it .qty button{width:26px;height:100%;border:none;background:none;font-size:13px;cursor:pointer}
+.cart-it .qty input{width:32px;text-align:center;border:none;font-weight:700;font-size:12.5px;outline:none}
+.cart-it .pr{font-weight:800;text-align:right;font-size:13.5px;min-width:70px}
+.cart-it .rm{background:none;border:none;color:var(--faint);font-size:14px;cursor:pointer}
+
+/* member/guest toggle */
+.who{display:flex;gap:8px;margin-bottom:14px}
+.who label{flex:1;padding:14px 16px;border:1.5px solid var(--line);cursor:pointer}
+.who label input{display:none}
+.who label b{font-size:13.5px;font-weight:800;display:block}
+.who label small{font-size:11.5px;color:var(--sub);margin-top:2px;display:block}
+.who label:has(input:checked){border-color:var(--ink);background:var(--bg)}
+.who label:has(input:checked) b::before{content:"✓ ";color:var(--accent)}
+.login-tip{background:var(--bg);padding:11px 16px;font-size:12.5px;color:var(--sub);display:flex;justify-content:space-between;align-items:center}
+.login-tip a{color:var(--ink);font-weight:800;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+
+.fld{margin-bottom:14px}
+.fld label{display:block;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--sub);margin-bottom:6px}
+.fld label .req{color:var(--accent)}
+.fld input,.fld textarea,.fld select{width:100%;padding:11px 13px;border:1px solid var(--line);background:#fff;outline:none;font-size:13.5px}
+.fld input:focus,.fld textarea:focus,.fld select:focus{border-color:var(--ink)}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.f-addr{display:grid;grid-template-columns:120px 1fr auto;gap:8px}
+.f-addr button{padding:11px 14px;border:1px solid var(--ink);background:#fff;font-weight:800;font-size:12.5px;cursor:pointer}
+
+/* pay methods inline */
+.pm{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:18px}
+.pm label{padding:16px 14px;border:1.5px solid var(--line);text-align:center;font-size:13px;font-weight:700;cursor:pointer}
+.pm label input{display:none}
+.pm label:has(input:checked){border-color:var(--ink);background:var(--bg)}
+.pm label:has(input:checked) b::before{content:"✓ ";color:var(--accent)}
+.pm label b{display:block;font-weight:800;font-size:13.5px}
+.pm label small{display:block;color:var(--sub);font-size:11px;margin-top:3px}
+
+.terms{font-size:12px;background:var(--bg);padding:14px 16px}
+.terms .all{display:flex;align-items:center;gap:8px;padding-bottom:8px;margin-bottom:8px;border-bottom:1px solid var(--line);font-weight:800;font-size:12.5px}
+.terms .all input{width:14px;height:14px;accent-color:var(--accent)}
+.terms div.t{padding:4px 0;display:flex;justify-content:space-between;align-items:center}
+.terms div.t label{display:flex;align-items:center;gap:7px}
+.terms div.t input{width:13px;height:13px;accent-color:var(--accent)}
+.terms .v{font-size:11px;color:var(--sub);cursor:pointer}
+
+footer{padding:30px 0;font-size:12.5px;color:var(--sub);text-align:center;border-top:1px solid var(--line)}
+
+@media(max-width:920px){.grid{grid-template-columns:1fr}.summary{position:static}.pm,.frow,.who{grid-template-columns:1fr 1fr}.cart-it{grid-template-columns:50px 1fr;gap:10px}.cart-it input[type=checkbox],.cart-it .qty,.cart-it .pr,.cart-it .rm{grid-column:2}}
+</style>
+</head>
+<body>
+
+<nav class="wrap"><div class="nav-in">
+  <a class="logo" href="mockup-b-minimal.html">Seoti</a>
+  <div class="nav-r"><a href="mockup-b-minimal.html">스토어</a><a href="auth-a.html">로그인</a><a href="mypage-a.html">마이페이지</a></div>
+</div></nav>
+
+<div class="ph"><div class="wrap"><h1>주문하기<i class="en">Checkout</i></h1><p>장바구니 / 주문자정보 / 배송 / 결제까지 한 페이지에서</p></div></div>
+
+<main class="wrap">
+  <div class="grid">
+    <div>
+      <!-- 1. 장바구니 -->
+      <div class="panel">
+        <h2><span class="n">1</span>장바구니<i class="en">Cart</i><small>4개 상품</small></h2>
+        <div class="cart-it">
+          <input type="checkbox" checked>
+          <div class="tn"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/a157d261092510f1542550274972a939.png"></div>
+          <div class="m"><b>서티 설탕 눈마을 스티커</b><small>단품 · 메모 스티커</small></div>
+          <div class="qty"><button>−</button><input value="2"><button>＋</button></div>
+          <div class="pr">7,000원</div>
+          <button class="rm">✕</button>
+        </div>
+        <div class="cart-it">
+          <input type="checkbox" checked>
+          <div class="tn"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/3d92c3f2ae8a816bb0aaf8374372b46a.png"></div>
+          <div class="m"><b>서티 스위티 메모 스티커팩</b><small>단품 · 메모 스티커</small></div>
+          <div class="qty"><button>−</button><input value="1"><button>＋</button></div>
+          <div class="pr">3,500원</div>
+          <button class="rm">✕</button>
+        </div>
+        <div class="cart-it">
+          <input type="checkbox" checked>
+          <div class="tn"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202508/13260f931f04e15ddc8bb56a20dc0e90.png"></div>
+          <div class="m"><b>서티 키스컷 마스킹테이프 2</b><small>단품 · 마스킹테이프</small></div>
+          <div class="qty"><button>−</button><input value="1"><button>＋</button></div>
+          <div class="pr">6,500원</div>
+          <button class="rm">✕</button>
+        </div>
+        <div class="cart-it">
+          <input type="checkbox" checked>
+          <div class="tn"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202410/e80feba7a57b4fcf1a3364e5cfbb40d6.png"></div>
+          <div class="m"><b>서티 냠냠만두 투명 스티커</b><small>단품 · 투명스티커</small></div>
+          <div class="qty"><button>−</button><input value="1"><button>＋</button></div>
+          <div class="pr">3,000원</div>
+          <button class="rm">✕</button>
+        </div>
+      </div>
+
+      <!-- 2. 주문 방식 -->
+      <div class="panel">
+        <h2><span class="n">2</span>주문 방식<i class="en">Order As</i></h2>
+        <div class="who">
+          <label><input type="radio" name="who"><b>회원으로 주문</b><small>적립금·쿠폰 적용 / 주문조회 자동</small></label>
+          <label><input type="radio" name="who" checked><b>비회원으로 주문</b><small>가입 없이 빠르게. 주문번호로 조회</small></label>
+        </div>
+        <div class="login-tip">이미 회원이신가요? <a href="auth-a.html">로그인하기 →</a></div>
+      </div>
+
+      <!-- 3. 주문자 정보 -->
+      <div class="panel">
+        <h2><span class="n">3</span>주문자 정보<i class="en">Buyer Info</i></h2>
+        <div class="frow">
+          <div class="fld"><label>이름 <span class="req">*</span></label><input placeholder="홍길동"></div>
+          <div class="fld"><label>휴대폰 <span class="req">*</span></label><input placeholder="010-0000-0000"></div>
+        </div>
+        <div class="frow">
+          <div class="fld"><label>이메일 <span class="req">*</span></label><input type="email" placeholder="주문 확인 메일"></div>
+          <div class="fld"><label>비회원 주문조회 비밀번호 <span class="req">*</span></label><input type="password" placeholder="4자리 이상"></div>
+        </div>
+        <p style="font-size:11.5px;color:var(--sub);margin-top:-6px">※ 비회원도 이 비밀번호로 주문조회/배송조회를 할 수 있어요.</p>
+      </div>
+
+      <!-- 4. 배송 -->
+      <div class="panel">
+        <h2><span class="n">4</span>배송 정보<i class="en">Shipping</i></h2>
+        <div class="frow">
+          <div class="fld"><label>받는 분</label><input placeholder="홍길동"></div>
+          <div class="fld"><label>연락처</label><input placeholder="010-0000-0000"></div>
+        </div>
+        <div class="fld"><label>주소 <span class="req">*</span></label>
+          <div class="f-addr"><input placeholder="우편번호" readonly><input placeholder="도로명 주소"><button>주소 검색</button></div>
+          <input style="margin-top:8px" placeholder="상세 주소">
+        </div>
+        <div class="frow">
+          <div class="fld"><label>배송 메모</label>
+            <select><option>선택 안함</option><option>문 앞에 놓아주세요</option><option>경비실에 맡겨주세요</option><option>택배함에 넣어주세요</option></select>
+          </div>
+          <div class="fld"><label>요청사항</label><input placeholder="포장·동봉 메시지 등 (선택)"></div>
+        </div>
+      </div>
+
+      <!-- 5. 결제 수단 -->
+      <div class="panel">
+        <h2><span class="n">5</span>결제 수단<i class="en">Payment</i></h2>
+        <div class="pm">
+          <label><input type="radio" name="pay" checked><b>💳 카드</b><small>국내·해외</small></label>
+          <label><input type="radio" name="pay"><b>💰 무통장</b><small>국민은행 KB</small></label>
+          <label><input type="radio" name="pay"><b>📱 카카오페이</b><small>간편결제</small></label>
+          <label><input type="radio" name="pay"><b>🌐 PayPal</b><small>해외 결제</small></label>
+        </div>
+        <div class="fld"><label>쿠폰</label><select><option>적용 가능한 쿠폰이 없습니다 (비회원)</option></select></div>
+        <div class="fld" style="margin-bottom:0"><label>적립금 (회원 전용)</label>
+          <input placeholder="비회원 주문은 적립금 사용 불가" disabled style="background:var(--bg);color:var(--sub)"></div>
+      </div>
+
+      <!-- 6. 약관 -->
+      <div class="panel">
+        <h2><span class="n">6</span>약관 동의<i class="en">Terms</i></h2>
+        <div class="terms">
+          <div class="all"><input type="checkbox" id="all2"><label for="all2">전체 동의</label></div>
+          <div class="t"><label><input type="checkbox" checked>[필수] 구매조건 확인 · 결제 진행 동의</label><a class="v">보기</a></div>
+          <div class="t"><label><input type="checkbox" checked>[필수] 개인정보 수집·이용 동의</label><a class="v">보기</a></div>
+          <div class="t"><label><input type="checkbox" checked>[필수] 개인정보 제3자 제공 (배송업체)</label><a class="v">보기</a></div>
+          <div class="t"><label><input type="checkbox">[선택] 마케팅 정보 수신</label><a class="v">보기</a></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- summary sticky -->
+    <aside class="summary">
+      <h3>주문 요약<small>4개 상품</small></h3>
+      <div class="items">
+        <div class="it"><div class="tn"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/a157d261092510f1542550274972a939.png"></div><div class="m"><b>설탕 눈마을 스티커 ×2</b><small>단품</small></div><span class="pr">7,000</span></div>
+        <div class="it"><div class="tn"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/3d92c3f2ae8a816bb0aaf8374372b46a.png"></div><div class="m"><b>스위티 메모팩 ×1</b><small>단품</small></div><span class="pr">3,500</span></div>
+        <div class="it"><div class="tn"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202508/13260f931f04e15ddc8bb56a20dc0e90.png"></div><div class="m"><b>키스컷 마테 2 ×1</b><small>단품</small></div><span class="pr">6,500</span></div>
+        <div class="it"><div class="tn"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202410/e80feba7a57b4fcf1a3364e5cfbb40d6.png"></div><div class="m"><b>냠냠만두 ×1</b><small>단품</small></div><span class="pr">3,000</span></div>
+      </div>
+      <div class="calc">
+        <div class="row"><span>상품금액</span><span>20,000원</span></div>
+        <div class="row dis"><span>할인 (재구매 5%)</span><span>− 1,000원</span></div>
+        <div class="row sub"><span>배송비</span><span>2,900원</span></div>
+        <div class="row sub" style="font-size:11.5px;color:var(--accent);font-weight:700">+ 8,100원 더 담으면 무료배송</div>
+      </div>
+      <div class="tot"><div><div class="k">결제 금액</div><div style="font-size:11px;color:var(--sub)">VAT 포함</div></div><div class="v">21,900원</div></div>
+      <button class="pay">💳 21,900원 결제하기</button>
+      <div class="pay-info">결제 시 위 약관에 동의한 것으로 간주됩니다 ·<br>비회원 주문조회는 주문번호+비밀번호로 가능</div>
+    </aside>
+  </div>
+</main>
+
+<footer>© 2026 SEOTI — 디자인 시안용 목업 · 장바구니/결제 변형 B</footer>
+
+</body>
+</html>

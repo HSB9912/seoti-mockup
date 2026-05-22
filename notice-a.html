@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>서티 SEOTI · 공지사항·이벤트 변형 A — 리스트형</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css">
+<style>
+:root{--bg:#fff;--ink:#161412;--sub:#8c8781;--faint:#bdb8b1;--line:#e7e4df;--paper:#f6f3ee;--accent:#e8503a;--ok:#3aa872}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Pretendard Variable',Pretendard,sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.55}
+img{display:block;max-width:100%}a{color:inherit;text-decoration:none}
+.wrap{max-width:1080px;margin:0 auto;padding:0 32px}
+.en{font-size:.7em;opacity:.45;margin-left:5px;font-weight:500;letter-spacing:.02em;text-transform:none;font-style:normal}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--sub)}
+
+nav{border-bottom:1px solid var(--line);background:#fff;height:62px;display:flex;align-items:center}
+.nav-in{display:flex;align-items:center;gap:30px;width:100%}
+.logo{font-size:20px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
+.nav-m{display:flex;gap:24px;font-size:13.5px;font-weight:600;color:var(--sub)}
+.nav-m a.on{color:var(--ink)}
+.nav-r{margin-left:auto;font-size:13px;color:var(--sub);font-weight:600}.nav-r a{margin-left:18px}
+
+.ph{padding:50px 0 30px;border-bottom:1px solid var(--line)}
+.ph h1{font-size:46px;font-weight:800;letter-spacing:-.025em}
+.ph h1 em{font-style:normal;color:var(--accent)}
+.ph p{color:var(--sub);font-size:14.5px;margin-top:8px}
+
+/* featured banner */
+.featured{margin:40px 0;background:var(--ink);color:#fff;display:grid;grid-template-columns:1.2fr 1fr;overflow:hidden}
+.featured .text{padding:50px 50px}
+.featured .text .ty{display:inline-block;background:var(--accent);color:#fff;font-size:11px;font-weight:800;letter-spacing:.12em;padding:5px 12px;text-transform:uppercase}
+.featured .text h2{font-size:34px;font-weight:800;letter-spacing:-.025em;margin:16px 0 12px;line-height:1.15}
+.featured .text p{font-size:14px;color:rgba(255,255,255,.7);max-width:380px;line-height:1.8}
+.featured .text .date{font-size:12px;color:rgba(255,255,255,.5);font-weight:700;letter-spacing:.06em;margin-top:18px;text-transform:uppercase}
+.featured .text .cta{display:inline-block;margin-top:24px;background:#fff;color:var(--ink);padding:14px 24px;font-size:13.5px;font-weight:800;letter-spacing:.04em;cursor:pointer}
+.featured .text .cta:hover{background:var(--accent);color:#fff}
+.featured .img{background:var(--paper)}
+.featured .img img{width:100%;height:100%;object-fit:cover}
+
+/* filter */
+.filter{display:flex;gap:24px;padding:24px 0;border-bottom:1px solid var(--ink);margin-bottom:6px;font-size:14px;font-weight:600}
+.filter a{color:var(--sub);cursor:pointer;display:flex;gap:5px;align-items:baseline}
+.filter a.on{color:var(--ink)}
+.filter a.on::before{content:"";width:6px;height:6px;background:var(--accent);border-radius:50%;display:inline-block;margin-right:7px;vertical-align:middle}
+.filter a sup{font-size:10px;color:var(--faint)}
+.filter .search{margin-left:auto;background:var(--paper);border:none;padding:9px 14px;font-family:inherit;font-size:13.5px;outline:none;width:220px}
+
+/* list */
+.notice-item{display:grid;grid-template-columns:80px 80px 1fr 100px;gap:18px;align-items:center;padding:20px 0;border-bottom:1px solid var(--line);cursor:pointer;transition:.12s}
+.notice-item:hover{background:var(--paper);padding-left:14px;padding-right:14px;margin:0 -14px}
+.notice-item .ty{font-size:11px;font-weight:800;letter-spacing:.06em;padding:5px 0;text-align:center;text-transform:uppercase}
+.notice-item .ty.notice{background:var(--ink);color:#fff}
+.notice-item .ty.event{background:var(--accent);color:#fff}
+.notice-item .ty.restock{background:var(--ok);color:#fff}
+.notice-item .ty.update{background:var(--paper);color:var(--sub);border:1px solid var(--line)}
+.notice-item .tn{width:80px;height:80px;background:var(--paper);overflow:hidden}
+.notice-item .tn img{width:100%;height:100%;object-fit:cover}
+.notice-item .m h3{font-size:16px;font-weight:700;letter-spacing:-.01em;line-height:1.4}
+.notice-item .m .pin{display:inline-block;background:var(--accent);color:#fff;font-size:10px;font-weight:800;padding:2px 7px;margin-right:6px;letter-spacing:.05em;vertical-align:middle}
+.notice-item .m small{display:block;font-size:12.5px;color:var(--sub);margin-top:6px;line-height:1.6}
+.notice-item .meta{text-align:right;font-size:12.5px;color:var(--sub)}
+.notice-item .meta b{display:block;color:var(--ink);font-weight:800;font-size:14px}
+.notice-item .meta .views{margin-top:4px}
+
+/* pinned/no-thumb */
+.notice-item.pinned{background:#fffdf8;border-left:3px solid var(--accent);padding-left:14px}
+
+/* pagination */
+.page{display:flex;justify-content:center;align-items:center;gap:4px;padding:40px 0 60px}
+.page a{padding:10px 14px;font-size:13.5px;font-weight:700;color:var(--sub);cursor:pointer}
+.page a.on{background:var(--ink);color:#fff}
+.page a:hover:not(.on){background:var(--paper)}
+
+footer{padding:30px 0;font-size:12.5px;color:var(--sub);text-align:center;border-top:1px solid var(--ink)}
+
+@media(max-width:760px){.ph h1{font-size:32px}.featured{grid-template-columns:1fr}.featured .text{padding:30px}.featured .img{aspect-ratio:1.4/1}
+  .notice-item{grid-template-columns:60px 1fr 70px;gap:12px}.notice-item .tn{display:none}.notice-item .meta{font-size:11px}.notice-item .meta b{font-size:12px}.filter{flex-wrap:wrap}.filter .search{width:100%;margin-left:0}}
+</style>
+</head>
+<body>
+
+<nav class="wrap"><div class="nav-in">
+  <a class="logo" href="mockup-b-minimal.html">Seoti</a>
+  <div class="nav-m"><a href="mockup-b-minimal.html">All</a><a>메모 스티커</a><a>마스킹테이프</a><a href="about-a.html">About</a><a class="on">소식</a></div>
+  <div class="nav-r"><a href="customer-bulk-order.html">대량주문</a><a href="customer-qna-a.html">Q&A</a><a href="auth-a.html">로그인</a></div>
+</div></nav>
+
+<header class="ph wrap">
+  <span class="eyebrow">News &amp; Events<i class="en">서티 소식</i></span>
+  <h1 style="margin-top:14px"><em>스튜디오</em> 소식</h1>
+  <p>신상품 발매·세일·재입고·작가 인터뷰까지, 서티의 모든 소식</p>
+</header>
+
+<!-- featured banner -->
+<section class="wrap">
+  <div class="featured">
+    <div class="text">
+      <span class="ty">🎉 진행중 이벤트</span>
+      <h2>봄맞이 메모 스티커<br>2개 사면 1개 무료!</h2>
+      <p>설탕 눈마을·스위티·선샤인데이 등 메모 스티커 시리즈 한정 — 가장 따뜻한 종이로 봄을 채워보세요.</p>
+      <div class="date">2026.05.15 ~ 2026.05.31</div>
+      <a class="cta">이벤트 페이지로 →</a>
+    </div>
+    <div class="img"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/a157d261092510f1542550274972a939.png"></div>
+  </div>
+</section>
+
+<!-- filter -->
+<main class="wrap">
+  <div class="filter">
+    <a class="on">전체 <sup>32</sup></a>
+    <a>공지 <sup>12</sup></a>
+    <a>이벤트 <sup>9</sup></a>
+    <a>신상 입고 <sup>8</sup></a>
+    <a>업데이트 <sup>3</sup></a>
+    <input class="search" placeholder="🔍 제목·내용 검색">
+  </div>
+
+  <!-- list -->
+  <article class="notice-item pinned">
+    <span class="ty event">EVENT</span>
+    <div class="tn"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/a157d261092510f1542550274972a939.png"></div>
+    <div class="m">
+      <h3><span class="pin">📌 고정</span>봄맞이 메모 스티커 2+1 이벤트 시작!</h3>
+      <small>설탕 눈마을, 스위티, 선샤인데이 등 메모 스티커 시리즈에서 자유롭게 2개 선택 시 1개 무료 증정. 5월 31일까지...</small>
+    </div>
+    <div class="meta"><b>05.15</b><div class="views">조회 2,481</div></div>
+  </article>
+
+  <article class="notice-item">
+    <span class="ty restock">RESTOCK</span>
+    <div class="tn"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/a157d261092510f1542550274972a939.png"></div>
+    <div class="m">
+      <h3>[재입고] 설탕 눈마을 스티커 5월 30일 재입고 안내</h3>
+      <small>품절되었던 설탕 눈마을 스티커가 5월 30일 오후 2시에 재입고 됩니다. 알림 신청해주신 분들께는...</small>
+    </div>
+    <div class="meta"><b>05.20</b><div class="views">조회 1,124</div></div>
+  </article>
+
+  <article class="notice-item">
+    <span class="ty notice">NOTICE</span>
+    <div class="tn"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202508/13260f931f04e15ddc8bb56a20dc0e90.png"></div>
+    <div class="m">
+      <h3>5월 27일(월) 휴무 안내</h3>
+      <small>스튜디오 일정으로 5월 27일은 발송이 진행되지 않습니다. 26일 오후 2시 이전 주문건까지 발송...</small>
+    </div>
+    <div class="meta"><b>05.18</b><div class="views">조회 712</div></div>
+  </article>
+
+  <article class="notice-item">
+    <span class="ty event">EVENT</span>
+    <div class="tn"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/3d92c3f2ae8a816bb0aaf8374372b46a.png"></div>
+    <div class="m">
+      <h3>인스타 인증샷 이벤트 — 다꾸 후기 올리고 적립금 받자!</h3>
+      <small>서티 제품으로 다꾸한 사진을 인스타에 @seoti.studio 태그 후 올려주시면 500P를 적립...</small>
+    </div>
+    <div class="meta"><b>05.10</b><div class="views">조회 3,210</div></div>
+  </article>
+
+  <article class="notice-item">
+    <span class="ty update">UPDATE</span>
+    <div class="tn"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202512/cb676b86854d5dc018ea0576b99c897a.png"></div>
+    <div class="m">
+      <h3>스토어 페이지 리뉴얼 안내</h3>
+      <small>더 편리한 쇼핑을 위해 스토어 디자인을 새롭게 단장했어요. 대량주문·Q&A·마이페이지 기능이 추가...</small>
+    </div>
+    <div class="meta"><b>05.08</b><div class="views">조회 524</div></div>
+  </article>
+
+  <article class="notice-item">
+    <span class="ty restock">RESTOCK</span>
+    <div class="tn"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202512/6df4ff16a044b3cd8dde5d8b78447e35.png"></div>
+    <div class="m">
+      <h3>[재입고] 초록책장 스티커 소량 재입고</h3>
+      <small>초록책장 스티커가 100개 한정으로 재입고 되었습니다. 조기 품절 가능하니 서두르세요!</small>
+    </div>
+    <div class="meta"><b>05.05</b><div class="views">조회 982</div></div>
+  </article>
+
+  <article class="notice-item">
+    <span class="ty notice">NOTICE</span>
+    <div class="tn"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202508/d9342a7de8b65e19f073f6f99139560d.png"></div>
+    <div class="m">
+      <h3>해외배송 요금 안내 (2026년 봄 기준)</h3>
+      <small>일본·미국·유럽·동남아 등 국가별 배송 요금이 업데이트 되었습니다. 자세한 내용은 본문에서...</small>
+    </div>
+    <div class="meta"><b>05.01</b><div class="views">조회 1,387</div></div>
+  </article>
+
+  <article class="notice-item">
+    <span class="ty event">EVENT</span>
+    <div class="tn"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202410/e80feba7a57b4fcf1a3364e5cfbb40d6.png"></div>
+    <div class="m">
+      <h3>가정의 달 회원 특별 할인 (종료)</h3>
+      <small>5월 한 달 회원 전용 10% 할인 이벤트. 종료되었지만, 다음 이벤트를 기대해주세요!</small>
+    </div>
+    <div class="meta"><b>04.29</b><div class="views">조회 4,562</div></div>
+  </article>
+
+  <div class="page">
+    <a>← 이전</a><a class="on">1</a><a>2</a><a>3</a><a>4</a><a>다음 →</a>
+  </div>
+</main>
+
+<footer>© 2026 SEOTI — 디자인 시안용 목업 · 공지·이벤트 변형 A</footer>
+
+</body>
+</html>

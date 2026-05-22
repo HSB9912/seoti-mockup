@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>서티 SEOTI · 대량주문 변형 C — 사이드 드로어</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css" />
+<style>
+  :root{
+    --bg:#fffaf5; --paper:#ffffff; --ink:#3a332e; --sub:#9a8f86;
+    --line:#f0e6db; --peach:#ff9bb0; --peach-deep:#f06f8c;
+    --mint:#bfe3d2; --gold:#e8c267; --ok:#5bbf8f;
+    --radius:18px; --shadow:0 14px 34px -18px rgba(150,110,90,.45);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Pretendard Variable',Pretendard,sans-serif;background:var(--bg);
+    color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.55}
+  img{display:block;max-width:100%}a{color:inherit;text-decoration:none}
+  .wrap{max-width:1240px;margin:0 auto;padding:0 28px}
+  .en{font-size:.7em;opacity:.45;margin-left:6px;font-weight:500;letter-spacing:.02em;
+    text-transform:none;font-style:normal}
+
+  /* nav */
+  nav{background:var(--paper);border-bottom:1px solid var(--line)}
+  .nav-in{display:flex;align-items:center;height:68px;gap:22px}
+  .logo{font-weight:800;font-size:21px;letter-spacing:.04em;display:flex;align-items:center;gap:8px}
+  .logo .dot{width:28px;height:28px;border-radius:50%;background:var(--peach)}
+  .crumb{font-size:13px;color:var(--sub)}
+  .nav-r{margin-left:auto;display:flex;gap:12px;align-items:center}
+  .back{font-size:13px;color:var(--sub);font-weight:600}
+
+  /* hero */
+  .hero{padding:48px 0 24px;text-align:center}
+  .hero .kick{display:inline-block;background:var(--peach);color:#fff;
+    font-weight:700;font-size:12.5px;letter-spacing:.04em;padding:6px 14px;border-radius:999px}
+  .hero h1{font-size:42px;font-weight:800;letter-spacing:-.02em;margin:18px 0 12px;line-height:1.2}
+  .hero h1 b{color:var(--peach-deep)}
+  .hero p{color:var(--sub);max-width:520px;margin:0 auto;font-size:15px}
+
+  /* sticky filter */
+  .filter{position:sticky;top:0;background:rgba(255,250,245,.92);backdrop-filter:blur(10px);
+    z-index:30;padding:18px 0;border-bottom:1px solid var(--line);margin-top:30px}
+  .filter-in{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+  .chips{display:flex;gap:8px;flex-wrap:wrap}
+  .chips span{background:var(--paper);border:1px solid var(--line);padding:8px 15px;
+    border-radius:999px;font-size:13.5px;font-weight:700;color:var(--sub);cursor:pointer}
+  .chips span.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .search{margin-left:auto;background:var(--paper);border:1px solid var(--line);
+    padding:9px 16px;border-radius:999px;font-family:inherit;font-size:13.5px;
+    outline:none;width:200px}
+
+  /* product grid */
+  .grid-wrap{padding:36px 0 90px}
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
+    overflow:hidden;cursor:pointer;transition:.2s;position:relative}
+  .card:hover{transform:translateY(-5px);box-shadow:var(--shadow)}
+  .card.sel{border-color:var(--peach-deep);outline:2px solid var(--peach-deep);outline-offset:-3px}
+  .card.out{opacity:.45;pointer-events:none}
+  .thumb{position:relative;aspect-ratio:1;background:#faf3ec;overflow:hidden}
+  .thumb img{width:100%;height:100%;object-fit:cover}
+  .stk{position:absolute;top:10px;right:10px;background:rgba(58,51,46,.85);color:#fff;
+    font-size:10.5px;font-weight:800;letter-spacing:.04em;padding:4px 9px;border-radius:999px}
+  .stk.low{background:var(--peach-deep)}
+  .stk.out{background:var(--sub)}
+  .qty-bubble{position:absolute;top:10px;left:10px;background:var(--peach-deep);color:#fff;
+    font-weight:800;font-size:13px;padding:5px 13px;border-radius:999px;display:none;
+    box-shadow:0 4px 14px -2px rgba(240,111,140,.6)}
+  .card.sel .qty-bubble{display:block}
+  .card-body{padding:13px 14px 14px}
+  .card-cat{font-size:11px;font-weight:800;letter-spacing:.04em;color:var(--peach-deep);
+    text-transform:uppercase}
+  .card-name{font-size:14.5px;font-weight:700;margin:3px 0 8px;line-height:1.35}
+  .card-foot{display:flex;align-items:center;justify-content:space-between;gap:6px}
+  .card-price{font-size:15px;font-weight:800}
+  .card-add{background:var(--ink);color:#fff;border:none;font-family:inherit;
+    font-size:13px;font-weight:800;padding:8px 14px;border-radius:999px;cursor:pointer;transition:.15s}
+  .card-add:hover{background:var(--peach-deep)}
+  .card.sel .card-add{display:none}
+  .card-step{display:none;align-items:center;border:1.5px solid var(--ink);border-radius:999px;height:34px}
+  .card-step button{width:34px;height:100%;background:none;border:none;font-size:15px;cursor:pointer;color:var(--ink)}
+  .card-step button:disabled{color:var(--sub)}
+  .card-step span{font-size:14px;font-weight:800;padding:0 10px}
+  .card.sel .card-step{display:flex}
+
+  /* floating cart button */
+  .cart-fab{position:fixed;bottom:24px;right:24px;background:var(--ink);color:#fff;
+    border:none;font-family:inherit;border-radius:999px;padding:16px 24px;cursor:pointer;
+    font-weight:800;font-size:15px;display:flex;align-items:center;gap:12px;z-index:60;
+    box-shadow:0 18px 36px -10px rgba(58,51,46,.6);transition:.2s}
+  .cart-fab:hover{background:var(--peach-deep)}
+  .cart-fab .badge{background:var(--peach);color:#fff;font-size:12px;font-weight:800;
+    padding:3px 9px;border-radius:999px;min-width:26px;text-align:center}
+  .cart-fab.empty{background:var(--paper);color:var(--sub);border:1.5px dashed var(--line);
+    box-shadow:none}
+
+  /* drawer */
+  .scrim{position:fixed;inset:0;background:rgba(58,51,46,.4);opacity:0;pointer-events:none;
+    transition:.25s;z-index:70}
+  .scrim.on{opacity:1;pointer-events:all}
+  .drawer{position:fixed;top:0;right:0;bottom:0;width:460px;max-width:100vw;background:var(--bg);
+    transform:translateX(100%);transition:.3s cubic-bezier(.5,.1,.2,1);z-index:80;
+    box-shadow:-20px 0 60px -20px rgba(0,0,0,.4);display:flex;flex-direction:column}
+  .drawer.on{transform:translateX(0)}
+  .dh{padding:20px 24px;background:var(--paper);border-bottom:1px solid var(--line);
+    display:flex;align-items:center;justify-content:space-between}
+  .dh h3{font-size:18px;font-weight:800;letter-spacing:-.01em}
+  .dh .x{background:none;border:none;font-size:22px;cursor:pointer;color:var(--sub);
+    width:36px;height:36px;border-radius:50%;display:grid;place-items:center}
+  .dh .x:hover{background:var(--line)}
+  .db{flex:1;overflow-y:auto;padding:18px 24px}
+  .dstep{margin-bottom:30px}
+  .dstep h4{font-size:13px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--peach-deep);margin-bottom:14px;display:flex;align-items:center;gap:10px}
+  .dstep h4 i{background:var(--peach-deep);color:#fff;width:22px;height:22px;border-radius:50%;
+    display:grid;place-items:center;font-style:normal;font-size:11px}
+  .dempty{padding:30px 14px;text-align:center;color:var(--sub);font-size:13.5px;
+    border:1.5px dashed var(--line);border-radius:14px}
+  .di{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);align-items:center}
+  .di .tn{width:54px;height:54px;border-radius:10px;background:#faf3ec;overflow:hidden;flex:none}
+  .di .tn img{width:100%;height:100%;object-fit:cover}
+  .di .m{flex:1;min-width:0}
+  .di .m b{font-size:13.5px;font-weight:700;display:block;overflow:hidden;
+    text-overflow:ellipsis;white-space:nowrap}
+  .di .m small{font-size:11.5px;color:var(--sub)}
+  .di .q{display:flex;align-items:center;border:1px solid var(--line);border-radius:8px;height:30px}
+  .di .q button{width:26px;height:100%;background:none;border:none;font-size:14px;cursor:pointer}
+  .di .q span{padding:0 8px;font-weight:800;font-size:13px}
+
+  .fld{margin-bottom:14px}
+  .fld label{display:block;font-size:11px;font-weight:800;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--sub);margin-bottom:6px}
+  .fld input,.fld textarea,.fld select{width:100%;font-family:inherit;font-size:14px;
+    padding:11px 13px;border:1px solid var(--line);border-radius:10px;background:#fff;outline:none}
+  .fld textarea{min-height:70px;resize:vertical}
+  .fld input:focus,.fld textarea:focus,.fld select:focus{border-color:var(--peach-deep)}
+  .frow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+  .totals{background:var(--paper);border:1.5px dashed var(--peach);border-radius:14px;
+    padding:16px;margin-bottom:14px}
+  .totals .r{display:flex;justify-content:space-between;font-size:13px;padding:4px 0}
+  .totals .r.big{font-size:17px;font-weight:800;border-top:1px dashed var(--peach);
+    padding-top:10px;margin-top:6px}
+  .totals .note{font-size:11.5px;color:var(--sub);margin-top:8px;line-height:1.55}
+
+  .df{padding:18px 24px;background:var(--paper);border-top:1px solid var(--line)}
+  .df .submit{width:100%;background:var(--peach-deep);color:#fff;border:none;font-family:inherit;
+    font-size:15px;font-weight:800;padding:18px;border-radius:14px;cursor:pointer;transition:.15s}
+  .df .submit:hover{background:var(--ink)}
+  .df .submit:disabled{background:#e6dccf;color:var(--sub);cursor:not-allowed}
+
+  /* payment info card on main page */
+  .pay-info{margin:50px 0;background:var(--ink);color:#fff;border-radius:24px;padding:36px 38px;
+    display:grid;grid-template-columns:1fr 1fr;gap:30px}
+  .pay-info h3{font-size:22px;font-weight:800;margin-bottom:16px}
+  .pay-info h3 .en{color:rgba(255,255,255,.45)}
+  .pi-row{display:grid;grid-template-columns:120px 1fr;gap:14px;padding:11px 0;
+    border-bottom:1px solid rgba(255,255,255,.13);font-size:13.5px;align-items:center}
+  .pi-row .k{color:rgba(255,255,255,.5);font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+  .pi-row .v{font-weight:700}
+  .pi-row .v.big{font-size:17px}
+  .pi-row .v.gold{color:var(--gold)}
+  .pi-help{font-size:13px;color:rgba(255,255,255,.7);line-height:1.8}
+  .pi-help b{color:#fff;display:block;margin-bottom:6px;font-size:14px}
+
+  footer{border-top:1px solid var(--line);padding:30px 0;font-size:12.5px;color:var(--sub);
+    text-align:center}
+
+  @media(max-width:920px){
+    .grid{grid-template-columns:repeat(2,1fr)}
+    .hero h1{font-size:32px}
+    .pay-info{grid-template-columns:1fr}
+    .drawer{width:100vw}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap nav-in">
+    <a class="logo" href="mockup-b-minimal.html"><span class="dot"></span>seoti</a>
+    <div class="crumb">스토어 · <b style="color:var(--ink)">대량주문 견적</b></div>
+    <div class="nav-r"><a class="back" href="mockup-b-minimal.html">← 돌아가기</a></div>
+  </div>
+</nav>
+
+<header class="hero">
+  <span class="kick">대량주문 <i class="en">Bulk Order</i></span>
+  <h1>마음에 드는 제품을 <b>담아주세요</b><br>견적 보내드릴게요</h1>
+  <p>+ 버튼으로 원하는 만큼 담으면, 우측 하단 장바구니에서 한 번에 견적을 신청할 수 있어요.</p>
+</header>
+
+<div class="filter">
+  <div class="wrap filter-in">
+    <div class="chips" id="cats">
+      <span class="on" data-f="">전체</span>
+      <span data-f="메모 스티커">메모 스티커</span>
+      <span data-f="마스킹테이프">마스킹테이프</span>
+      <span data-f="투명스티커">투명스티커</span>
+      <span data-f="키링·굿즈">키링·굿즈</span>
+      <span data-f="조각 스티커">조각 스티커</span>
+    </div>
+    <input class="search" id="search" placeholder="🔍 제품 검색">
+  </div>
+</div>
+
+<main class="wrap grid-wrap">
+  <div class="grid" id="grid"></div>
+
+  <div class="pay-info">
+    <div>
+      <h3>입금 안내<span class="en">Payment Info</span></h3>
+      <div class="pi-row"><span class="k">은행<i class="en">Bank</i></span><span class="v">국민은행 KB</span></div>
+      <div class="pi-row"><span class="k">예금주<i class="en">Holder</i></span><span class="v">서○티</span></div>
+      <div class="pi-row"><span class="k">계좌번호<i class="en">Account</i></span><span class="v big">123-4567-89012-3</span></div>
+      <div class="pi-row"><span class="k">국제송금<i class="en">Intl.</i></span><span class="v">Wise · PayPal · seoti.studio@gmail.com</span></div>
+    </div>
+    <div class="pi-help">
+      <b>이렇게 진행돼요 <i class="en">How It Works</i></b>
+      ① 제품 담기 → ② 우측 하단 장바구니에서 정보 입력 → ③ 견적 회신 (24h 내) → ④ 입금 → ⑤ 발송<br><br>
+      입금 시 이름 끝에 <b style="color:var(--gold)">참조번호</b>를 함께 적어주세요. 입금 확인 후 1~2영업일 내 출고됩니다.
+    </div>
+  </div>
+</main>
+
+<button class="cart-fab empty" id="fab">
+  <span>🛒 장바구니</span><span class="badge" id="badge">0</span>
+</button>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer">
+  <div class="dh">
+    <h3>견적 신청<span class="en" style="font-size:.7em">Request Quote</span></h3>
+    <button class="x" id="closeDrawer">✕</button>
+  </div>
+  <div class="db">
+    <div class="dstep">
+      <h4><i>1</i>선택한 품목<span class="en" style="font-size:.85em;font-weight:600;color:var(--sub);margin-left:auto">Items</span></h4>
+      <div id="dlist"></div>
+    </div>
+    <div class="dstep">
+      <h4><i>2</i>주문자 정보<span class="en" style="font-size:.85em;font-weight:600;color:var(--sub);margin-left:auto">Your Info</span></h4>
+      <div class="frow">
+        <div class="fld"><label>이름<i class="en">Name</i></label><input placeholder="홍길동"></div>
+        <div class="fld"><label>국가<i class="en">Country</i></label>
+          <select><option>🇰🇷 한국</option><option>🇯🇵 일본</option><option>🇺🇸 미국</option><option>기타</option></select></div>
+      </div>
+      <div class="fld"><label>이메일<i class="en">Email</i></label><input type="email" placeholder="name@example.com"></div>
+      <div class="frow">
+        <div class="fld"><label>연락처<i class="en">Phone</i></label><input placeholder="010-0000-0000"></div>
+        <div class="fld"><label>채널<i class="en">Reply</i></label>
+          <select><option>이메일</option><option>인스타 DM</option><option>카톡</option></select></div>
+      </div>
+      <div class="fld"><label>배송지<i class="en">Address</i></label><input placeholder="우편번호 + 주소"></div>
+      <div class="fld"><label>요청사항<i class="en">Notes</i></label><textarea placeholder="배송 희망일, 포장 요청 등"></textarea></div>
+    </div>
+    <div class="totals">
+      <div class="r"><span>총 수량</span><span id="dqty">0개</span></div>
+      <div class="r"><span>예상 정가 합계</span><span id="dsub">₩0</span></div>
+      <div class="r big"><span>견적 요청</span><span id="dfinal">₩0</span></div>
+      <div class="note">※ 수량·국가·배송비에 따라 단가가 달라집니다. 최종 견적은 회신 시 안내드려요.</div>
+    </div>
+  </div>
+  <div class="df">
+    <button class="submit" id="submit" disabled>견적 요청 보내기 →</button>
+  </div>
+</aside>
+
+<footer>© 2026 SEOTI · 디자인 시안용 목업</footer>
+
+<script>
+const products=[
+ {c:"메모 스티커",n:"롱 메모 스티커팩",p:3500,s:42,img:"202602/bc4816b7234830cacfd8e73dbc81ebcb"},
+ {c:"메모 스티커",n:"스위티 메모 스티커팩",p:3500,s:18,img:"202602/3d92c3f2ae8a816bb0aaf8374372b46a"},
+ {c:"메모 스티커",n:"설탕 눈마을 스티커",p:3500,s:6,img:"202602/a157d261092510f1542550274972a939"},
+ {c:"메모 스티커",n:"학교괴담 스티커",p:3500,s:31,img:"202602/8844055f11daba2bd37b69a6150cdac6"},
+ {c:"메모 스티커",n:"메모빈티지 스티커팩",p:2500,s:24,img:"202602/3dba9ab4bcc29cf34566d08a48284e13"},
+ {c:"조각 스티커",n:"초록책장 스티커",p:3500,s:3,img:"202512/6df4ff16a044b3cd8dde5d8b78447e35"},
+ {c:"메모 스티커",n:"다이어리 스티코",p:3500,s:55,img:"202512/cb676b86854d5dc018ea0576b99c897a"},
+ {c:"메모 스티커",n:"선샤인데이 스티커",p:3500,s:9,img:"202508/d9342a7de8b65e19f073f6f99139560d"},
+ {c:"마스킹테이프",n:"키스컷 마스킹테이프 2",p:6500,s:27,img:"202508/13260f931f04e15ddc8bb56a20dc0e90"},
+ {c:"투명스티커",n:"냠냠만두 투명 스티커",p:3000,s:14,img:"202410/e80feba7a57b4fcf1a3364e5cfbb40d6"},
+ {c:"투명스티커",n:"갓파갓파 투명스티커",p:3000,s:11,img:"202410/a20a1e98cd7574c0c8a6b6f025691a20"},
+ {c:"키링·굿즈",n:"크레페 말랑 키링",p:2500,s:0,img:"202503/58dafda9eee23c1a553c073971af033c"},
+ {c:"메모 스티커",n:"눈송이 여행 스티커",p:3500,s:21,img:"202602/655ded5da50146cf19dbaa537f0378da"},
+ {c:"메모 스티커",n:"뉴데이 다이어리 스티커",p:3500,s:48,img:"202602/879c65563f5176d1a3592b11970a68db"},
+];
+const cart={};let filter="",search="";
+function stk(s){if(s===0)return `<span class="stk out">SOLD OUT</span>`;
+  if(s<=5)return `<span class="stk low">재고 ${s}</span>`;return "";}
+function render(){
+  const list=products.filter(p=>(!filter||p.c===filter)&&(!search||p.n.includes(search)));
+  document.getElementById('grid').innerHTML=list.map(p=>{
+    const i=products.indexOf(p),q=cart[i]||0;
+    return `<article class="card ${q?'sel':''} ${p.s===0?'out':''}">
+      <div class="thumb">
+        ${q?`<span class="qty-bubble">✓ ${q}개</span>`:''}
+        ${stk(p.s)}
+        <img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/${p.img}.png">
+      </div>
+      <div class="card-body">
+        <div class="card-cat">${p.c}</div>
+        <div class="card-name">서티 ${p.n}</div>
+        <div class="card-foot">
+          <span class="card-price">${p.p.toLocaleString()}원</span>
+          <button class="card-add" data-act="+" data-i="${i}">+ 담기</button>
+          <div class="card-step">
+            <button data-act="−" data-i="${i}">−</button>
+            <span>${q}</span>
+            <button data-act="+" data-i="${i}" ${q>=p.s?'disabled':''}>+</button>
+          </div>
+        </div>
+      </div>
+    </article>`;
+  }).join('');
+  updateCart();
+}
+function updateCart(){
+  const keys=Object.keys(cart).filter(k=>cart[k]>0);
+  const totQ=keys.reduce((s,k)=>s+cart[k],0);
+  const totP=keys.reduce((s,k)=>s+cart[k]*products[k].p,0);
+  document.getElementById('badge').textContent=keys.length;
+  document.getElementById('fab').classList.toggle('empty',keys.length===0);
+  document.getElementById('dqty').textContent=totQ+'개';
+  document.getElementById('dsub').textContent='₩'+totP.toLocaleString();
+  document.getElementById('dfinal').textContent='₩'+totP.toLocaleString();
+  document.getElementById('submit').disabled=totQ===0;
+  const dl=document.getElementById('dlist');
+  if(!keys.length){dl.innerHTML=`<div class="dempty">아직 담은 제품이 없어요.<br>왼쪽에서 + 버튼으로 담아주세요</div>`;}
+  else{dl.innerHTML=keys.map(k=>{
+    const p=products[k];
+    return `<div class="di">
+      <div class="tn"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/${p.img}.png"></div>
+      <div class="m"><b>서티 ${p.n}</b><small>₩${p.p.toLocaleString()}</small></div>
+      <div class="q">
+        <button data-act="−" data-i="${k}">−</button>
+        <span>${cart[k]}</span>
+        <button data-act="+" data-i="${k}" ${cart[k]>=p.s?'disabled':''}>+</button>
+      </div>
+    </div>`;}).join('');}
+}
+function openD(){document.getElementById('drawer').classList.add('on');document.getElementById('scrim').classList.add('on');}
+function closeD(){document.getElementById('drawer').classList.remove('on');document.getElementById('scrim').classList.remove('on');}
+document.addEventListener('click',e=>{
+  const act=e.target.closest('[data-act]');
+  if(act){const i=+act.dataset.i;cart[i]=(cart[i]||0)+(act.dataset.act==='+'?1:-1);
+    if(cart[i]<=0)delete cart[i];render();return;}
+  const ch=e.target.closest('.chips span');
+  if(ch){document.querySelectorAll('.chips span').forEach(a=>a.classList.remove('on'));
+    ch.classList.add('on');filter=ch.dataset.f;render();return;}
+  if(e.target.closest('#fab'))openD();
+  if(e.target.closest('#closeDrawer')||e.target.closest('#scrim'))closeD();
+});
+document.getElementById('search').addEventListener('input',e=>{search=e.target.value.trim();render();});
+render();
+</script>
+</body>
+</html>

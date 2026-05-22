@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>서티 SEOTI · 대량주문 견적 신청 / Bulk Order</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css" />
+<style>
+  :root{
+    --bg:#fff; --ink:#161412; --sub:#8c8781; --faint:#bdb8b1;
+    --line:#e7e4df; --paper:#f3f1ed; --accent:#e8503a; --ok:#3aa872;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:'Pretendard Variable',Pretendard,-apple-system,sans-serif;
+    background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.55}
+  img{display:block;max-width:100%}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1320px;margin:0 auto;padding:0 40px}
+  .eyebrow{font-size:11px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--sub)}
+  .en{font-size:.72em;opacity:.5;margin-left:6px;font-weight:500;letter-spacing:.04em;text-transform:none;font-style:normal}
+  .util .en{color:rgba(255,255,255,.55);opacity:1}
+
+  /* top utility bar */
+  .util{background:var(--ink);color:#fff;font-size:12.5px;font-weight:600;
+    padding:9px 40px;display:flex;justify-content:space-between;align-items:center}
+  .util a{color:#fff;text-decoration:underline;text-underline-offset:3px}
+
+  /* nav */
+  nav{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(255,255,255,.94);
+    backdrop-filter:blur(10px);z-index:50}
+  .nav-in{display:flex;align-items:center;height:72px;gap:30px}
+  .logo{font-size:21px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
+  .crumb{font-size:13px;color:var(--sub);font-weight:600}
+  .crumb b{color:var(--ink)}
+  .nav-r{margin-left:auto;display:flex;gap:22px;font-size:13.5px;font-weight:600;color:var(--sub)}
+
+  /* page header */
+  .ph{padding:54px 0 30px;border-bottom:1px solid var(--line)}
+  .ph .row{display:flex;justify-content:space-between;align-items:flex-end;gap:30px}
+  .ph h1{font-size:50px;font-weight:800;letter-spacing:-.03em;line-height:1.08}
+  .ph h1 em{font-style:normal;color:var(--accent)}
+  .ph .sub{font-size:13.5px;color:var(--sub);max-width:340px;line-height:1.7;text-align:right}
+
+  /* stepper */
+  .steps{display:flex;align-items:center;gap:16px;margin:34px 0 0;padding-bottom:6px}
+  .step{display:flex;align-items:center;gap:14px;cursor:pointer;flex:1;
+    padding:14px 18px;border:1px solid var(--line);border-radius:2px;transition:.15s}
+  .step .n{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--ink);
+    display:grid;place-items:center;font-size:13px;font-weight:800;color:var(--ink);
+    background:#fff;flex:none}
+  .step.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .step.on .n{background:#fff;color:var(--ink);border-color:#fff}
+  .step.done .n{background:var(--ok);border-color:var(--ok);color:#fff}
+  .step .lab b{font-size:14.5px;font-weight:800;letter-spacing:-.01em}
+  .step .lab small{font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    display:block;color:var(--sub);font-weight:700}
+  .step.on .lab small{color:rgba(255,255,255,.6)}
+
+  /* sections */
+  .sect{display:none;padding:50px 0 80px}
+  .sect.on{display:block}
+
+  /* step 1: catalog + summary */
+  .pick-wrap{display:grid;grid-template-columns:1fr 360px;gap:48px;align-items:flex-start}
+  .chips{display:flex;gap:22px;padding-bottom:20px;border-bottom:1px solid var(--ink);
+    margin-bottom:30px;font-size:13.5px;font-weight:600}
+  .chips a{color:var(--sub);cursor:pointer}
+  .chips a.on{color:var(--ink)}
+  .chips a.on::before{content:"";display:inline-block;width:6px;height:6px;background:var(--accent);
+    border-radius:50%;margin-right:8px;vertical-align:middle}
+  .chips .search{margin-left:auto;background:var(--paper);border:none;font-family:inherit;
+    font-size:13.5px;padding:9px 14px;width:200px;outline:none}
+
+  .pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:34px 26px}
+  .pc{cursor:pointer;transition:.18s}
+  .pc.selected{outline:2px solid var(--ink);outline-offset:-2px}
+  .pc.out{opacity:.45;pointer-events:none}
+  .pc .ph-img{position:relative;background:var(--paper);aspect-ratio:1;overflow:hidden}
+  .pc .ph-img img{width:100%;height:100%;object-fit:cover;transition:.4s}
+  .pc:hover .ph-img img{transform:scale(1.04)}
+  .qty-pill{position:absolute;top:10px;left:10px;font-size:13px;font-weight:800;
+    background:var(--accent);color:#fff;padding:4px 11px;border-radius:999px;
+    display:none;letter-spacing:.02em}
+  .pc.selected .qty-pill{display:inline-flex;align-items:center;gap:4px}
+  .pc .stk{position:absolute;top:10px;right:10px;font-size:10px;font-weight:800;
+    letter-spacing:.08em;text-transform:uppercase;padding:4px 8px;background:rgba(22,20,18,.85);color:#fff}
+  .pc .stk.low{background:var(--accent)}
+  .pc .stk.out{background:#fff;color:var(--sub);border:1px solid var(--line)}
+  .pc-foot{display:flex;justify-content:space-between;align-items:baseline;margin-top:14px;gap:8px}
+  .pc-foot .nm{font-size:14.5px;font-weight:700;line-height:1.4}
+  .pc-foot .ct{font-size:11px;color:var(--sub);font-weight:600;letter-spacing:.04em;
+    text-transform:uppercase;margin-top:3px}
+  .pc-foot .pr{font-size:14.5px;font-weight:700;white-space:nowrap}
+  .stepctrl{display:flex;align-items:center;justify-content:space-between;margin-top:14px;
+    border:1px solid var(--line);height:42px}
+  .stepctrl button{flex:none;width:42px;height:100%;background:#fff;border:none;
+    font-family:inherit;font-size:18px;cursor:pointer;color:var(--ink)}
+  .stepctrl button:disabled{color:var(--faint);cursor:not-allowed}
+  .stepctrl button:hover:not(:disabled){background:var(--ink);color:#fff}
+  .stepctrl .num{font-size:14px;font-weight:700;color:var(--ink)}
+  .stepctrl .num small{color:var(--sub);font-weight:600;margin-left:5px;font-size:12px}
+  .pc.selected .stepctrl{border-color:var(--ink)}
+
+  /* summary aside */
+  .aside{position:sticky;top:100px;border:1px solid var(--ink);background:#fff}
+  .aside h3{font-size:16px;font-weight:800;letter-spacing:-.01em;padding:18px 20px;
+    border-bottom:1px solid var(--line);display:flex;justify-content:space-between}
+  .aside h3 .count{font-size:13px;color:var(--accent);font-weight:800}
+  .aside .body{max-height:340px;overflow-y:auto;padding:6px 0}
+  .aside .empty{padding:36px 24px;text-align:center;color:var(--sub);font-size:13px;line-height:1.7}
+  .aside .item{display:flex;gap:12px;padding:12px 20px;border-bottom:1px solid var(--paper);align-items:center}
+  .aside .item:last-child{border-bottom:none}
+  .aside .item .tn{width:44px;height:44px;background:var(--paper);overflow:hidden;flex:none}
+  .aside .item .tn img{width:100%;height:100%;object-fit:cover}
+  .aside .item .mid{flex:1;min-width:0}
+  .aside .item .mid b{font-size:13px;font-weight:700;display:block;line-height:1.3;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .aside .item .mid small{font-size:11.5px;color:var(--sub)}
+  .aside .item .qx{font-size:13px;font-weight:800}
+  .aside .item .rm{background:none;border:none;color:var(--faint);font-size:14px;cursor:pointer;margin-left:6px}
+  .aside .totals{padding:18px 20px;border-top:1px solid var(--ink);font-size:13.5px}
+  .aside .totals .r{display:flex;justify-content:space-between;padding:5px 0}
+  .aside .totals .r.big{font-size:18px;font-weight:800;border-top:1px solid var(--line);
+    padding-top:14px;margin-top:8px}
+  .aside .totals .note{font-size:11.5px;color:var(--sub);margin-top:10px;line-height:1.6}
+  .aside .next{display:block;width:100%;background:var(--ink);color:#fff;
+    font-family:inherit;font-size:14px;font-weight:800;padding:18px;letter-spacing:.04em;
+    border:none;cursor:pointer;text-transform:uppercase}
+  .aside .next:hover{background:var(--accent)}
+  .aside .next:disabled{background:var(--paper);color:var(--faint);cursor:not-allowed}
+
+  /* step 2: info form */
+  .form-wrap{display:grid;grid-template-columns:1fr 380px;gap:48px;align-items:flex-start}
+  .form-card{border:1px solid var(--line);padding:36px}
+  .form-card h2{font-size:22px;font-weight:800;margin-bottom:6px;letter-spacing:-.015em}
+  .form-card .lead{font-size:13.5px;color:var(--sub);margin-bottom:30px}
+  .fld{margin-bottom:22px}
+  .fld label{display:block;font-size:11.5px;font-weight:800;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--sub);margin-bottom:8px}
+  .fld input,.fld textarea,.fld select{width:100%;font-family:inherit;font-size:14.5px;
+    padding:13px 14px;border:1px solid var(--line);background:#fff;outline:none;color:var(--ink)}
+  .fld textarea{min-height:110px;resize:vertical;line-height:1.55}
+  .fld input:focus,.fld textarea:focus,.fld select:focus{border-color:var(--ink)}
+  .fld .hint{font-size:12px;color:var(--sub);margin-top:6px}
+  .frow{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .channel{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:6px}
+  .channel label{display:flex;align-items:center;gap:8px;padding:11px 12px;border:1px solid var(--line);
+    cursor:pointer;font-size:13.5px;font-weight:600;margin:0;text-transform:none;letter-spacing:0;color:var(--ink)}
+  .channel input{display:none}
+  .channel input:checked+span{font-weight:800}
+  .channel label:has(input:checked){border-color:var(--ink);background:var(--paper)}
+  .nav-btns{display:flex;gap:10px;margin-top:34px}
+  .nav-btns button{font-family:inherit;font-size:14px;font-weight:800;padding:16px 26px;cursor:pointer;
+    border:1px solid var(--ink);letter-spacing:.05em}
+  .nav-btns .prev{background:#fff;color:var(--ink)}
+  .nav-btns .submit{background:var(--ink);color:#fff;margin-left:auto}
+  .nav-btns .submit:hover{background:var(--accent);border-color:var(--accent)}
+
+  .review{border:1px solid var(--line);background:var(--paper);padding:24px;position:sticky;top:100px}
+  .review h4{font-size:13px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--sub);margin-bottom:14px}
+  .review .li{display:flex;justify-content:space-between;font-size:13px;padding:7px 0;
+    border-bottom:1px dashed var(--line)}
+  .review .li:last-child{border-bottom:none}
+  .review .total{display:flex;justify-content:space-between;font-size:16px;font-weight:800;
+    margin-top:14px;padding-top:14px;border-top:1px solid var(--ink)}
+  .review .note{font-size:11.5px;color:var(--sub);margin-top:14px;line-height:1.7}
+
+  /* step 3: payment */
+  .pay-wrap{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:flex-start}
+  .pay-card{border:1px solid var(--ink);padding:36px 40px}
+  .pay-card.dark{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .pay-card h2{font-size:22px;font-weight:800;letter-spacing:-.015em;margin-bottom:6px}
+  .pay-card.dark .eyebrow{color:rgba(255,255,255,.5)}
+  .pay-card .lead{font-size:13.5px;color:var(--sub);margin:6px 0 26px;line-height:1.7}
+  .pay-card.dark .lead{color:rgba(255,255,255,.7)}
+  .bank{display:grid;grid-template-columns:130px 1fr auto;gap:16px;font-size:14px;
+    padding:14px 0;border-bottom:1px solid rgba(255,255,255,.15)}
+  .bank:last-of-type{border-bottom:none}
+  .bank .k{color:rgba(255,255,255,.55);font-weight:600;text-transform:uppercase;letter-spacing:.08em;font-size:11.5px;align-self:center}
+  .bank .v{font-weight:700;letter-spacing:.01em;align-self:center}
+  .bank .v.big{font-size:18px}
+  .bank .copy{background:rgba(255,255,255,.13);border:none;color:#fff;font-family:inherit;
+    font-size:11px;font-weight:800;padding:7px 12px;letter-spacing:.1em;cursor:pointer}
+  .bank .copy:hover{background:var(--accent)}
+  .ref-box{background:var(--paper);padding:18px;margin-top:24px;display:flex;
+    justify-content:space-between;align-items:center}
+  .ref-box .k{font-size:11px;font-weight:800;letter-spacing:.12em;color:var(--sub);text-transform:uppercase}
+  .ref-box .v{font-size:24px;font-weight:800;letter-spacing:.04em;font-feature-settings:"tnum"}
+  .timeline{margin-top:30px}
+  .tl-item{display:flex;gap:16px;padding:14px 0}
+  .tl-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--line);background:#fff;
+    margin-top:4px;flex:none;position:relative}
+  .tl-item.done .tl-dot{background:var(--ok);border-color:var(--ok)}
+  .tl-item.active .tl-dot{background:var(--accent);border-color:var(--accent);
+    box-shadow:0 0 0 4px rgba(232,80,58,.15)}
+  .tl-item:not(:last-child) .tl-dot::after{content:"";position:absolute;left:50%;top:14px;
+    width:2px;height:38px;background:var(--line);transform:translateX(-1px)}
+  .tl-item.done:not(:last-child) .tl-dot::after{background:var(--ok)}
+  .tl-item b{font-size:14px;font-weight:800;display:block}
+  .tl-item small{font-size:12px;color:var(--sub)}
+  .tl-item.active b{color:var(--accent)}
+  .paid-btn{margin-top:30px;width:100%;background:var(--accent);color:#fff;border:none;
+    padding:18px;font-family:inherit;font-size:14px;font-weight:800;letter-spacing:.06em;
+    cursor:pointer;text-transform:uppercase}
+
+  /* how-it-works under steps */
+  .how{margin-top:60px;background:var(--paper);padding:42px;display:grid;
+    grid-template-columns:repeat(4,1fr);gap:24px}
+  .how .h{font-size:11px;font-weight:800;color:var(--sub);letter-spacing:.12em}
+  .how .t{font-size:16px;font-weight:800;margin:6px 0 6px;letter-spacing:-.01em}
+  .how .d{font-size:12.5px;color:var(--sub);line-height:1.7}
+
+  footer{border-top:1px solid var(--ink);padding:40px 0;font-size:12.5px;color:var(--sub);
+    display:flex;justify-content:space-between}
+
+  @media(max-width:1080px){
+    .pick-wrap,.form-wrap,.pay-wrap{grid-template-columns:1fr}
+    .aside,.review{position:static}
+    .pgrid{grid-template-columns:repeat(2,1fr)}
+    .ph h1{font-size:34px}
+    .how{grid-template-columns:1fr 1fr}
+  }
+</style>
+</head>
+<body>
+
+<div class="util">
+  <span>대량주문 <i class="en">· Bulk Order Quote</i></span>
+  <a href="mockup-b-minimal.html">← 스토어로 돌아가기</a>
+</div>
+
+<nav>
+  <div class="wrap nav-in">
+    <a class="logo" href="mockup-b-minimal.html">Seoti</a>
+    <div class="crumb">스토어 / <b>대량주문 견적신청</b></div>
+    <div class="nav-r"><a>도움말</a><a>1:1 문의</a></div>
+  </div>
+</nav>
+
+<header class="ph wrap">
+  <div class="row">
+    <h1>대량으로 주문하시나요?<br><em>간편하게 견적</em> 보내드릴게요.</h1>
+    <p class="sub"><span class="eyebrow">Bulk Order Quote Request</span><br>국내·해외 어디서든. 원하시는 제품과 수량만 선택해주시면, 24시간 내 견적과 입금 계좌를 회신드립니다.</p>
+  </div>
+  <div class="steps">
+    <div class="step on" data-go="1">
+      <div class="n">1</div>
+      <div class="lab"><small>STEP 1</small><b>품목·수량 선택</b></div>
+    </div>
+    <div class="step" data-go="2">
+      <div class="n">2</div>
+      <div class="lab"><small>STEP 2</small><b>주문자 정보</b></div>
+    </div>
+    <div class="step" data-go="3">
+      <div class="n">3</div>
+      <div class="lab"><small>STEP 3</small><b>견적 확인 · 입금</b></div>
+    </div>
+  </div>
+</header>
+
+<!-- ============ STEP 1 ============ -->
+<section class="sect on wrap" data-step="1">
+  <div class="pick-wrap">
+    <div>
+      <div class="chips">
+        <a class="on" data-f="">전체</a>
+        <a data-f="메모 스티커">메모 스티커</a>
+        <a data-f="마스킹테이프">마스킹테이프</a>
+        <a data-f="투명스티커">투명스티커</a>
+        <a data-f="키링·굿즈">키링·굿즈</a>
+        <a data-f="조각 스티커">조각 스티커</a>
+        <input class="search" id="search" placeholder="🔍  제품명 검색"/>
+      </div>
+      <div class="pgrid" id="pgrid"></div>
+    </div>
+
+    <aside class="aside">
+      <h3>선택 내역 <span class="count" id="count">0개</span></h3>
+      <div class="body" id="cart"></div>
+      <div class="totals">
+        <div class="r"><span>총 수량</span><span id="totQty">0개</span></div>
+        <div class="r"><span>예상 정가 합계</span><span id="totPrice">₩0</span></div>
+        <div class="r big"><span>견적 요청</span><span id="totFinal">₩0</span></div>
+        <div class="note">※ 대량주문은 수량·국가별로 단가가 달라집니다. 견적 확인 후 최종 금액을 안내드려요.</div>
+      </div>
+      <button class="next" id="toStep2" disabled>다음 단계 — 주문자 정보 입력 →</button>
+    </aside>
+  </div>
+</section>
+
+<!-- ============ STEP 2 ============ -->
+<section class="sect wrap" data-step="2">
+  <div class="form-wrap">
+    <div class="form-card">
+      <span class="eyebrow">STEP 2</span>
+      <h2 style="margin-top:6px">주문자 정보를 입력해주세요</h2>
+      <p class="lead">입력하신 연락처로 24시간 안에 견적과 계좌정보를 보내드립니다.</p>
+
+      <div class="frow">
+        <div class="fld"><label>주문자 이름<i class="en">Name</i></label><input type="text" placeholder="홍길동"></div>
+        <div class="fld"><label>국가<i class="en">Country</i></label>
+          <select><option>🇰🇷 대한민국</option><option>🇯🇵 일본</option><option>🇺🇸 미국</option><option>🇪🇺 유럽</option><option>기타</option></select>
+        </div>
+      </div>
+      <div class="frow">
+        <div class="fld"><label>이메일<i class="en">Email</i></label><input type="email" placeholder="name@example.com"></div>
+        <div class="fld"><label>휴대폰<i class="en">Phone</i></label><input type="tel" placeholder="010-0000-0000"></div>
+      </div>
+      <div class="fld">
+        <label>회신받을 채널<i class="en">Reply Channel</i></label>
+        <div class="channel">
+          <label><input type="radio" name="ch" checked><span>이메일</span></label>
+          <label><input type="radio" name="ch"><span>인스타 DM</span></label>
+          <label><input type="radio" name="ch"><span>카카오톡</span></label>
+          <label><input type="radio" name="ch"><span>기타</span></label>
+        </div>
+      </div>
+      <div class="fld"><label>배송지<i class="en">Shipping Address</i></label>
+        <input type="text" placeholder="우편번호 + 상세주소">
+        <div class="hint">해외 주문은 영문 주소로 작성해주세요. 통관 정보(개인통관고유부호 등)는 견적 회신 후 안내드립니다.</div>
+      </div>
+      <div class="fld"><label>요청사항<i class="en">Notes</i></label>
+        <textarea placeholder="예) ◯월 ◯일까지 받고싶어요 / 포장 관련 요청 / 동봉 메시지 등"></textarea>
+      </div>
+
+      <div class="nav-btns">
+        <button class="prev" data-go="1">← 이전 단계</button>
+        <button class="submit" data-go="3">견적 요청 보내기 →</button>
+      </div>
+    </div>
+
+    <aside class="review">
+      <h4>견적 요약 / Summary</h4>
+      <div id="review"></div>
+      <div class="total"><span>예상 합계</span><span id="reviewTotal">₩0</span></div>
+      <p class="note">최종 금액은 수량·배송비·국가에 따라 달라지며, 견적 회신 시 정확히 안내드립니다.</p>
+    </aside>
+  </div>
+</section>
+
+<!-- ============ STEP 3 ============ -->
+<section class="sect wrap" data-step="3">
+  <div class="pay-wrap">
+    <div class="pay-card dark">
+      <span class="eyebrow">STEP 3 — Payment</span>
+      <h2 style="margin-top:6px;color:#fff">입금 계좌 안내</h2>
+      <p class="lead">아래 계좌로 견적 금액을 입금해주시면, <b style="color:#fff">입금 확인 즉시 출고</b>됩니다.<br>해외 송금이 필요하면 Wise·PayPal도 가능해요.</p>
+
+      <div class="bank">
+        <span class="k">은행<i class="en">Bank</i></span><span class="v">국민은행 KB</span><button class="copy">COPY</button>
+      </div>
+      <div class="bank">
+        <span class="k">예금주<i class="en">Holder</i></span><span class="v">서○티</span><span></span>
+      </div>
+      <div class="bank">
+        <span class="k">계좌번호<i class="en">Account</i></span><span class="v big">123-4567-89012-3</span><button class="copy">COPY</button>
+      </div>
+      <div class="bank">
+        <span class="k">입금 금액<i class="en">Amount</i></span><span class="v big" id="payAmount" style="color:#ffd23f">견적 회신 후 안내</span><span></span>
+      </div>
+      <div class="bank">
+        <span class="k">국제송금<i class="en">Intl.</i></span><span class="v">Wise · PayPal — seoti.studio@gmail.com</span><button class="copy">COPY</button>
+      </div>
+
+      <div class="ref-box" style="background:rgba(255,255,255,.08)">
+        <div><div class="k" style="color:rgba(255,255,255,.6)">주문 참조번호<i class="en">Order Ref.</i></div><div class="v" style="color:#fff">SEO-2026-A4K9</div></div>
+        <div style="font-size:11.5px;color:rgba(255,255,255,.6);max-width:160px;text-align:right">입금 시 이름 끝에 위 번호를 함께 적어주세요 (예: 홍길동 A4K9)</div>
+      </div>
+    </div>
+
+    <div class="pay-card">
+      <span class="eyebrow">진행 상태 / Status</span>
+      <h2 style="margin-top:6px">주문 진행 현황</h2>
+      <p class="lead">아래 단계에 따라 진행됩니다. 상태가 바뀌면 이메일/DM으로 알림이 와요.</p>
+
+      <div class="timeline">
+        <div class="tl-item done">
+          <div class="tl-dot"></div>
+          <div><b>견적 요청 접수</b><small>2026-05-21 14:23 · 12개 품목, 총 84개</small></div>
+        </div>
+        <div class="tl-item active">
+          <div class="tl-dot"></div>
+          <div><b>견적서 발송 — 답변 대기중</b><small>최대 24시간 내 안내드려요</small></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div><b>입금 확인</b><small>입금 후 아래 버튼으로 알려주세요</small></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div><b>포장 · 출고</b><small>입금 확인 후 1~2영업일</small></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div><b>배송 시작</b><small>운송장 번호 발송</small></div>
+        </div>
+      </div>
+
+      <button class="paid-btn">✓ 입금 완료를 알려드릴게요</button>
+    </div>
+  </div>
+
+  <div class="how">
+    <div><div class="h">01</div><div class="t">품목 선택</div><div class="d">제품 사진을 보며 원하는 수량을 더해주세요. 카테고리·검색 모두 가능해요.</div></div>
+    <div><div class="h">02</div><div class="t">정보 입력</div><div class="d">연락처와 배송지를 알려주세요. 회신은 이메일/DM/카톡 중 선택할 수 있어요.</div></div>
+    <div><div class="h">03</div><div class="t">견적·계좌 회신</div><div class="d">24시간 안에 최종 금액과 입금 계좌를 보내드립니다.</div></div>
+    <div><div class="h">04</div><div class="t">입금 확인 → 발송</div><div class="d">입금 확인되면 1~2영업일 내 포장·발송. 운송장도 알려드려요.</div></div>
+  </div>
+</section>
+
+<footer class="wrap">
+  <span>© 2026 SEOTI — 디자인 시안용 목업</span>
+  <span>대량주문 문의 · seoti.studio@gmail.com</span>
+</footer>
+
+<script>
+const products=[
+ {c:"메모 스티커",n:"롱 메모 스티커팩",p:3500,s:42,img:"202602/bc4816b7234830cacfd8e73dbc81ebcb"},
+ {c:"메모 스티커",n:"스위티 메모 스티커팩",p:3500,s:18,img:"202602/3d92c3f2ae8a816bb0aaf8374372b46a"},
+ {c:"메모 스티커",n:"설탕 눈마을 스티커",p:3500,s:6,img:"202602/a157d261092510f1542550274972a939"},
+ {c:"메모 스티커",n:"학교괴담 스티커",p:3500,s:31,img:"202602/8844055f11daba2bd37b69a6150cdac6"},
+ {c:"메모 스티커",n:"메모빈티지 스티커팩",p:2500,s:24,img:"202602/3dba9ab4bcc29cf34566d08a48284e13"},
+ {c:"조각 스티커",n:"초록책장 스티커",p:3500,s:3,img:"202512/6df4ff16a044b3cd8dde5d8b78447e35"},
+ {c:"메모 스티커",n:"다이어리 스티코",p:3500,s:55,img:"202512/cb676b86854d5dc018ea0576b99c897a"},
+ {c:"메모 스티커",n:"선샤인데이 스티커",p:3500,s:9,img:"202508/d9342a7de8b65e19f073f6f99139560d"},
+ {c:"마스킹테이프",n:"키스컷 마스킹테이프 2",p:6500,s:27,img:"202508/13260f931f04e15ddc8bb56a20dc0e90"},
+ {c:"마스킹테이프",n:"마스킹테이프 4type",p:4500,s:36,img:"202508/383bee900dbacb6369f996fc668c0f42"},
+ {c:"투명스티커",n:"냠냠만두 투명 스티커",p:3000,s:14,img:"202410/e80feba7a57b4fcf1a3364e5cfbb40d6"},
+ {c:"투명스티커",n:"갓파갓파 투명스티커",p:3000,s:11,img:"202410/a20a1e98cd7574c0c8a6b6f025691a20"},
+ {c:"키링·굿즈",n:"크레페 말랑 키링",p:2500,s:0,img:"202503/58dafda9eee23c1a553c073971af033c"},
+ {c:"메모 스티커",n:"눈송이 여행 스티커",p:3500,s:21,img:"202602/655ded5da50146cf19dbaa537f0378da"},
+ {c:"메모 스티커",n:"뉴데이 다이어리 스티커",p:3500,s:48,img:"202602/879c65563f5176d1a3592b11970a68db"},
+];
+const cart={};
+let filter="",search="";
+
+function stk(s){
+  if(s===0)return `<span class="stk out">SOLD OUT</span>`;
+  if(s<=5)return `<span class="stk low">재고 ${s}</span>`;
+  if(s<=10)return `<span class="stk">재고 ${s}</span>`;
+  return "";
+}
+
+function render(){
+  const list=products.filter(p=>(!filter||p.c===filter)&&(!search||p.n.includes(search)));
+  document.getElementById('pgrid').innerHTML=list.map((p,i)=>{
+    const idx=products.indexOf(p);
+    const q=cart[idx]||0;
+    return `<article class="pc ${q?'selected':''} ${p.s===0?'out':''}" data-i="${idx}">
+      <div class="ph-img">
+        <span class="qty-pill">✓ ${q}개 담음</span>
+        ${stk(p.s)}
+        <img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/${p.img}.png" alt="${p.n}">
+      </div>
+      <div class="pc-foot">
+        <div><div class="nm">서티 ${p.n}</div><div class="ct">${p.c}</div></div>
+        <div class="pr">₩${p.p.toLocaleString()}</div>
+      </div>
+      <div class="stepctrl">
+        <button data-act="−" data-i="${idx}" ${q<=0?'disabled':''}>−</button>
+        <span class="num">${q}<small>/ ${p.s}</small></span>
+        <button data-act="+" data-i="${idx}" ${q>=p.s?'disabled':''}>+</button>
+      </div>
+    </article>`;
+  }).join('');
+  renderCart();
+}
+
+function renderCart(){
+  const keys=Object.keys(cart).filter(k=>cart[k]>0);
+  const el=document.getElementById('cart');
+  if(!keys.length){el.innerHTML=`<div class="empty">제품 카드에서 <b>+</b> 버튼으로<br>원하는 수량을 더해주세요</div>`;}
+  else{el.innerHTML=keys.map(k=>{
+    const p=products[k];
+    return `<div class="item">
+      <div class="tn"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/${p.img}.png"></div>
+      <div class="mid"><b>서티 ${p.n}</b><small>₩${p.p.toLocaleString()} · ${p.c}</small></div>
+      <div class="qx">×${cart[k]}</div>
+      <button class="rm" data-rm="${k}">✕</button>
+    </div>`;
+  }).join('');}
+  const totQ=keys.reduce((s,k)=>s+cart[k],0);
+  const totP=keys.reduce((s,k)=>s+cart[k]*products[k].p,0);
+  document.getElementById('count').textContent=keys.length+'개 품목';
+  document.getElementById('totQty').textContent=totQ+'개';
+  document.getElementById('totPrice').textContent='₩'+totP.toLocaleString();
+  document.getElementById('totFinal').textContent='₩'+totP.toLocaleString();
+  document.getElementById('toStep2').disabled=totQ===0;
+  // review on step2
+  const rv=document.getElementById('review');
+  if(rv){
+    rv.innerHTML=keys.length?keys.map(k=>{
+      const p=products[k];return `<div class="li"><span>서티 ${p.n} ×${cart[k]}</span><span>₩${(cart[k]*p.p).toLocaleString()}</span></div>`;
+    }).join(''):`<div class="li" style="color:var(--sub)">선택된 품목이 없습니다</div>`;
+    document.getElementById('reviewTotal').textContent='₩'+totP.toLocaleString();
+  }
+}
+
+document.addEventListener('click',e=>{
+  const act=e.target.closest('[data-act]');
+  if(act){const i=+act.dataset.i;cart[i]=(cart[i]||0)+(act.dataset.act==='+'?1:-1);
+    if(cart[i]<=0)delete cart[i];render();return;}
+  const rm=e.target.closest('[data-rm]');
+  if(rm){delete cart[rm.dataset.rm];render();return;}
+  const ch=e.target.closest('.chips a');
+  if(ch){document.querySelectorAll('.chips a').forEach(a=>a.classList.remove('on'));
+    ch.classList.add('on');filter=ch.dataset.f;render();return;}
+  const go=e.target.closest('[data-go]');
+  if(go){const n=go.dataset.go;
+    document.querySelectorAll('.sect').forEach(s=>s.classList.toggle('on',s.dataset.step===n));
+    document.querySelectorAll('.step').forEach((s,i)=>{
+      const k=String(i+1);s.classList.toggle('on',k===n);
+      s.classList.toggle('done',Number(k)<Number(n));
+    });
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+});
+document.getElementById('search').addEventListener('input',e=>{search=e.target.value.trim();render();});
+render();
+</script>
+</body>
+</html>

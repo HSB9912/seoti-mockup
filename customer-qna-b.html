@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>서티 SEOTI · Q&A 변형 B — 게시판형</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css" />
+<style>
+  :root{
+    --bg:#fafaf8; --paper:#fff; --ink:#1a1816; --sub:#857f78; --faint:#c4beb5;
+    --line:#ebe6dd; --line2:#dcd5c9; --accent:#3a82d6; --ok:#3aa872; --warn:#d68a3a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Pretendard Variable',Pretendard,sans-serif;background:var(--bg);
+    color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.55}
+  img{display:block;max-width:100%}a{color:inherit;text-decoration:none}
+  .wrap{max-width:1280px;margin:0 auto;padding:0 28px}
+  .en{font-size:.7em;opacity:.45;margin-left:6px;font-weight:500;letter-spacing:.02em;text-transform:none;font-style:normal}
+
+  nav{background:var(--paper);border-bottom:1px solid var(--line)}
+  .nav-in{display:flex;align-items:center;height:62px;gap:30px}
+  .logo{font-size:20px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
+  .nav-r{margin-left:auto;font-size:13px;color:var(--sub)}
+  .nav-r a{margin-left:20px;font-weight:600}.nav-r a.on{color:var(--ink)}
+
+  .ph{padding:36px 0 28px;border-bottom:1px solid var(--line);background:var(--paper)}
+  .ph-in{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap}
+  .ph h1{font-size:30px;font-weight:800;letter-spacing:-.015em}
+  .ph small{color:var(--sub);font-weight:600;margin-left:10px;font-size:14px}
+  .ph .stats{display:flex;gap:30px;font-size:13px;color:var(--sub)}
+  .ph .stats b{display:block;color:var(--ink);font-size:20px;font-weight:800;margin-top:3px}
+
+  /* main grid */
+  main{padding:30px 0 80px}
+  .grid{display:grid;grid-template-columns:240px 1fr;gap:32px;align-items:flex-start}
+
+  /* sidebar */
+  .sb{background:var(--paper);border:1px solid var(--line);position:sticky;top:20px}
+  .sb-blk{padding:18px 20px;border-bottom:1px solid var(--line)}
+  .sb-blk:last-child{border-bottom:none}
+  .sb-blk h4{font-size:10.5px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;
+    color:var(--sub);margin-bottom:12px}
+  .sb a{display:flex;justify-content:space-between;align-items:center;padding:7px 0;
+    font-size:13.5px;font-weight:600;color:var(--ink);cursor:pointer;border-radius:3px;
+    padding-left:8px;padding-right:8px;margin:0 -8px}
+  .sb a:hover{background:var(--bg)}
+  .sb a.on{background:var(--ink);color:#fff}
+  .sb a.on .cnt{color:rgba(255,255,255,.55)}
+  .sb a .cnt{font-size:12px;color:var(--faint);font-weight:700}
+  .sb .ask-mini{margin:12px 20px 20px;display:block;background:var(--accent);color:#fff;
+    text-align:center;padding:12px;font-size:13.5px;font-weight:800;letter-spacing:.02em}
+  .sb .ask-mini:hover{background:var(--ink)}
+  .top-ans{font-size:12.5px;color:var(--ink);padding:8px 0;border-bottom:1px dashed var(--line);line-height:1.5}
+  .top-ans:last-child{border-bottom:none}
+  .top-ans b{color:var(--sub);font-size:11px;display:block;margin-bottom:3px}
+
+  /* board */
+  .board{background:var(--paper);border:1px solid var(--line)}
+  .b-top{padding:16px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+    border-bottom:1px solid var(--line)}
+  .b-top .sort{font-size:13px;font-weight:700;color:var(--sub)}
+  .b-top .sort b{color:var(--ink)}
+  .b-top .pipe{color:var(--line2)}
+  .b-top .search{background:var(--bg);border:1px solid var(--line);padding:8px 14px;
+    font-family:inherit;font-size:13px;outline:none;width:240px;margin-left:auto}
+  .b-top .ask{background:var(--ink);color:#fff;border:none;font-family:inherit;font-size:13px;
+    font-weight:800;padding:9px 16px;letter-spacing:.04em;cursor:pointer}
+  .b-top .ask:hover{background:var(--accent)}
+
+  /* table-ish list */
+  .row-head,.row{display:grid;grid-template-columns:50px 90px 1fr 110px 100px 90px;gap:14px;
+    align-items:center;padding:13px 20px;font-size:13px}
+  .row-head{background:var(--bg);border-bottom:1px solid var(--line2);color:var(--sub);
+    font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+  .row{border-bottom:1px solid var(--line);cursor:pointer;transition:.12s}
+  .row:hover{background:var(--bg)}
+  .row.open{background:var(--bg)}
+  .row .no{color:var(--faint);font-weight:700;font-variant-numeric:tabular-nums}
+  .row .cat{font-size:11.5px;font-weight:800;letter-spacing:.05em;color:var(--sub);
+    background:#fff;border:1px solid var(--line);padding:3px 9px;text-align:center;width:fit-content}
+  .row .tt{font-weight:700;font-size:14px;letter-spacing:-.01em;display:flex;align-items:center;gap:8px;min-width:0}
+  .row .tt span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+  .row .tt .lock{font-size:11px;color:var(--sub)}
+  .row .by{color:var(--sub);font-size:13px}
+  .row .dt{color:var(--sub);font-size:12.5px;font-variant-numeric:tabular-nums}
+  .row .st{font-size:10.5px;font-weight:800;letter-spacing:.06em;padding:4px 9px;text-align:center;
+    text-transform:uppercase;background:var(--ok);color:#fff;width:fit-content}
+  .row .st.wait{background:#fff;color:var(--warn);border:1px solid var(--warn)}
+
+  /* expanded inline detail */
+  .detail{display:none;grid-column:1 / -1;padding:24px 30px;background:var(--bg);
+    border-top:1px solid var(--line2);border-bottom:2px solid var(--ink)}
+  .row.open + .detail{display:block}
+  .det-q,.det-a{display:flex;gap:18px;padding:14px 0}
+  .det-q + .det-a{border-top:1px dashed var(--line2);margin-top:6px}
+  .det-q .lbl,.det-a .lbl{width:32px;height:32px;background:var(--ink);color:#fff;
+    font-weight:800;font-size:13px;display:grid;place-items:center;flex:none}
+  .det-a .lbl{background:var(--accent)}
+  .det-q .body,.det-a .body{flex:1}
+  .det-q h4{font-size:16px;font-weight:800;margin-bottom:5px;letter-spacing:-.01em}
+  .det-q .meta{font-size:12px;color:var(--sub);margin-bottom:6px}
+  .det-q p,.det-a p{font-size:13.5px;line-height:1.8;color:var(--ink)}
+  .det-a .meta{font-size:12px;color:var(--sub);margin-bottom:6px}
+  .det-a .meta b{color:var(--ink)}
+  .det-actions{margin-top:12px;display:flex;gap:8px}
+  .det-actions a{font-size:12px;font-weight:700;color:var(--sub);cursor:pointer;padding:5px 10px;
+    background:#fff;border:1px solid var(--line)}
+  .det-actions a:hover{color:var(--ink);border-color:var(--ink)}
+
+  /* page */
+  .page{display:flex;justify-content:space-between;align-items:center;padding:18px 20px;font-size:13px}
+  .page-info{color:var(--sub);font-weight:600}
+  .page-nums{display:flex;gap:2px}
+  .page-nums a{padding:7px 12px;color:var(--sub);font-weight:700;cursor:pointer}
+  .page-nums a.on{background:var(--ink);color:#fff}
+
+  footer{padding:30px 0;font-size:12px;color:var(--sub);text-align:center;border-top:1px solid var(--line)}
+
+  @media(max-width:880px){
+    .grid{grid-template-columns:1fr}
+    .sb{position:static}
+    .row-head,.row{grid-template-columns:60px 1fr 90px;font-size:12px}
+    .row-head .by,.row-head .dt,.row .by,.row .dt{display:none}
+    .row-head .cat,.row .cat{display:none}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap nav-in">
+    <a class="logo" href="mockup-b-minimal.html">Seoti</a>
+    <div class="nav-r"><a href="mockup-b-minimal.html">스토어</a>
+      <a href="customer-bulk-order.html">대량주문</a><a class="on">Q&A</a><a>Studio</a></div>
+  </div>
+</nav>
+
+<header class="ph">
+  <div class="wrap ph-in">
+    <div>
+      <h1>고객 문의 <small>Customer Q&A</small></h1>
+    </div>
+    <div class="stats">
+      <div>전체 문의<b>247</b></div>
+      <div>답변 완료<b>239</b></div>
+      <div>답변 대기<b>8</b></div>
+      <div>평균 답변<b>0.8일</b></div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="grid">
+    <!-- SIDEBAR -->
+    <aside class="sb">
+      <a class="ask-mini">+ 새 문의 작성<i class="en">Ask</i></a>
+      <div class="sb-blk">
+        <h4>카테고리<i class="en">Category</i></h4>
+        <a class="on">전체 <span class="cnt">247</span></a>
+        <a>배송 <span class="cnt">98</span></a>
+        <a>제품 <span class="cnt">72</span></a>
+        <a>결제 · 환불 <span class="cnt">41</span></a>
+        <a>교환 · A/S <span class="cnt">22</span></a>
+        <a>해외주문 <span class="cnt">9</span></a>
+        <a>기타 <span class="cnt">5</span></a>
+      </div>
+      <div class="sb-blk">
+        <h4>상태<i class="en">Status</i></h4>
+        <a>전체 보기 <span class="cnt">247</span></a>
+        <a>답변 완료 <span class="cnt">239</span></a>
+        <a>답변 대기 <span class="cnt">8</span></a>
+        <a>내 문의 <span class="cnt">·</span></a>
+      </div>
+      <div class="sb-blk">
+        <h4>도움이 된 답변 TOP<i class="en">Best</i></h4>
+        <div class="top-ans"><b>배송</b>해외배송은 어떻게 신청하나요?</div>
+        <div class="top-ans"><b>제품</b>마스킹테이프 사용법 알려주세요</div>
+        <div class="top-ans"><b>결제</b>입금자명 잘못 적었을 때</div>
+      </div>
+    </aside>
+
+    <!-- BOARD -->
+    <section>
+      <div class="board">
+        <div class="b-top">
+          <span class="sort">정렬 · <b>최신순</b></span>
+          <span class="pipe">|</span>
+          <span class="sort">답변 대기만 보기</span>
+          <input class="search" placeholder="🔍 제목·내용 검색">
+          <button class="ask">+ 문의 작성</button>
+        </div>
+        <div class="row-head">
+          <span>No.</span><span>분류</span><span>제목</span><span>작성자</span><span>작성일</span><span>상태</span>
+        </div>
+        <div id="rows"></div>
+      </div>
+
+      <div class="board" style="margin-top:16px">
+        <div class="page">
+          <span class="page-info">전체 247건 · 1~8 표시</span>
+          <div class="page-nums">
+            <a>‹</a><a class="on">1</a><a>2</a><a>3</a><a>4</a><a>5</a><a>›</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer>© 2026 SEOTI — 디자인 시안용 목업 · Q&A 게시판형</footer>
+
+<script>
+const qa=[
+ {no:247,c:"제품",t:"설탕 눈마을 스티커 재입고 언제 되나요?",by:"송이*",d:"05-20",s:"answered",
+  q:"5월 첫 주에 봤을 때 품절이라 알림 신청만 해뒀어요. 곧 재입고 되나요? 다이어리 꾸미려고 기다리고 있어요!",
+  ans:"안녕하세요! 설탕 눈마을 스티커는 5월 30일에 재입고 예정이에요. 알림 신청해주시면 입고 즉시 메일로 안내드릴게요 🙇‍♀️",resp:"서티"},
+ {no:246,c:"배송",t:"해외배송 가능한가요? 미국으로 받고 싶어서요",by:"jenn*",d:"05-19",s:"answered",
+  q:"Hi! Can you ship to the US? I'd like to buy ~30 pieces of various stickers.",
+  ans:"네! 미국 포함 전 세계로 배송 가능합니다. 30개 이상 구매하실 경우 [대량주문 페이지]에서 신청해 주시면 견적과 함께 배송비 안내드려요.",resp:"서티"},
+ {no:245,c:"교환",t:"받은 제품에 미세한 흠집이 있어요",by:"minji*",d:"05-18",s:"answered",lock:true,
+  q:"오늘 받았는데 모서리가 살짝 눌렸어요. 사진 첨부합니다.",
+  ans:"불편드려 죄송합니다 ㅠㅠ 새 제품으로 교환해드릴게요. 반송비도 저희가 부담합니다.",resp:"서티"},
+ {no:244,c:"결제",t:"무통장입금 입금자명을 잘못 적었어요",by:"jihye*",d:"05-17",s:"wait",
+  q:"주문번호 #2026-0517-021 인데 입금자명을 회사명으로 적어버렸어요. 어떻게 해야 하나요?",ans:"",resp:""},
+ {no:243,c:"제품",t:"마스킹테이프 자유롭게 자를 수 있나요?",by:"하늘*",d:"05-16",s:"answered",
+  q:"키스컷과 일반 마테 차이가 궁금해요!",
+  ans:"키스컷은 캐릭터 모양대로 떼어 쓰실 수 있고, 일반 마테는 자유롭게 잘라 쓰는 형식이에요. 둘다 다꾸에 좋아요!",resp:"서티"},
+ {no:242,c:"배송",t:"주문 후 며칠이면 받을 수 있나요?",by:"수민*",d:"05-15",s:"answered",
+  q:"이번 주 안에 받을 수 있을까요?",
+  ans:"평일 오후 2시 이전 결제 건은 당일 출고됩니다. 일반택배 기준 1~3일 정도 소요돼요!",resp:"서티"},
+ {no:241,c:"해외",t:"콜라보 문의는 어디로 드리면 되나요?",by:"agency*",d:"05-14",s:"wait",lock:true,q:"비공개 문의입니다.",ans:"",resp:""},
+ {no:240,c:"제품",t:"학교괴담 스티커 사이즈가 어떻게 되나요?",by:"가을*",d:"05-13",s:"answered",
+  q:"다이어리 사이즈에 맞는지 알고 싶어요.",
+  ans:"135 × 105mm 사이즈예요. A6 다이어리 한 페이지에 잘 맞아요!",resp:"서티"},
+];
+const cls={answered:["","답변완료"],wait:["wait","답변대기"]};
+const cl={"제품":"제품","배송":"배송","교환":"교환","결제":"결제","해외":"해외","기타":"기타"};
+document.getElementById('rows').innerHTML=qa.map((q,i)=>`
+ <div class="row" data-i="${i}">
+   <span class="no">${q.no}</span>
+   <span class="cat">${q.c}</span>
+   <span class="tt"><span>${q.t}</span> ${q.lock?'<span class="lock">🔒</span>':''}</span>
+   <span class="by">${q.by}</span>
+   <span class="dt">2026-${q.d}</span>
+   <span class="st ${cls[q.s][0]}">${cls[q.s][1]}</span>
+ </div>
+ <div class="detail">
+   <div class="det-q">
+     <div class="lbl">Q</div>
+     <div class="body">
+       <h4>${q.t}</h4>
+       <div class="meta">${q.by} · 2026-${q.d} · ${q.c} · 조회 ${Math.floor(Math.random()*200+40)}</div>
+       <p>${q.q}</p>
+       <div class="det-actions"><a>🔗 공유</a><a>📌 북마크</a><a>🚩 신고</a></div>
+     </div>
+   </div>
+   ${q.ans?`<div class="det-a">
+     <div class="lbl">A</div>
+     <div class="body">
+       <div class="meta"><b>${q.resp}</b> · 답변 2026-${q.d} · 도움됨 ${Math.floor(Math.random()*40+5)}</div>
+       <p>${q.ans}</p>
+     </div>
+   </div>`:`<div class="det-a"><div class="lbl" style="background:var(--faint)">A</div><div class="body"><div class="meta">아직 답변이 등록되지 않았어요</div></div></div>`}
+ </div>`).join('');
+document.addEventListener('click',e=>{
+  const r=e.target.closest('.row');if(!r)return;
+  document.querySelectorAll('.row').forEach(x=>{if(x!==r)x.classList.remove('open')});
+  r.classList.toggle('open');
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>서티 SEOTI · 로그인·회원가입 변형 B — 좌우 분할</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css">
+<style>
+:root{--bg:#fff;--ink:#161412;--sub:#8c8781;--faint:#bdb8b1;--line:#e7e4df;--paper:#f6f3ee;--accent:#e8503a}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Pretendard Variable',Pretendard,sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.55;height:100vh;overflow:hidden}
+img{display:block;max-width:100%}a{color:inherit;text-decoration:none}button,input{font-family:inherit}
+.en{font-size:.7em;opacity:.45;margin-left:5px;font-weight:500;letter-spacing:.02em;text-transform:none;font-style:normal}
+
+.split{display:grid;grid-template-columns:1.1fr 1fr;height:100vh}
+
+/* LEFT — brand visual */
+.hero-side{background:var(--paper);position:relative;overflow:hidden;padding:50px}
+.hero-side .logo{font-size:22px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;position:relative;z-index:2}
+.hero-side .quote{position:absolute;left:50px;bottom:50px;right:50px;z-index:2}
+.hero-side .quote .eyebrow{font-size:11px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--sub);margin-bottom:14px}
+.hero-side .quote h2{font-size:36px;font-weight:800;letter-spacing:-.025em;line-height:1.25}
+.hero-side .quote h2 em{font-style:normal;color:var(--accent)}
+.hero-side .quote p{color:var(--sub);font-size:14px;margin-top:14px;max-width:380px;line-height:1.8}
+
+.stickers{position:absolute;inset:0;z-index:1;pointer-events:none}
+.sticker{position:absolute;border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 14px 40px -14px rgba(0,0,0,.3)}
+.sticker img{width:100%;height:100%;object-fit:cover}
+.s1{width:160px;height:160px;top:80px;right:60px;transform:rotate(-8deg)}
+.s2{width:130px;height:130px;top:200px;right:240px;transform:rotate(6deg)}
+.s3{width:180px;height:180px;top:280px;right:90px;transform:rotate(-4deg)}
+.s4{width:120px;height:120px;top:60px;left:50%;transform:rotate(5deg)}
+
+/* RIGHT — form */
+.form-side{padding:60px;overflow-y:auto;display:flex;flex-direction:column}
+.form-top{display:flex;justify-content:flex-end;font-size:13px;color:var(--sub);font-weight:600;gap:18px}
+.form-top a{cursor:pointer}.form-top a:hover{color:var(--ink)}
+.form-box{flex:1;display:flex;flex-direction:column;justify-content:center;max-width:420px;width:100%;margin:0 auto;padding:30px 0}
+
+.toggle{display:inline-flex;background:var(--paper);padding:4px;margin-bottom:30px}
+.toggle a{padding:9px 22px;font-size:13.5px;font-weight:700;color:var(--sub);cursor:pointer}
+.toggle a.on{background:var(--ink);color:#fff}
+
+.sect{display:none}.sect.on{display:block}
+
+.sect h1{font-size:32px;font-weight:800;letter-spacing:-.025em;line-height:1.2}
+.sect .desc{color:var(--sub);font-size:14px;margin-top:8px}
+
+.fld{margin:18px 0 14px}
+.fld label{display:block;font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--sub);margin-bottom:7px}
+.fld input{width:100%;padding:14px 0;border:none;border-bottom:1.5px solid var(--line);background:none;outline:none;font-size:15px;transition:.15s}
+.fld input:focus{border-bottom-color:var(--ink)}
+.fld .hint{font-size:11.5px;color:var(--sub);margin-top:5px}
+.fld .send{display:flex;gap:8px;align-items:flex-end}
+.fld .send input{flex:1}
+.fld .send button{background:var(--ink);color:#fff;border:none;padding:9px 14px;font-size:12px;font-weight:800;cursor:pointer;letter-spacing:.04em;white-space:nowrap}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+.opts{display:flex;justify-content:space-between;align-items:center;margin:20px 0;font-size:12.5px;color:var(--sub)}
+.opts label{display:flex;align-items:center;gap:6px;cursor:pointer}
+.opts input{width:14px;height:14px;accent-color:var(--ink)}
+.opts a{cursor:pointer}.opts a:hover{color:var(--ink)}
+
+.submit{width:100%;background:var(--ink);color:#fff;border:none;padding:18px;font-family:inherit;font-size:14px;font-weight:800;letter-spacing:.06em;cursor:pointer;text-transform:uppercase;margin-top:6px}
+.submit:hover{background:var(--accent)}
+
+.divider{display:flex;align-items:center;gap:14px;margin:24px 0;color:var(--sub);font-size:11.5px;font-weight:700;letter-spacing:.06em}
+.divider::before,.divider::after{content:"";flex:1;height:1px;background:var(--line)}
+
+.social-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.social-row a{padding:13px;text-align:center;font-size:13px;font-weight:700;cursor:pointer;border:1px solid var(--line)}
+.social-row a:hover{border-color:var(--ink)}
+.social-row a.kakao{background:#fee500;border-color:#fee500}
+.social-row a.naver{background:#03c75a;color:#fff;border-color:#03c75a}
+
+.terms-mini{font-size:11.5px;color:var(--sub);line-height:1.7;margin-top:14px;text-align:center}
+.terms-mini a{color:var(--ink);text-decoration:underline;text-underline-offset:3px;font-weight:700}
+
+.bottom-link{text-align:center;margin-top:20px;font-size:13px;color:var(--sub);padding-top:20px;border-top:1px solid var(--line)}
+.bottom-link a{color:var(--ink);font-weight:800;margin-left:6px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.guest-link{margin-top:14px;text-align:center;font-size:12.5px;color:var(--sub)}
+.guest-link a{display:inline-block;margin-top:8px;padding:10px 22px;border:1px solid var(--ink);color:var(--ink);font-weight:800;font-size:13px;cursor:pointer}
+.guest-link a:hover{background:var(--ink);color:#fff}
+
+@media(max-width:880px){.split{grid-template-columns:1fr;height:auto}body{overflow:auto;height:auto}.hero-side{padding:30px;min-height:280px}.hero-side .quote{position:static;margin-top:auto}.stickers{display:none}.form-side{padding:30px 24px}}
+</style>
+</head>
+<body>
+
+<div class="split">
+  <!-- LEFT brand visual -->
+  <div class="hero-side">
+    <a class="logo" href="mockup-b-minimal.html">Seoti</a>
+    <div class="stickers">
+      <div class="sticker s1"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/a157d261092510f1542550274972a939.png"></div>
+      <div class="sticker s2"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/3d92c3f2ae8a816bb0aaf8374372b46a.png"></div>
+      <div class="sticker s3"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202508/d9342a7de8b65e19f073f6f99139560d.png"></div>
+      <div class="sticker s4"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/655ded5da50146cf19dbaa537f0378da.png"></div>
+    </div>
+    <div class="quote">
+      <div class="eyebrow">손그림 다꾸 일러스트<i class="en">Seoti Studio</i></div>
+      <h2>오늘 하루를<br><em>말랑하게</em><br>채우는 작은 종이.</h2>
+      <p>서티 패밀리가 되시면 3,000원 신규 적립금, 매달 신상 알림, 회원 전용 세일을 가장 먼저 받아볼 수 있어요.</p>
+    </div>
+  </div>
+
+  <!-- RIGHT form -->
+  <div class="form-side">
+    <div class="form-top">
+      <a href="mockup-b-minimal.html">← 스토어로 돌아가기</a>
+    </div>
+    <div class="form-box">
+      <div class="toggle">
+        <a class="on" data-go="login">로그인</a>
+        <a data-go="signup">회원가입</a>
+      </div>
+
+      <!-- LOGIN -->
+      <section class="sect on" data-s="login">
+        <h1>안녕하세요,<br>다시 오신 걸 환영해요.</h1>
+        <p class="desc">이메일과 비밀번호로 로그인 해주세요.</p>
+        <div class="fld"><label>이메일<i class="en">Email</i></label><input type="email" placeholder="name@example.com"></div>
+        <div class="fld"><label>비밀번호<i class="en">Password</i></label><input type="password" placeholder="••••••••"></div>
+        <div class="opts">
+          <label><input type="checkbox">로그인 유지</label>
+          <a>비밀번호 찾기</a>
+        </div>
+        <button class="submit">로그인</button>
+        <div class="divider">OR · SNS 로그인</div>
+        <div class="social-row">
+          <a class="kakao">카카오</a><a class="naver">네이버</a><a>Google</a>
+        </div>
+        <div class="bottom-link">계정이 없으신가요?<a data-go="signup">회원가입 →</a></div>
+        <div class="guest-link">가입 없이 주문하실 건가요?<br><a href="cart-checkout-a.html">비회원 주문 →</a></div>
+      </section>
+
+      <!-- SIGNUP -->
+      <section class="sect" data-s="signup">
+        <h1>서티 패밀리가<br>되어주세요 🎀</h1>
+        <p class="desc">신규회원 3,000P · 매주 신상 알림 · 회원 전용 세일</p>
+        <div class="fld"><label>이메일<i class="en">Email</i></label>
+          <div class="send"><input type="email" placeholder="name@example.com"><button>인증발송</button></div>
+        </div>
+        <div class="fld"><label>인증번호<i class="en">Code</i></label>
+          <div class="send"><input placeholder="6자리" maxlength="6"><button>확인</button></div>
+        </div>
+        <div class="frow">
+          <div class="fld"><label>이름</label><input placeholder="홍길동"></div>
+          <div class="fld"><label>닉네임</label><input placeholder="다꾸요정"></div>
+        </div>
+        <div class="fld"><label>비밀번호<i class="en">Password</i></label><input type="password" placeholder="영문+숫자 8자 이상"></div>
+        <div class="fld"><label>비밀번호 확인</label><input type="password" placeholder="다시 입력"></div>
+        <p class="terms-mini">가입 시 <a>이용약관</a> 및 <a>개인정보 처리방침</a>에 동의한 것으로 간주됩니다.</p>
+        <button class="submit" style="margin-top:18px">가입하고 시작하기</button>
+        <div class="bottom-link">이미 회원이신가요?<a data-go="login">로그인 →</a></div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('click',e=>{
+  const go=e.target.closest('[data-go]');if(!go)return;
+  const k=go.dataset.go;
+  document.querySelectorAll('.toggle a').forEach(a=>a.classList.toggle('on',a.dataset.go===k));
+  document.querySelectorAll('.sect').forEach(s=>s.classList.toggle('on',s.dataset.s===k));
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>서티 SEOTI · 관리자 확장 기능 — 회원·리뷰·공지·쿠폰</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css">
+<style>
+:root{--bg:#f7f6f3;--paper:#fff;--ink:#161412;--sub:#8a8480;--faint:#c5c0ba;--line:#e7e3dc;--line2:#d8d3cb;--accent:#e8503a;--ok:#3aa872;--warn:#d68a3a;--bad:#d63a3a}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Pretendard Variable',Pretendard,sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.5;font-size:14px}
+a{color:inherit;text-decoration:none}img{display:block;max-width:100%}
+button,input,select,textarea{font-family:inherit}
+.en{font-size:.7em;opacity:.45;margin-left:5px;font-weight:500;letter-spacing:.02em;text-transform:none;font-style:normal}
+
+.app{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+
+.sb{background:var(--paper);border-right:1px solid var(--line);display:flex;flex-direction:column}
+.sb-logo{padding:22px 24px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+.sb-logo b{font-size:18px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
+.sb-logo small{font-size:10px;font-weight:700;color:var(--sub);letter-spacing:.1em;text-transform:uppercase}
+.sb-nav{flex:1;padding:14px 12px}
+.sb-grp{margin-bottom:14px}
+.sb-grp h5{font-size:10.5px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:var(--faint);padding:8px 12px;margin-bottom:2px}
+.sb a{display:flex;align-items:center;gap:11px;padding:9px 12px;font-size:13.5px;font-weight:600;color:var(--sub);cursor:pointer;border-radius:6px;margin:2px 0}
+.sb a:hover{background:var(--bg);color:var(--ink)}
+.sb a.on{background:var(--ink);color:#fff}
+.sb a .badge{margin-left:auto;background:var(--accent);color:#fff;font-size:10.5px;font-weight:800;padding:2px 7px;border-radius:999px}
+.sb a.on .badge{background:#fff;color:var(--ink)}
+.sb a .ico{width:18px;text-align:center}
+.sb-extension{padding:8px 12px;background:linear-gradient(135deg,#fff5f3,#fff);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.sb-extension small{font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);padding:0 8px}
+.sb-bot{padding:14px 16px;border-top:1px solid var(--line);display:flex;gap:10px;align-items:center}
+.sb-bot .av{width:34px;height:34px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:800;font-size:13px}
+.sb-bot b{font-size:13px;font-weight:800;display:block}
+.sb-bot small{font-size:11px;color:var(--sub)}
+
+/* main */
+.main{display:flex;flex-direction:column;min-width:0}
+.topbar{background:var(--paper);border-bottom:1px solid var(--line);padding:14px 30px;display:flex;align-items:center;gap:18px}
+.crumb{font-size:12.5px;color:var(--sub);font-weight:600}
+.crumb b{color:var(--ink)}
+.top-search{background:var(--bg);border:1px solid var(--line);padding:8px 14px;font-size:13px;outline:none;width:280px;margin-left:8px}
+.top-r{margin-left:auto;display:flex;gap:10px;align-items:center}
+.top-r .ic{width:34px;height:34px;display:grid;place-items:center;border-radius:6px;color:var(--sub);cursor:pointer;font-size:16px}
+.top-r .ic:hover{background:var(--bg);color:var(--ink)}
+
+.content{padding:30px;flex:1;overflow-y:auto}
+.page-h{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;margin-bottom:24px;flex-wrap:wrap}
+.page-h h1{font-size:26px;font-weight:800;letter-spacing:-.015em}
+.page-h .lead{font-size:13px;color:var(--sub);margin-top:5px}
+.actions{display:flex;gap:8px}
+.btn{font-size:13px;font-weight:700;padding:10px 18px;border:1px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer;letter-spacing:.02em}
+.btn:hover{border-color:var(--ink)}
+.btn-p{background:var(--ink);color:#fff;border-color:var(--ink)}
+.btn-p:hover{background:var(--accent);border-color:var(--accent)}
+
+.card{background:var(--paper);border:1px solid var(--line);padding:20px 22px}
+.sect{display:none}.sect.on{display:block}
+
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.kpi{background:var(--paper);border:1px solid var(--line);padding:18px 22px}
+.kpi .lbl{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--sub)}
+.kpi .val{font-size:26px;font-weight:800;margin:6px 0 4px;letter-spacing:-.015em}
+.kpi .delta{font-size:12px;font-weight:700;color:var(--ok)}
+
+.seg{display:inline-flex;background:var(--paper);border:1px solid var(--line);padding:3px}
+.seg a{padding:7px 14px;font-size:12.5px;font-weight:700;color:var(--sub);cursor:pointer}
+.seg a.on{background:var(--ink);color:#fff}
+
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{font-size:10.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--sub);text-align:left;padding:10px 12px;border-bottom:1px solid var(--line2);background:var(--bg)}
+td{padding:12px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:hover td{background:var(--bg)}
+td .thumb{width:36px;height:36px;background:var(--bg);overflow:hidden;display:inline-block;vertical-align:middle;margin-right:10px}
+td .thumb img{width:100%;height:100%;object-fit:cover}
+td .nm{font-weight:700;font-size:13.5px;display:inline-block;vertical-align:middle}
+td .nm small{display:block;color:var(--sub);font-weight:500;font-size:11.5px;margin-top:2px}
+.tnum{font-variant-numeric:tabular-nums}
+.pill{display:inline-block;font-size:10.5px;font-weight:800;letter-spacing:.05em;padding:3px 8px;text-transform:uppercase;background:var(--ok);color:#fff}
+.pill.warn{background:#fff;color:var(--warn);border:1px solid var(--warn)}
+.pill.bad{background:var(--bad);color:#fff}
+.pill.gray{background:var(--bg);color:var(--sub);border:1px solid var(--line)}
+.pill.ink{background:var(--ink);color:#fff}
+.pill.gold{background:#cba24b;color:#fff}
+.pill.purple{background:#9d7bff;color:#fff}
+
+.row-act a{font-size:12.5px;font-weight:700;color:var(--sub);cursor:pointer;margin-right:10px}
+.row-act a:hover{color:var(--ink)}
+
+/* review */
+.rev{padding:18px 20px;border:1px solid var(--line);background:var(--paper);margin-bottom:10px}
+.rev .head{display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap}
+.rev .h-thumb{width:54px;height:54px;background:var(--bg);overflow:hidden}
+.rev .h-thumb img{width:100%;height:100%;object-fit:cover}
+.rev .h-mid{flex:1;min-width:0}
+.rev .h-mid b{font-size:13.5px;font-weight:800;display:block}
+.rev .h-mid small{font-size:11.5px;color:var(--sub)}
+.rev .stars{color:#f5b942;font-size:14px;letter-spacing:.04em}
+.rev p{font-size:13px;line-height:1.7;color:var(--ink);margin:6px 0}
+.rev .pho{display:flex;gap:6px;margin:8px 0}
+.rev .pho div{width:60px;height:60px;background:var(--bg);overflow:hidden}
+.rev .pho img{width:100%;height:100%;object-fit:cover}
+.rev .reply-area{margin-top:10px;padding:12px 14px;background:var(--bg);border-left:3px solid var(--accent)}
+.rev .reply-area b{font-size:12px;color:var(--accent);font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+.rev .reply-area textarea{width:100%;margin-top:6px;background:#fff;border:1px solid var(--line);padding:9px;font-family:inherit;font-size:13px;min-height:60px;resize:vertical;outline:none}
+.rev .actions{display:flex;gap:6px;margin-top:8px;justify-content:flex-end}
+
+/* notice management */
+.notice-form{display:grid;grid-template-columns:240px 1fr;gap:24px;align-items:flex-start}
+.notice-cover{aspect-ratio:1.4/1;background:var(--bg);border:2px dashed var(--line2);display:grid;place-items:center;color:var(--sub);font-size:13px;cursor:pointer}
+.notice-cover:hover{border-color:var(--ink)}
+.fld{margin-bottom:14px}
+.fld label{display:block;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--sub);margin-bottom:6px}
+.fld input,.fld textarea,.fld select{width:100%;font-size:14px;padding:10px 12px;border:1px solid var(--line);background:#fff;outline:none}
+.fld textarea{min-height:120px;resize:vertical}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.editor-toolbar{display:flex;gap:4px;padding:6px;background:var(--bg);border:1px solid var(--line);border-bottom:none}
+.editor-toolbar button{background:none;border:none;padding:4px 10px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;color:var(--sub)}
+.editor-toolbar button:hover{background:#fff;color:var(--ink)}
+
+/* coupon */
+.coupon-make{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:18px;background:var(--paper);border:1px solid var(--line);margin-bottom:18px}
+.cp-preview{background:linear-gradient(135deg,#fff5f3,#fff);border:1.5px dashed var(--accent);padding:24px;text-align:center;border-radius:12px}
+.cp-preview .v{font-size:38px;font-weight:800;color:var(--accent);letter-spacing:-.03em}
+.cp-preview .n{font-size:15px;font-weight:800;margin-top:4px}
+.cp-preview .d{font-size:12px;color:var(--sub);margin-top:6px}
+.cp-preview .ex{font-size:11px;color:var(--sub);margin-top:14px}
+
+@media(max-width:900px){.app{grid-template-columns:1fr}.sb{display:none}.kpis,.notice-form,.coupon-make{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="sb">
+    <div class="sb-logo"><b>Seoti</b><small>Admin</small></div>
+    <nav class="sb-nav">
+      <div class="sb-grp">
+        <h5>운영<i class="en">Operations</i></h5>
+        <a href="admin-a.html"><span class="ico">▦</span>대시보드</a>
+        <a href="admin-a.html"><span class="ico">📈</span>판매 실적</a>
+      </div>
+      <div class="sb-grp">
+        <h5>상품·재고<i class="en">Inventory</i></h5>
+        <a href="admin-a.html"><span class="ico">🏷</span>상품 관리<span class="badge">43</span></a>
+        <a href="admin-a.html"><span class="ico">📦</span>재고 관리<span class="badge">3</span></a>
+        <a href="admin-a.html"><span class="ico">＋</span>새 상품 등록</a>
+      </div>
+      <div class="sb-grp">
+        <h5>주문<i class="en">Orders</i></h5>
+        <a href="admin-a.html"><span class="ico">📋</span>대량주문<span class="badge">5</span></a>
+        <a href="admin-a.html"><span class="ico">🚚</span>일반 주문</a>
+      </div>
+    </nav>
+    <div class="sb-extension">
+      <small>+ 확장 기능</small>
+    </div>
+    <nav class="sb-nav" style="padding-top:8px">
+      <div class="sb-grp">
+        <h5>고객<i class="en">Customer</i></h5>
+        <a class="on" data-go="members"><span class="ico">👥</span>회원 관리<span class="badge">1,842</span></a>
+        <a data-go="reviews"><span class="ico">⭐</span>리뷰 관리<span class="badge">12</span></a>
+        <a><span class="ico">💬</span>Q&A 답변<span class="badge">8</span></a>
+      </div>
+      <div class="sb-grp">
+        <h5>마케팅<i class="en">Marketing</i></h5>
+        <a data-go="notices"><span class="ico">📢</span>공지·이벤트<span class="badge">32</span></a>
+        <a data-go="coupons"><span class="ico">🎟</span>쿠폰 관리<span class="badge">7</span></a>
+        <a><span class="ico">🖼</span>배너 관리</a>
+      </div>
+    </nav>
+    <div class="sb-bot">
+      <div class="av">서</div>
+      <div><b>서티</b><small>관리자</small></div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="crumb">관리자 / <b id="crumbNow">회원 관리</b></div>
+      <input class="top-search" placeholder="🔍 전체 검색">
+      <div class="top-r"><div class="ic">🔔</div><div class="ic">✉</div></div>
+    </div>
+
+    <div class="content">
+
+      <!-- ======= 회원 관리 ======= -->
+      <section class="sect on" data-s="members">
+        <div class="page-h">
+          <div><h1>회원 관리<i class="en">Members</i></h1>
+            <div class="lead">전체 회원 1,842명 · 이번 달 +127명 · VIP 84명</div></div>
+          <div class="actions">
+            <button class="btn">📤 CSV 내보내기</button>
+            <button class="btn">📧 단체 메일 보내기</button>
+            <button class="btn btn-p">＋ 회원 직접 추가</button>
+          </div>
+        </div>
+
+        <div class="kpis">
+          <div class="kpi"><div class="lbl">총 회원</div><div class="val">1,842</div><div class="delta">▲ 127 이번달</div></div>
+          <div class="kpi"><div class="lbl">VIP (플래티넘+)</div><div class="val">84</div><div class="delta">▲ 6</div></div>
+          <div class="kpi"><div class="lbl">활성 회원 (30일)</div><div class="val">512</div><div class="delta">27.8%</div></div>
+          <div class="kpi"><div class="lbl">평균 LTV</div><div class="val">₩42k</div><div class="delta">▲ ₩2.1k</div></div>
+        </div>
+
+        <div class="card" style="padding:0">
+          <div style="padding:14px 18px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--line)">
+            <span class="seg"><a class="on">전체 1,842</a><a>VIP 84</a><a>골드 218</a><a>실버 540</a><a>신규 (7일) 23</a><a>휴면</a></span>
+            <input style="margin-left:auto;background:var(--bg);border:1px solid var(--line);padding:8px 12px;font-size:13px;outline:none;width:240px" placeholder="🔍 이름·이메일·전화번호">
+          </div>
+          <table>
+            <thead><tr><th style="width:30px"><input type="checkbox"></th><th>회원</th><th>등급</th><th>가입일</th><th>최근 접속</th><th>총 구매</th><th>적립금</th><th>상태</th><th></th></tr></thead>
+            <tbody>
+              <tr><td><input type="checkbox"></td><td><span class="nm">다꾸요정<small>seoti.fan@example.com · 010-1234-****</small></span></td><td><span class="pill gold">골드</span></td><td>2026-05-01</td><td class="tnum">방금 전</td><td class="tnum">₩87,500<br><small style="color:var(--sub)">14건</small></td><td class="tnum">1,250P</td><td><span class="pill">활성</span></td><td class="row-act"><a>상세</a><a>메일</a></td></tr>
+              <tr><td><input type="checkbox"></td><td><span class="nm">송이*<small>song***@gmail.com · 010-2345-****</small></span></td><td><span class="pill purple">플래티넘</span></td><td>2025-12-08</td><td class="tnum">2시간 전</td><td class="tnum">₩324,800<br><small style="color:var(--sub)">38건</small></td><td class="tnum">4,830P</td><td><span class="pill">활성</span></td><td class="row-act"><a>상세</a><a>메일</a></td></tr>
+              <tr><td><input type="checkbox"></td><td><span class="nm">jenn*<small>🇺🇸 jenn***@gmail.com</small></span></td><td><span class="pill gold">골드</span></td><td>2025-08-14</td><td class="tnum">어제</td><td class="tnum">₩142,300<br><small style="color:var(--sub)">8건 (해외)</small></td><td class="tnum">540P</td><td><span class="pill">활성</span></td><td class="row-act"><a>상세</a><a>메일</a></td></tr>
+              <tr><td><input type="checkbox"></td><td><span class="nm">민지*<small>mj***@naver.com</small></span></td><td><span class="pill">실버</span></td><td>2026-03-22</td><td class="tnum">3일 전</td><td class="tnum">₩28,400<br><small style="color:var(--sub)">3건</small></td><td class="tnum">250P</td><td><span class="pill">활성</span></td><td class="row-act"><a>상세</a><a>메일</a></td></tr>
+              <tr><td><input type="checkbox"></td><td><span class="nm">하늘*<small>sky***@kakao.com</small></span></td><td><span class="pill">실버</span></td><td>2026-05-19</td><td class="tnum">오늘</td><td class="tnum">₩6,400<br><small style="color:var(--sub)">1건</small></td><td class="tnum">3,180P</td><td><span class="pill gray">신규</span></td><td class="row-act"><a>상세</a><a>메일</a></td></tr>
+              <tr><td><input type="checkbox"></td><td><span class="nm">유빈*<small>yoo***@daum.net</small></span></td><td><span class="pill">실버</span></td><td>2026-02-10</td><td class="tnum">60일 전</td><td class="tnum">₩42,500<br><small style="color:var(--sub)">5건</small></td><td class="tnum">820P</td><td><span class="pill warn">휴면 임박</span></td><td class="row-act"><a>상세</a><a>리마인드</a></td></tr>
+              <tr><td><input type="checkbox"></td><td><span class="nm">agency*<small>ad***@studio.kr</small></span></td><td><span class="pill ink">기업</span></td><td>2025-11-04</td><td class="tnum">1주 전</td><td class="tnum">₩1,840,000<br><small style="color:var(--sub)">3건 (대량)</small></td><td class="tnum">—</td><td><span class="pill">활성</span></td><td class="row-act"><a>상세</a><a>메일</a></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ======= 리뷰 관리 ======= -->
+      <section class="sect" data-s="reviews">
+        <div class="page-h">
+          <div><h1>리뷰 관리<i class="en">Reviews</i></h1>
+            <div class="lead">전체 412건 · 미답글 12건 · 평균 평점 ★ 4.8</div></div>
+          <div class="actions">
+            <span class="seg"><a class="on">미답글 12</a><a>전체 412</a><a>사진 리뷰 167</a><a>신고 1</a></span>
+            <button class="btn">📝 자주쓰는 답글 관리</button>
+          </div>
+        </div>
+
+        <div class="rev">
+          <div class="head">
+            <div class="h-thumb"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/a157d261092510f1542550274972a939.png"></div>
+            <div class="h-mid"><b>설탕 눈마을 스티커 · 단품</b><small>리뷰어 송이* (골드) · 2026-05-20</small></div>
+            <span class="stars">★★★★★</span>
+            <span class="pill">미답글</span>
+          </div>
+          <div class="pho"><div><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/a157d261092510f1542550274972a939.png"></div><div><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202512/cb676b86854d5dc018ea0576b99c897a.png"></div></div>
+          <p>다꾸할 때 한 페이지를 통째로 메꿔주는 느낌이라 너무 좋아요! 색감도 사진이랑 똑같고, 종이도 두꺼워서 만족합니다. 재입고 되자마자 또 샀어요 🥹</p>
+          <div class="reply-area">
+            <b>답글 작성<i class="en">Reply</i></b>
+            <textarea placeholder="자주쓰는 답글: ⌘+1 ~ ⌘+9"></textarea>
+          </div>
+          <div class="actions">
+            <button class="btn">⭐ 베스트 리뷰로 지정</button>
+            <button class="btn">🚩 신고</button>
+            <button class="btn btn-p">답글 등록 (+적립 100P)</button>
+          </div>
+        </div>
+
+        <div class="rev">
+          <div class="head">
+            <div class="h-thumb"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/8844055f11daba2bd37b69a6150cdac6.png"></div>
+            <div class="h-mid"><b>학교괴담 스티커 · 단품</b><small>리뷰어 하늘* (실버) · 2026-05-15</small></div>
+            <span class="stars">★★★★☆</span>
+            <span class="pill warn">신중 검토</span>
+          </div>
+          <p>그림 자체는 예쁜데 살짝 작게 느껴졌어요. 그래도 색감 좋고 종이 질 좋아서 만족.</p>
+          <div class="reply-area">
+            <b>답글 작성</b>
+            <textarea placeholder="별점 4점 이하 리뷰는 답글로 더 정중하게..."></textarea>
+          </div>
+          <div class="actions">
+            <button class="btn">🚩 신고</button>
+            <button class="btn btn-p">답글 등록</button>
+          </div>
+        </div>
+
+        <div class="rev">
+          <div class="head">
+            <div class="h-thumb"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202508/d9342a7de8b65e19f073f6f99139560d.png"></div>
+            <div class="h-mid"><b>선샤인데이 스티커 · 2개 세트</b><small>리뷰어 minji* (골드) · 2026-05-14</small></div>
+            <span class="stars">★★★★★</span>
+            <span class="pill">미답글</span>
+          </div>
+          <p>다이어리 꾸미기에 진심인 친구한테 선물했는데 너무 좋아하더라구요. 2개 세트로 산 거 정말 잘했어요!</p>
+          <div class="reply-area">
+            <b>답글 작성</b>
+            <textarea placeholder="답글을 작성하세요..."></textarea>
+          </div>
+          <div class="actions">
+            <button class="btn">⭐ 베스트</button>
+            <button class="btn btn-p">답글 등록</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======= 공지·이벤트 관리 ======= -->
+      <section class="sect" data-s="notices">
+        <div class="page-h">
+          <div><h1>공지·이벤트 관리<i class="en">Notices</i></h1>
+            <div class="lead">진행중 3개 · 종료 예정 1개 · 전체 32건</div></div>
+          <div class="actions">
+            <span class="seg"><a class="on">전체</a><a>진행중 3</a><a>예약 2</a><a>종료</a><a>임시저장 1</a></span>
+            <button class="btn btn-p">＋ 새 글 작성</button>
+          </div>
+        </div>
+
+        <div class="card" style="padding:0;margin-bottom:18px">
+          <table>
+            <thead><tr><th style="width:30px"><input type="checkbox"></th><th>분류</th><th>제목</th><th>상태</th><th>게시 기간</th><th>조회</th><th>참여</th><th></th></tr></thead>
+            <tbody>
+              <tr><td><input type="checkbox"></td><td><span class="pill" style="background:var(--accent)">EVENT</span></td><td><b style="color:var(--accent);font-weight:800">📌</b> <span class="nm">봄맞이 메모 스티커 2+1 이벤트</span></td><td><span class="pill">진행중</span></td><td class="tnum">05.15 ~ 05.31<br><small style="color:var(--sub)">10일 남음</small></td><td class="tnum">2,481</td><td class="tnum">482명</td><td class="row-act"><a>편집</a><a>종료</a></td></tr>
+              <tr><td><input type="checkbox"></td><td><span class="pill ink">NOTICE</span></td><td><span class="nm">5월 27일(월) 휴무 안내</span></td><td><span class="pill">진행중</span></td><td class="tnum">상시</td><td class="tnum">712</td><td>—</td><td class="row-act"><a>편집</a><a>숨김</a></td></tr>
+              <tr><td><input type="checkbox"></td><td><span class="pill ok">RESTOCK</span></td><td><span class="nm">[재입고] 설탕 눈마을 5월 30일 재입고</span></td><td><span class="pill ink">예약</span></td><td class="tnum">05.28 자동 게시</td><td>—</td><td>—</td><td class="row-act"><a>편집</a><a>지금 게시</a></td></tr>
+              <tr><td><input type="checkbox"></td><td><span class="pill" style="background:var(--accent)">EVENT</span></td><td><span class="nm">인스타 인증샷 이벤트</span></td><td><span class="pill">진행중</span></td><td class="tnum">05.10 ~ 06.10</td><td class="tnum">3,210</td><td class="tnum">128명</td><td class="row-act"><a>편집</a><a>종료</a></td></tr>
+              <tr><td><input type="checkbox"></td><td><span class="pill gray">DRAFT</span></td><td><span class="nm" style="color:var(--sub)">6월 신상품 예고편 (작성중)</span></td><td><span class="pill gray">임시저장</span></td><td>—</td><td>—</td><td>—</td><td class="row-act"><a>이어쓰기</a><a>삭제</a></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <h3 style="font-size:14px;font-weight:800;margin-bottom:14px">＋ 새 공지/이벤트 작성<i class="en">New Post</i></h3>
+          <div class="notice-form">
+            <div>
+              <div class="notice-cover">📷<br>커버 이미지<br><small style="font-size:11px;color:var(--faint);margin-top:4px;display:block">1.4:1 권장 · 1400×1000</small></div>
+              <div class="fld" style="margin-top:14px"><label>분류</label><select><option>공지</option><option>이벤트</option><option>재입고</option><option>업데이트</option></select></div>
+              <div class="fld"><label>상태</label><select><option>임시저장</option><option>지금 게시</option><option>예약 게시</option></select></div>
+            </div>
+            <div>
+              <div class="fld"><label>제목 (눈에 띄게)</label><input placeholder="예: 봄맞이 메모 스티커 2+1 이벤트"></div>
+              <div class="frow">
+                <div class="fld"><label>시작 일시</label><input type="datetime-local" value="2026-05-15T00:00"></div>
+                <div class="fld"><label>종료 일시</label><input type="datetime-local" value="2026-05-31T23:59"></div>
+              </div>
+              <div class="fld"><label>요약 (목록에 보임)</label><input placeholder="한 줄 요약 — 목록에서 보이는 텍스트"></div>
+              <div class="fld" style="margin-bottom:0"><label>본문</label>
+                <div class="editor-toolbar">
+                  <button><b>B</b></button><button><i>I</i></button><button>H1</button><button>H2</button><button>🔗</button><button>📷</button><button>📋</button><button>💬</button>
+                </div>
+                <textarea placeholder="이벤트 상세 내용을 입력하세요..." style="border-top:none"></textarea>
+              </div>
+              <div style="display:flex;gap:8px;margin-top:14px;justify-content:flex-end">
+                <button class="btn">미리보기</button>
+                <button class="btn">임시저장</button>
+                <button class="btn btn-p">게시하기</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======= 쿠폰 관리 ======= -->
+      <section class="sect" data-s="coupons">
+        <div class="page-h">
+          <div><h1>쿠폰 관리<i class="en">Coupons</i></h1>
+            <div class="lead">활성 쿠폰 7개 · 발급 1,247장 · 사용 423장 (34%)</div></div>
+          <div class="actions">
+            <button class="btn">📊 사용 통계</button>
+            <button class="btn btn-p">＋ 새 쿠폰 만들기</button>
+          </div>
+        </div>
+
+        <div class="kpis">
+          <div class="kpi"><div class="lbl">활성 쿠폰</div><div class="val">7</div><div class="delta">+ 2 이번달</div></div>
+          <div class="kpi"><div class="lbl">발급 / 사용</div><div class="val">1,247 / 423</div><div class="delta">사용률 33.9%</div></div>
+          <div class="kpi"><div class="lbl">쿠폰 매출</div><div class="val">₩1.2M</div><div class="delta">▲ 전월 +18%</div></div>
+          <div class="kpi"><div class="lbl">평균 할인</div><div class="val">₩2,840</div><div class="delta">건당</div></div>
+        </div>
+
+        <div class="card" style="padding:0;margin-bottom:18px">
+          <table>
+            <thead><tr><th>쿠폰명</th><th>코드</th><th>할인</th><th>조건</th><th>발급/사용</th><th>유효기간</th><th>상태</th><th></th></tr></thead>
+            <tbody>
+              <tr><td><span class="nm">신규회원 3,000P</span></td><td class="tnum"><code style="background:var(--bg);padding:2px 6px;font-size:11px">WELCOME3000</code></td><td><b style="color:var(--accent)">3,000원</b></td><td>가입 시 자동</td><td class="tnum">412 / 287</td><td class="tnum">상시</td><td><span class="pill">활성</span></td><td class="row-act"><a>편집</a><a>중단</a></td></tr>
+              <tr><td><span class="nm">봄 시즌 15%</span></td><td class="tnum"><code style="background:var(--bg);padding:2px 6px;font-size:11px">SPRING15</code></td><td><b style="color:var(--accent)">15%</b></td><td>5천원↑ / 1회</td><td class="tnum">524 / 89</td><td class="tnum">~ 5/31</td><td><span class="pill">활성</span></td><td class="row-act"><a>편집</a><a>중단</a></td></tr>
+              <tr><td><span class="nm">3만원 이상 2,000원</span></td><td class="tnum"><code style="background:var(--bg);padding:2px 6px;font-size:11px">OVER30K</code></td><td><b style="color:var(--accent)">2,000원</b></td><td>3만원↑</td><td class="tnum">189 / 34</td><td class="tnum">~ 6/30</td><td><span class="pill">활성</span></td><td class="row-act"><a>편집</a><a>중단</a></td></tr>
+              <tr><td><span class="nm">생일 축하 10%</span></td><td class="tnum"><code style="background:var(--bg);padding:2px 6px;font-size:11px">BDAY10</code></td><td><b style="color:var(--accent)">10%</b></td><td>생일 달 자동</td><td class="tnum">68 / 41</td><td class="tnum">생일월</td><td><span class="pill">활성</span></td><td class="row-act"><a>편집</a><a>중단</a></td></tr>
+              <tr><td><span class="nm">무료배송</span></td><td class="tnum"><code style="background:var(--bg);padding:2px 6px;font-size:11px">FREESHIP</code></td><td><b style="color:var(--accent)">배송비 무료</b></td><td>국내</td><td class="tnum">54 / 12</td><td class="tnum">~ 7/15</td><td><span class="pill">활성</span></td><td class="row-act"><a>편집</a><a>중단</a></td></tr>
+              <tr><td><span class="nm">가정의 달 10%</span></td><td class="tnum"><code style="background:var(--bg);padding:2px 6px;font-size:11px">MAY10</code></td><td><b style="color:var(--sub)">10%</b></td><td>—</td><td class="tnum">412 / 312</td><td class="tnum">~ 5/15 종료</td><td><span class="pill gray">종료</span></td><td class="row-act"><a>리포트</a></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="coupon-make">
+          <div>
+            <h3 style="font-size:14px;font-weight:800;margin-bottom:14px">＋ 새 쿠폰 만들기</h3>
+            <div class="fld"><label>쿠폰명 (회원이 보는 이름)</label><input placeholder="예: 신상품 15% 할인"></div>
+            <div class="frow">
+              <div class="fld"><label>코드</label><input placeholder="SPRING15" style="font-family:monospace"></div>
+              <div class="fld"><label>발급 방식</label><select><option>자동 발급 (가입·생일 등)</option><option>코드 입력</option><option>관리자 직접 발급</option></select></div>
+            </div>
+            <div class="frow">
+              <div class="fld"><label>할인 종류</label><select><option>정률 (%)</option><option>정액 (원)</option><option>배송비 무료</option></select></div>
+              <div class="fld"><label>할인값</label><input placeholder="15"></div>
+            </div>
+            <div class="frow">
+              <div class="fld"><label>최소 주문 금액</label><input placeholder="5000"></div>
+              <div class="fld"><label>1인당 사용</label><select><option>1회</option><option>무제한</option></select></div>
+            </div>
+            <div class="frow">
+              <div class="fld"><label>시작일</label><input type="date" value="2026-05-21"></div>
+              <div class="fld"><label>종료일</label><input type="date" value="2026-05-31"></div>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:14px;justify-content:flex-end">
+              <button class="btn">임시저장</button>
+              <button class="btn btn-p">발급 시작</button>
+            </div>
+          </div>
+          <div>
+            <h3 style="font-size:14px;font-weight:800;margin-bottom:14px">미리보기 (사용자가 보는 화면)</h3>
+            <div class="cp-preview">
+              <div class="v">15%</div>
+              <div class="n">신상품 15% 할인</div>
+              <div class="d">최소 ₩5,000 / 1인 1회</div>
+              <div class="ex">⏰ ~ 2026-05-31</div>
+            </div>
+            <p style="font-size:12px;color:var(--sub);margin-top:14px;line-height:1.7">
+              💡 만든 쿠폰은 마이페이지/결제 화면에서 회원이 직접 받거나 사용할 수 있어요. 자동 발급 쿠폰은 조건 만족 시 자동 지급됩니다.
+            </p>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<script>
+const labels={members:"회원 관리",reviews:"리뷰 관리",notices:"공지·이벤트 관리",coupons:"쿠폰 관리"};
+document.addEventListener('click',e=>{
+  const go=e.target.closest('[data-go]');if(!go)return;
+  e.preventDefault();
+  const k=go.dataset.go;
+  document.querySelectorAll('.sect').forEach(s=>s.classList.toggle('on',s.dataset.s===k));
+  document.querySelectorAll('.sb a').forEach(a=>a.classList.toggle('on',a.dataset.go===k));
+  document.getElementById('crumbNow').textContent=labels[k]||"";
+  document.querySelector('.content').scrollTop=0;
+});
+</script>
+</body>
+</html>

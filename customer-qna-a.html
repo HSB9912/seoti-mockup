@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>서티 SEOTI · Q&A 변형 A — 카드 리스트</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css" />
+<style>
+  :root{
+    --bg:#fff; --ink:#161412; --sub:#8c8781; --faint:#bdb8b1;
+    --line:#e7e4df; --paper:#f6f3ee; --accent:#e8503a; --ok:#3aa872;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Pretendard Variable',Pretendard,sans-serif;background:var(--bg);
+    color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.55}
+  img{display:block;max-width:100%}a{color:inherit;text-decoration:none}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 32px}
+  .en{font-size:.7em;opacity:.45;margin-left:6px;font-weight:500;letter-spacing:.02em;text-transform:none;font-style:normal}
+  .eyebrow{font-size:11px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--sub)}
+
+  nav{border-bottom:1px solid var(--line);background:rgba(255,255,255,.95);
+    backdrop-filter:blur(8px);position:sticky;top:0;z-index:30}
+  .nav-in{display:flex;align-items:center;height:68px;gap:30px}
+  .logo{font-size:20px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
+  .nav-r{margin-left:auto;font-size:13px;color:var(--sub);font-weight:600}
+  .nav-r a{margin-left:18px}.nav-r a.on{color:var(--ink)}
+
+  /* header */
+  .ph{padding:60px 0 36px;border-bottom:1px solid var(--line)}
+  .ph-top{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap}
+  .ph h1{font-size:54px;font-weight:800;letter-spacing:-.025em;line-height:1.05}
+  .ph h1 em{font-style:normal;color:var(--accent)}
+  .ph p{color:var(--sub);font-size:14px;max-width:340px;margin-top:8px;line-height:1.7;text-align:right}
+  .ask-btn{background:var(--ink);color:#fff;border:none;font-family:inherit;
+    font-size:14px;font-weight:800;padding:16px 26px;letter-spacing:.05em;cursor:pointer}
+  .ask-btn:hover{background:var(--accent)}
+
+  /* filters */
+  .filters{display:flex;gap:22px;padding:24px 0;border-bottom:1px solid var(--ink);
+    margin-top:30px;font-size:13.5px;font-weight:600;flex-wrap:wrap;align-items:center}
+  .filters a{color:var(--sub);cursor:pointer;display:flex;gap:5px;align-items:baseline}
+  .filters a sup{font-size:10px;color:var(--faint)}
+  .filters a.on{color:var(--ink)}
+  .filters a.on::before{content:"";width:6px;height:6px;background:var(--accent);
+    border-radius:50%;display:inline-block;margin-right:7px;vertical-align:middle}
+  .filters .search{margin-left:auto;background:var(--paper);border:none;padding:10px 14px;
+    font-family:inherit;font-size:13.5px;outline:none;width:220px}
+  .filters .sort{color:var(--ink);font-weight:700}
+
+  /* list */
+  .list{padding:30px 0 50px}
+  .qa{border-bottom:1px solid var(--line);padding:24px 0;cursor:pointer;transition:.15s}
+  .qa:hover{background:var(--paper);margin:0 -16px;padding:24px 16px}
+  .qa-head{display:flex;align-items:flex-start;gap:18px}
+  .qa-q{flex:none;font-size:22px;font-weight:800;color:var(--accent);width:30px;line-height:1.2}
+  .qa-mid{flex:1;min-width:0}
+  .qa-meta{display:flex;gap:10px;align-items:center;margin-bottom:6px;flex-wrap:wrap}
+  .qa-cat{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--sub)}
+  .qa-stat{font-size:10.5px;font-weight:800;letter-spacing:.06em;padding:3px 8px;
+    text-transform:uppercase;background:var(--ok);color:#fff}
+  .qa-stat.wait{background:var(--paper);color:var(--sub);border:1px solid var(--line)}
+  .qa-stat.private::before{content:"🔒 ";font-size:10px}
+  .qa h3{font-size:16px;font-weight:700;letter-spacing:-.01em;line-height:1.4}
+  .qa-by{font-size:12.5px;color:var(--sub);margin-top:8px}
+  .qa-chev{font-size:14px;color:var(--sub);transition:.2s}
+  .qa.open .qa-chev{transform:rotate(180deg);color:var(--ink)}
+  .qa-ans{display:none;margin:20px 0 0 48px;padding:22px 24px;background:var(--paper);
+    border-left:3px solid var(--accent)}
+  .qa.open .qa-ans{display:block}
+  .qa-ans .head{display:flex;gap:14px;margin-bottom:12px;align-items:center}
+  .qa-ans .a{background:var(--accent);color:#fff;width:28px;height:28px;
+    font-weight:800;font-size:13px;display:grid;place-items:center}
+  .qa-ans .by{font-size:12.5px;color:var(--sub)}
+  .qa-ans .by b{color:var(--ink);font-weight:800}
+  .qa-ans p{font-size:14px;line-height:1.8;color:var(--ink)}
+
+  /* pagination */
+  .page{display:flex;justify-content:center;align-items:center;gap:4px;padding:30px 0}
+  .page a{padding:10px 14px;font-size:13.5px;font-weight:700;color:var(--sub);cursor:pointer}
+  .page a.on{background:var(--ink);color:#fff}
+  .page a:hover:not(.on){background:var(--paper)}
+
+  /* ask form */
+  .ask{margin-top:60px;background:var(--paper);padding:50px;display:grid;
+    grid-template-columns:1fr 1.5fr;gap:50px;align-items:flex-start}
+  .ask h2{font-size:28px;font-weight:800;letter-spacing:-.02em;line-height:1.2}
+  .ask .lead{font-size:13.5px;color:var(--sub);margin-top:10px;line-height:1.7}
+  .ask .info{font-size:12.5px;color:var(--sub);margin-top:20px;line-height:1.7;
+    padding-top:20px;border-top:1px solid var(--line)}
+  .ask .info b{color:var(--ink);font-weight:800;display:block;margin-bottom:5px}
+  .ask form{background:#fff;padding:30px 32px;border:1px solid var(--line)}
+  .fld{margin-bottom:18px}
+  .fld label{display:block;font-size:11px;font-weight:800;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--sub);margin-bottom:7px}
+  .fld input,.fld textarea,.fld select{width:100%;font-family:inherit;font-size:14px;
+    padding:12px 14px;border:1px solid var(--line);background:#fff;outline:none}
+  .fld textarea{min-height:140px;resize:vertical}
+  .fld input:focus,.fld textarea:focus,.fld select:focus{border-color:var(--ink)}
+  .frow{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .ch{display:flex;gap:10px;align-items:center;font-size:13px;margin-bottom:18px}
+  .ch input{width:14px;height:14px;accent-color:var(--accent)}
+  .submit{background:var(--ink);color:#fff;border:none;padding:16px 28px;
+    font-family:inherit;font-size:14px;font-weight:800;letter-spacing:.06em;cursor:pointer}
+  .submit:hover{background:var(--accent)}
+
+  footer{border-top:1px solid var(--ink);padding:34px 0;font-size:12.5px;color:var(--sub);
+    display:flex;justify-content:space-between}
+
+  @media(max-width:760px){
+    .ask{grid-template-columns:1fr;padding:32px}
+    .ph h1{font-size:36px}
+    .qa-ans{margin-left:0}
+    .filters .search{margin-left:0;width:100%}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap nav-in">
+    <a class="logo" href="mockup-b-minimal.html">Seoti</a>
+    <div class="nav-r"><a href="mockup-b-minimal.html">스토어</a>
+      <a href="customer-bulk-order.html">대량주문</a><a class="on">Q&A</a><a>Studio</a></div>
+  </div>
+</nav>
+
+<header class="ph wrap">
+  <div class="ph-top">
+    <div>
+      <span class="eyebrow">자주묻는질문 · 문의<i class="en">Customer Q&A</i></span>
+      <h1 style="margin-top:14px">궁금한 게 있으면<br><em>편하게 물어보세요.</em></h1>
+    </div>
+    <div style="text-align:right">
+      <p>배송·교환·제품 관련 모든 문의는 여기서. 영업일 기준 1~2일 내 답변드려요.</p>
+      <button class="ask-btn" style="margin-top:14px">+ 새 문의 작성<i class="en">Ask</i></button>
+    </div>
+  </div>
+  <div class="filters">
+    <a class="on">전체 <sup>32</sup></a>
+    <a>배송 <sup>11</sup></a>
+    <a>제품 <sup>9</sup></a>
+    <a>결제 <sup>5</sup></a>
+    <a>교환·환불 <sup>4</sup></a>
+    <a>기타 <sup>3</sup></a>
+    <input class="search" placeholder="🔍 문의 내용 검색">
+    <span class="sort">최신순 ↕</span>
+  </div>
+</header>
+
+<main class="wrap list" id="list"></main>
+
+<div class="wrap page">
+  <a>← 이전</a><a class="on">1</a><a>2</a><a>3</a><a>4</a><a>5</a><a>다음 →</a>
+</div>
+
+<section class="wrap ask">
+  <div>
+    <span class="eyebrow">직접 문의하기<i class="en">Ask Directly</i></span>
+    <h2 style="margin-top:10px">목록에 답이 없다면<br>여기서 바로 물어보세요</h2>
+    <p class="lead">개인정보가 포함된 질문은 <b style="color:var(--ink)">비공개</b>로 설정해 주세요. 가입 회원이 아니어도 이메일로 답변 받을 수 있어요.</p>
+    <div class="info">
+      <b>답변 시간<i class="en">Reply Time</i></b>평일 기준 1~2영업일 내<br><br>
+      <b>긴급 문의<i class="en">Urgent</i></b>인스타 DM @seoti.studio
+    </div>
+  </div>
+  <form>
+    <div class="frow">
+      <div class="fld"><label>카테고리<i class="en">Category</i></label>
+        <select><option>제품</option><option>배송</option><option>결제</option><option>교환·환불</option><option>기타</option></select></div>
+      <div class="fld"><label>이름<i class="en">Name</i></label><input placeholder="홍길동"></div>
+    </div>
+    <div class="fld"><label>이메일<i class="en">Email</i></label><input type="email" placeholder="답변받을 이메일"></div>
+    <div class="fld"><label>제목<i class="en">Title</i></label><input placeholder="문의 제목을 입력해주세요"></div>
+    <div class="fld"><label>내용<i class="en">Message</i></label>
+      <textarea placeholder="궁금하신 점을 자세히 적어주세요. 주문번호가 있다면 함께 알려주시면 도움이 돼요."></textarea></div>
+    <div class="ch"><input type="checkbox" id="prv"><label for="prv">비공개로 작성 — 본인과 작가만 볼 수 있어요 🔒</label></div>
+    <button type="button" class="submit">문의 보내기 →</button>
+  </form>
+</section>
+
+<footer class="wrap">
+  <span>© 2026 SEOTI — 디자인 시안용 목업</span>
+  <span>Q&A · seoti.studio@gmail.com</span>
+</footer>
+
+<script>
+const qa=[
+ {c:"제품",t:"설탕 눈마을 스티커 재입고 언제 되나요?",by:"송이*",d:"2026-05-20",s:"answered",
+  ans:"안녕하세요! 설탕 눈마을 스티커는 5월 30일에 재입고 예정이에요. 알림 신청해주시면 입고 즉시 안내드릴게요 🙇‍♀️",
+  resp:"서티"},
+ {c:"배송",t:"해외배송 가능한가요? 미국으로 받고 싶어서요",by:"jenn*",d:"2026-05-19",s:"answered",
+  ans:"네! 미국 포함 전 세계로 배송 가능합니다. 단, 대량으로 주문하실 경우 별도 견적이 필요하니 [대량주문 페이지]에서 신청해 주세요.",resp:"서티"},
+ {c:"교환·환불",t:"받은 제품에 미세한 흠집이 있어요",by:"minji*",d:"2026-05-18",s:"answered",
+  ans:"불편드려 죄송합니다. 사진을 인스타 DM(@seoti.studio)으로 보내주시면 새 제품으로 교환해드릴게요. 반송비도 저희가 부담합니다.",resp:"서티"},
+ {c:"결제",t:"무통장입금 입금자명을 잘못 적었어요",by:"jihye*",d:"2026-05-17",s:"wait",ans:"",resp:""},
+ {c:"제품",t:"마스킹테이프 자유롭게 자를 수 있나요?",by:"하늘*",d:"2026-05-16",s:"answered",
+  ans:"키스컷 마스킹테이프는 캐릭터 모양대로 떼어 쓰실 수 있고, 일반 마테는 자유롭게 잘라 사용 가능합니다. 둘다 다꾸용으로 좋아요!",resp:"서티"},
+ {c:"배송",t:"주문 후 며칠이면 받을 수 있나요?",by:"수민*",d:"2026-05-15",s:"answered",
+  ans:"평일 오후 2시 이전 결제 건은 당일 출고됩니다. 일반택배 기준 1~3일 정도 소요되니 참고해주세요!",resp:"서티"},
+ {c:"기타",t:"콜라보 문의는 어디로 드리면 되나요?",by:"agency*",d:"2026-05-14",s:"wait",private:true,ans:"",resp:""},
+ {c:"제품",t:"학교괴담 스티커 사이즈가 어떻게 되나요?",by:"가을*",d:"2026-05-13",s:"answered",
+  ans:"학교괴담 스티커는 135 × 105mm 사이즈예요. 다이어리 한 페이지에 딱 맞게 작게 나뉘어 있어서 활용하기 좋답니다!",resp:"서티"},
+];
+const stat={answered:["","답변완료"],wait:["wait","답변대기"]};
+document.getElementById('list').innerHTML=qa.map((q,i)=>`
+ <article class="qa" data-i="${i}">
+   <div class="qa-head">
+     <div class="qa-q">Q.</div>
+     <div class="qa-mid">
+       <div class="qa-meta">
+         <span class="qa-cat">${q.c}</span>
+         <span class="qa-stat ${stat[q.s][0]} ${q.private?'private':''}">${stat[q.s][1]}</span>
+       </div>
+       <h3>${q.t}</h3>
+       <div class="qa-by">작성자 ${q.by} · ${q.d}</div>
+     </div>
+     <div class="qa-chev">⌃</div>
+   </div>
+   ${q.ans?`<div class="qa-ans">
+     <div class="head"><div class="a">A.</div><div class="by"><b>${q.resp}</b> · 답변 2026-05-${parseInt(q.d.slice(-2))+1}</div></div>
+     <p>${q.ans}</p>
+   </div>`:`<div class="qa-ans"><div class="head"><div class="a" style="background:var(--faint)">A.</div><div class="by">아직 답변이 등록되지 않았어요</div></div></div>`}
+ </article>`).join('');
+document.addEventListener('click',e=>{
+  const a=e.target.closest('.qa');if(a)a.classList.toggle('open');
+});
+</script>
+</body>
+</html>

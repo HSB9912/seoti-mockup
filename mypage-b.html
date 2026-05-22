@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>서티 SEOTI · 마이페이지 변형 B — 상단 탭/카드</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css">
+<style>
+:root{--bg:#fbfaf7;--paper:#fff;--ink:#1c1b1a;--sub:#87827d;--faint:#bdb8b1;--line:#ebe6dd;--accent:#5b8a72;--accent2:#e8503a;--ok:#3aa872;--warn:#d68a3a;--radius:14px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Pretendard Variable',Pretendard,sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.55;font-size:14px}
+img{display:block;max-width:100%}a{color:inherit;text-decoration:none}button,input{font-family:inherit}
+.wrap{max-width:1240px;margin:0 auto;padding:0 30px}
+.en{font-size:.7em;opacity:.45;margin-left:5px;font-weight:500;letter-spacing:.02em;text-transform:none;font-style:normal}
+
+nav{background:var(--paper);border-bottom:1px solid var(--line);height:60px;display:flex;align-items:center}
+.nav-in{display:flex;width:100%;align-items:center;gap:24px}
+.logo{font-size:20px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
+.nav-m{display:flex;gap:22px;font-size:13.5px;font-weight:600;color:var(--sub)}
+.nav-r{margin-left:auto;font-size:13px;color:var(--sub);font-weight:600}.nav-r a{margin-left:16px}.nav-r a.on{color:var(--ink)}
+
+/* hero greeting */
+.hero{padding:46px 0 30px}
+.hero-card{background:linear-gradient(135deg,var(--paper) 0%,#f7f4ee 100%);border:1px solid var(--line);
+  border-radius:var(--radius);padding:32px 38px;display:grid;grid-template-columns:auto 1fr auto;gap:28px;align-items:center}
+.hero-card .av{width:72px;height:72px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:30px;font-weight:800;flex:none}
+.hero-card h1{font-size:24px;font-weight:800;letter-spacing:-.015em}
+.hero-card h1 b{color:var(--accent2)}
+.hero-card p{color:var(--sub);font-size:13px;margin-top:4px}
+.hero-card .level{display:inline-flex;gap:8px;align-items:center;margin-top:8px;font-size:12.5px;color:var(--sub)}
+.hero-card .level .bar{width:140px;height:6px;background:#fff;border-radius:99px;overflow:hidden}
+.hero-card .level .bar div{height:100%;background:var(--accent2);border-radius:99px}
+.hero-card .right{display:flex;gap:8px;font-size:13px}
+.hero-card .right a{padding:9px 14px;border:1px solid var(--line);background:#fff;border-radius:99px;cursor:pointer;font-weight:700}
+.hero-card .right a:hover{border-color:var(--ink)}
+
+/* top tabs (horizontal pill) */
+.tabs-row{padding:24px 0 30px}
+.pills{display:flex;gap:6px;flex-wrap:wrap}
+.pills a{padding:10px 18px;font-size:13.5px;font-weight:700;color:var(--sub);background:var(--paper);border:1px solid var(--line);
+  border-radius:99px;cursor:pointer;display:flex;align-items:center;gap:7px}
+.pills a:hover{border-color:var(--ink);color:var(--ink)}
+.pills a.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.pills a .b{background:var(--accent2);color:#fff;font-size:10.5px;font-weight:800;padding:2px 7px;border-radius:99px;letter-spacing:.04em}
+.pills a.on .b{background:#fff;color:var(--ink)}
+
+/* content */
+.content{padding-bottom:80px}
+.sect{display:none}.sect.on{display:block}
+
+/* dashboard cards */
+.dash{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+.dc{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:22px;cursor:pointer}
+.dc:hover{border-color:var(--ink)}
+.dc .ic{width:38px;height:38px;border-radius:10px;background:var(--bg);display:grid;place-items:center;font-size:18px;margin-bottom:14px}
+.dc .ic.a{background:#fff4ec}.dc .ic.b{background:#ecf3ee}.dc .ic.c{background:#f0eef7}.dc .ic.d{background:#fff7dc}
+.dc .k{font-size:11.5px;color:var(--sub);font-weight:700}
+.dc .v{font-size:24px;font-weight:800;margin-top:5px;letter-spacing:-.015em}
+.dc .v.accent{color:var(--accent2)}
+.dc small{display:block;font-size:11.5px;color:var(--sub);margin-top:3px}
+
+.row{display:grid;gap:14px;margin-bottom:18px}
+.row.r-2{grid-template-columns:1fr 1fr}
+.row.r-3-1{grid-template-columns:2fr 1fr}
+
+.card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:24px 26px}
+.card h3{font-size:15px;font-weight:800;letter-spacing:-.01em;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
+.card h3 a{font-size:12px;font-weight:700;color:var(--sub);cursor:pointer}
+
+/* orders */
+.o-card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:22px 24px;margin-bottom:12px}
+.o-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+.o-head .meta{font-size:13px;color:var(--sub)}.o-head .meta b{color:var(--ink);font-weight:800}
+.o-stat{font-size:11px;font-weight:800;letter-spacing:.06em;padding:5px 12px;text-transform:uppercase;border-radius:99px}
+.o-stat.ok{background:var(--ok);color:#fff}.o-stat.ink{background:var(--ink);color:#fff}
+.o-stat.warn{background:#fff;color:var(--warn);border:1px solid var(--warn)}
+.o-stat.done{background:var(--bg);color:var(--sub);border:1px solid var(--line)}
+.oi{display:flex;gap:14px;align-items:center;padding:8px 0}
+.oi .tn{width:54px;height:54px;background:var(--bg);overflow:hidden;border-radius:8px;flex:none}
+.oi img{width:100%;height:100%;object-fit:cover}
+.oi b{font-size:13.5px;font-weight:700;display:block}
+.oi small{font-size:11.5px;color:var(--sub)}
+.oi .pr{margin-left:auto;font-weight:700}
+.o-foot{display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:14px;border-top:1px dashed var(--line);font-size:13px}
+.o-foot .tot{font-size:15px;font-weight:800}
+.o-foot .actions{display:flex;gap:6px}
+.btn{font-family:inherit;font-size:12.5px;font-weight:700;padding:9px 16px;border:1px solid var(--line);background:#fff;border-radius:99px;cursor:pointer;color:var(--ink)}
+.btn:hover{border-color:var(--ink)}.btn-p{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+/* wishlist grid */
+.wgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.wi{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;cursor:pointer;position:relative}
+.wi .ph{aspect-ratio:1;background:var(--bg);overflow:hidden}
+.wi .ph img{width:100%;height:100%;object-fit:cover;transition:.4s}
+.wi:hover img{transform:scale(1.04)}
+.wi .heart{position:absolute;top:10px;right:10px;width:32px;height:32px;background:rgba(255,255,255,.95);border-radius:50%;display:grid;place-items:center;font-size:14px;color:var(--accent2)}
+.wi .b{padding:12px 14px}
+.wi .ct{font-size:10.5px;color:var(--sub);font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.wi h4{font-size:13.5px;font-weight:700;margin:3px 0 8px}
+.wi .foot{display:flex;justify-content:space-between;align-items:center;font-size:13px}
+.wi .foot .price{font-weight:800}
+
+/* points/coupons table */
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{font-size:10.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--sub);text-align:left;padding:11px 0;border-bottom:1px solid var(--line)}
+td{padding:13px 0;border-bottom:1px solid var(--line)}
+.p-in{color:var(--ok);font-weight:800}.p-out{color:var(--accent2);font-weight:800}
+
+/* coupons */
+.coupon-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.cp{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:20px;position:relative}
+.cp .v{font-size:28px;font-weight:800;color:var(--accent2)}
+.cp .n{font-size:14.5px;font-weight:800;margin-top:4px}
+.cp .d{font-size:12px;color:var(--sub);margin-top:5px}
+.cp .expire{font-size:11px;color:var(--accent2);margin-top:10px;font-weight:700}
+.cp button{margin-top:14px;width:100%;background:var(--ink);color:#fff;border:none;padding:10px;font-family:inherit;font-size:12.5px;font-weight:800;border-radius:99px;cursor:pointer;letter-spacing:.04em}
+.cp.used{opacity:.4}
+
+/* reviews */
+.rt-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.rt{display:flex;gap:14px;background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:16px;align-items:center}
+.rt .tn{width:64px;height:64px;background:var(--bg);overflow:hidden;border-radius:10px;flex:none}
+.rt img{width:100%;height:100%;object-fit:cover}
+.rt b{font-size:13.5px;font-weight:700;display:block}
+.rt small{font-size:11.5px;color:var(--sub)}
+.rt button{background:var(--accent2);color:#fff;border:none;font-family:inherit;font-size:11.5px;font-weight:800;padding:8px 14px;border-radius:99px;cursor:pointer;letter-spacing:.04em}
+
+/* profile */
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+footer{padding:30px 0;font-size:12.5px;color:var(--sub);text-align:center}
+
+@media(max-width:920px){.hero-card{grid-template-columns:1fr;text-align:center}.hero-card .right{justify-content:center}.dash{grid-template-columns:1fr 1fr}.row.r-2,.row.r-3-1{grid-template-columns:1fr}.wgrid{grid-template-columns:1fr 1fr}.coupon-grid,.rt-grid,.profile-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<nav class="wrap"><div class="nav-in">
+  <a class="logo" href="mockup-b-minimal.html">Seoti</a>
+  <div class="nav-m"><a href="mockup-b-minimal.html">스토어</a><a href="customer-bulk-order.html">대량주문</a><a href="customer-qna-a.html">Q&A</a></div>
+  <div class="nav-r"><a class="on">마이</a><a>🛒</a></div>
+</div></nav>
+
+<header class="hero wrap">
+  <div class="hero-card">
+    <div class="av">다</div>
+    <div>
+      <h1><b>다꾸요정</b>님, 어서오세요 🎀</h1>
+      <p>가입 20일 · 누적 구매 ₩87,500 · 14건 주문 · 평균 평점 ★ 4.8</p>
+      <div class="level">
+        <span>골드</span><div class="bar"><div style="width:87%"></div></div><span>플래티넘까지 ₩12,500</span>
+      </div>
+    </div>
+    <div class="right">
+      <a>🔔 알림</a><a>⚙ 설정</a><a>로그아웃</a>
+    </div>
+  </div>
+</header>
+
+<section class="tabs-row wrap">
+  <div class="pills">
+    <a class="on" data-go="dash">▦ 대시보드</a>
+    <a data-go="orders">📦 주문 <span class="b">8</span></a>
+    <a data-go="wish">♡ 위시리스트 <span class="b">12</span></a>
+    <a data-go="reviews">⭐ 리뷰 <span class="b">2</span></a>
+    <a data-go="points">💰 적립금</a>
+    <a data-go="coupons">🎟 쿠폰 <span class="b">3</span></a>
+    <a data-go="profile">👤 회원정보</a>
+  </div>
+</section>
+
+<main class="wrap content">
+
+  <!-- 대시보드 -->
+  <section class="sect on" data-s="dash">
+    <div class="dash">
+      <div class="dc"><div class="ic a">💰</div><div class="k">보유 적립금</div><div class="v accent">1,250P</div><small>이번 달 +320P</small></div>
+      <div class="dc"><div class="ic b">🎟</div><div class="k">사용 가능 쿠폰</div><div class="v">3장</div><small>가장 빠른 만료 5/31</small></div>
+      <div class="dc"><div class="ic c">⭐</div><div class="k">작성 가능 리뷰</div><div class="v">2건</div><small>작성 시 +200P</small></div>
+      <div class="dc"><div class="ic d">📦</div><div class="k">진행중 주문</div><div class="v">1건</div><small>배송중</small></div>
+    </div>
+    <div class="row r-3-1">
+      <div class="card">
+        <h3>최근 주문 <a data-go="orders">전체 보기 →</a></h3>
+        <div class="oi"><div class="tn"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/a157d261092510f1542550274972a939.png"></div>
+          <div><b>설탕 눈마을 ×2 외 3건</b><small>SEOTI-26-0521-0148 · 2026-05-21</small></div>
+          <span class="o-stat ink" style="margin-left:auto">배송중</span></div>
+        <div class="oi"><div class="tn"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/8844055f11daba2bd37b69a6150cdac6.png"></div>
+          <div><b>학교괴담 스티커</b><small>SEOTI-26-0519-0132 · 2026-05-19</small></div>
+          <span class="o-stat ok" style="margin-left:auto">완료</span></div>
+        <div class="oi"><div class="tn"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202508/d9342a7de8b65e19f073f6f99139560d.png"></div>
+          <div><b>선샤인데이 스티커</b><small>SEOTI-26-0515-0098 · 2026-05-15</small></div>
+          <span class="o-stat done" style="margin-left:auto">구매확정</span></div>
+      </div>
+      <div class="card">
+        <h3>리뷰 작성하고 적립받기 ✨</h3>
+        <div class="rt" style="padding:12px;border-radius:10px;margin-bottom:8px">
+          <div class="tn" style="width:48px;height:48px"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/8844055f11daba2bd37b69a6150cdac6.png"></div>
+          <div style="flex:1"><b>학교괴담</b><small>+100P</small></div>
+          <button>작성</button>
+        </div>
+        <div class="rt" style="padding:12px;border-radius:10px">
+          <div class="tn" style="width:48px;height:48px"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202508/d9342a7de8b65e19f073f6f99139560d.png"></div>
+          <div style="flex:1"><b>선샤인데이</b><small>+100P</small></div>
+          <button>작성</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 주문 -->
+  <section class="sect" data-s="orders">
+    <div class="o-card">
+      <div class="o-head"><div class="meta">주문번호 <b>SEOTI-26-0521-0148</b> · 2026-05-21</div><span class="o-stat ink">배송중</span></div>
+      <div class="oi"><div class="tn"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/a157d261092510f1542550274972a939.png"></div><div><b>설탕 눈마을 스티커</b><small>단품 ×2</small></div><span class="pr">7,000원</span></div>
+      <div class="oi"><div class="tn"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202508/13260f931f04e15ddc8bb56a20dc0e90.png"></div><div><b>키스컷 마스킹테이프 2</b><small>단품 ×1</small></div><span class="pr">6,500원</span></div>
+      <div class="oi"><small style="color:var(--sub)">+ 외 2개 품목</small></div>
+      <div class="o-foot"><span>운송장 CJ대한통운 <b>123456789</b></span><span class="tot">21,900원</span>
+        <div class="actions"><button class="btn">배송조회</button><button class="btn">상세</button></div></div>
+    </div>
+    <div class="o-card">
+      <div class="o-head"><div class="meta">주문번호 <b>SEOTI-26-0519-0132</b> · 2026-05-19</div><span class="o-stat ok">배송완료</span></div>
+      <div class="oi"><div class="tn"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/8844055f11daba2bd37b69a6150cdac6.png"></div><div><b>학교괴담 스티커</b><small>단품 ×1</small></div><span class="pr">3,500원</span></div>
+      <div class="o-foot"><span style="color:var(--sub)">2026-05-21 수령</span><span class="tot">6,400원</span>
+        <div class="actions"><button class="btn">리뷰 작성 <small style="color:var(--accent2)">+100P</small></button><button class="btn btn-p">재구매</button></div></div>
+    </div>
+    <div class="o-card">
+      <div class="o-head"><div class="meta">주문번호 <b>SEOTI-26-0515-0098</b> · 2026-05-15</div><span class="o-stat done">구매확정</span></div>
+      <div class="oi"><div class="tn"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202508/d9342a7de8b65e19f073f6f99139560d.png"></div><div><b>선샤인데이 스티커</b><small>2개 세트 ×1</small></div><span class="pr">7,000원</span></div>
+      <div class="o-foot"><span style="color:var(--sub)">리뷰 ★★★★★</span><span class="tot">9,900원</span>
+        <div class="actions"><button class="btn">재구매</button></div></div>
+    </div>
+  </section>
+
+  <!-- 위시리스트 -->
+  <section class="sect" data-s="wish">
+    <div class="wgrid">
+      <a class="wi"><div class="ph"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202512/6df4ff16a044b3cd8dde5d8b78447e35.png"><span class="heart">♥</span></div><div class="b"><div class="ct">조각</div><h4>초록책장 스티커</h4><div class="foot"><span class="price">₩3,500</span><button class="btn">담기</button></div></div></a>
+      <a class="wi"><div class="ph"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/3d92c3f2ae8a816bb0aaf8374372b46a.png"><span class="heart">♥</span></div><div class="b"><div class="ct">메모</div><h4>스위티 메모팩</h4><div class="foot"><span class="price">₩3,500</span><button class="btn">담기</button></div></div></a>
+      <a class="wi"><div class="ph"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202503/58dafda9eee23c1a553c073971af033c.png"><span class="heart">♥</span></div><div class="b"><div class="ct">굿즈</div><h4>크레페 키링</h4><div class="foot"><span class="price">₩2,500</span><button class="btn" disabled style="opacity:.5">품절</button></div></div></a>
+      <a class="wi"><div class="ph"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202508/383bee900dbacb6369f996fc668c0f42.png"><span class="heart">♥</span></div><div class="b"><div class="ct">마테</div><h4>마스킹테이프 4type</h4><div class="foot"><span class="price">₩4,500</span><button class="btn">담기</button></div></div></a>
+      <a class="wi"><div class="ph"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202410/a20a1e98cd7574c0c8a6b6f025691a20.png"><span class="heart">♥</span></div><div class="b"><div class="ct">투명</div><h4>갓파갓파</h4><div class="foot"><span class="price">₩3,000</span><button class="btn">담기</button></div></div></a>
+      <a class="wi"><div class="ph"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/655ded5da50146cf19dbaa537f0378da.png"><span class="heart">♥</span></div><div class="b"><div class="ct">메모</div><h4>눈송이 여행</h4><div class="foot"><span class="price">₩3,500</span><button class="btn">담기</button></div></div></a>
+    </div>
+  </section>
+
+  <!-- 리뷰 -->
+  <section class="sect" data-s="reviews">
+    <div class="card" style="margin-bottom:14px"><h3>작성 가능 리뷰 2건 · 작성 시 +200P</h3>
+      <div class="rt-grid">
+        <div class="rt"><div class="tn"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/8844055f11daba2bd37b69a6150cdac6.png"></div>
+          <div style="flex:1"><b>학교괴담 스티커</b><small>2026-05-19 구매</small></div><button>리뷰 작성</button></div>
+        <div class="rt"><div class="tn"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202508/d9342a7de8b65e19f073f6f99139560d.png"></div>
+          <div style="flex:1"><b>선샤인데이 스티커</b><small>2026-05-15 구매</small></div><button>리뷰 작성</button></div>
+      </div>
+    </div>
+    <div class="card"><h3>작성한 리뷰 14건</h3>
+      <p style="color:var(--sub);font-size:13px">작성하신 리뷰는 각 상품 페이지에서 확인할 수 있어요. 평균 평점 ★ 4.8</p>
+    </div>
+  </section>
+
+  <!-- 적립금 -->
+  <section class="sect" data-s="points">
+    <div class="row r-3-1">
+      <div class="card">
+        <h3>적립금 내역</h3>
+        <table>
+          <thead><tr><th>일자</th><th>내역</th><th style="text-align:right">변동</th><th style="text-align:right">잔액</th></tr></thead>
+          <tbody>
+            <tr><td>05-21</td><td>주문 적립 #0521-0148 (3%)</td><td style="text-align:right" class="p-in">+ 600P</td><td style="text-align:right">1,250P</td></tr>
+            <tr><td>05-19</td><td>리뷰 작성 적립</td><td style="text-align:right" class="p-in">+ 100P</td><td style="text-align:right">650P</td></tr>
+            <tr><td>05-15</td><td>주문 적립 (3%)</td><td style="text-align:right" class="p-in">+ 300P</td><td style="text-align:right">550P</td></tr>
+            <tr><td>05-10</td><td>주문 시 사용 #0510-0067</td><td style="text-align:right" class="p-out">− 500P</td><td style="text-align:right">250P</td></tr>
+            <tr><td>05-01</td><td>가입 축하</td><td style="text-align:right" class="p-in">+ 3,000P</td><td style="text-align:right">3,000P</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h3>적립금 안내</h3>
+        <p style="font-size:13px;color:var(--sub);line-height:1.8">
+        💎 구매 금액의 <b style="color:var(--ink)">3%</b> 자동 적립<br>
+        ✏️ 리뷰 작성 시 <b style="color:var(--ink)">100P</b><br>
+        📷 사진 리뷰 시 <b style="color:var(--ink)">+50P</b><br>
+        🎁 생일 달 <b style="color:var(--ink)">1,000P</b><br>
+        💡 1,000P부터 사용 가능, 1P = 1원</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 쿠폰 -->
+  <section class="sect" data-s="coupons">
+    <div class="coupon-grid">
+      <div class="cp"><div class="v">15%</div><div class="n">신상품 15% 할인</div><div class="d">최소 ₩5,000 · 1회 사용</div><div class="expire">⏰ ~ 2026-05-31 (10일 남음)</div><button>사용하기</button></div>
+      <div class="cp"><div class="v">₩2,000</div><div class="n">3만원 이상 할인</div><div class="d">최소 주문 ₩30,000</div><div class="expire">⏰ ~ 2026-06-30</div><button>사용하기</button></div>
+      <div class="cp"><div class="v">무료</div><div class="n">무료배송 쿠폰</div><div class="d">국내 일반택배</div><div class="expire">⏰ ~ 2026-07-15</div><button>사용하기</button></div>
+      <div class="cp used"><div class="v">10%</div><div class="n">생일 축하 10% 할인</div><div class="d" style="color:var(--sub)">2026-05-10 사용 완료</div></div>
+    </div>
+  </section>
+
+  <!-- 회원정보 -->
+  <section class="sect" data-s="profile">
+    <div class="card" style="margin-bottom:14px">
+      <h3>기본 정보 <a>저장하기 →</a></h3>
+      <div class="profile-grid">
+        <div><label style="font-size:11px;color:var(--sub);font-weight:800;letter-spacing:.1em;text-transform:uppercase">이메일</label>
+          <input value="seoti.fan@example.com" readonly style="width:100%;margin-top:6px;padding:11px 13px;border:1px solid var(--line);border-radius:8px;font-size:14px;background:var(--bg)"></div>
+        <div><label style="font-size:11px;color:var(--sub);font-weight:800;letter-spacing:.1em;text-transform:uppercase">닉네임</label>
+          <input value="다꾸요정" style="width:100%;margin-top:6px;padding:11px 13px;border:1px solid var(--line);border-radius:8px;font-size:14px"></div>
+        <div><label style="font-size:11px;color:var(--sub);font-weight:800;letter-spacing:.1em;text-transform:uppercase">이름</label>
+          <input value="홍길동" style="width:100%;margin-top:6px;padding:11px 13px;border:1px solid var(--line);border-radius:8px;font-size:14px"></div>
+        <div><label style="font-size:11px;color:var(--sub);font-weight:800;letter-spacing:.1em;text-transform:uppercase">휴대폰</label>
+          <input value="010-1234-5678" style="width:100%;margin-top:6px;padding:11px 13px;border:1px solid var(--line);border-radius:8px;font-size:14px"></div>
+        <div><label style="font-size:11px;color:var(--sub);font-weight:800;letter-spacing:.1em;text-transform:uppercase">생일</label>
+          <input value="04-12" style="width:100%;margin-top:6px;padding:11px 13px;border:1px solid var(--line);border-radius:8px;font-size:14px"></div>
+        <div><label style="font-size:11px;color:var(--sub);font-weight:800;letter-spacing:.1em;text-transform:uppercase">비밀번호 변경</label>
+          <input type="password" placeholder="새 비밀번호" style="width:100%;margin-top:6px;padding:11px 13px;border:1px solid var(--line);border-radius:8px;font-size:14px"></div>
+      </div>
+    </div>
+    <div class="row r-2">
+      <div class="card"><h3>마케팅 수신</h3>
+        <div style="font-size:13.5px"><label style="display:flex;align-items:center;gap:8px;padding:7px 0"><input type="checkbox" checked> 이메일 · 신상품, 세일</label>
+        <label style="display:flex;align-items:center;gap:8px;padding:7px 0"><input type="checkbox"> SMS 알림</label>
+        <label style="display:flex;align-items:center;gap:8px;padding:7px 0"><input type="checkbox" checked> 앱 푸시</label></div>
+      </div>
+      <div class="card" style="background:#fff5f4;border-color:#f3c5b6">
+        <h3 style="color:var(--accent2)">회원 탈퇴 🥲</h3>
+        <p style="font-size:13px;color:var(--sub);line-height:1.7">탈퇴하시면 적립금·쿠폰·주문내역이 모두 삭제됩니다.</p>
+        <button class="btn" style="margin-top:12px;border-color:var(--accent2);color:var(--accent2)">탈퇴 신청</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>© 2026 SEOTI — 디자인 시안용 목업 · 마이페이지 변형 B</footer>
+
+<script>
+document.addEventListener('click',e=>{
+  const go=e.target.closest('[data-go]');if(!go)return;
+  const k=go.dataset.go;
+  document.querySelectorAll('.pills a').forEach(a=>a.classList.toggle('on',a.dataset.go===k));
+  document.querySelectorAll('.sect').forEach(s=>s.classList.toggle('on',s.dataset.s===k));
+  window.scrollTo({top:200,behavior:'smooth'});
+});
+</script>
+</body>
+</html>

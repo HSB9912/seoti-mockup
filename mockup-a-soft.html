@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>서티 SEOTI · 시안 A — 소프트 파스텔</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css" />
+<style>
+  :root{
+    --bg:#fffaf5; --surface:#ffffff; --ink:#3a332e; --sub:#9a8f86;
+    --line:#f0e6db; --peach:#ff9bb0; --peach-deep:#f06f8c;
+    --mint:#bfe3d2; --lav:#d6cdf0; --butter:#ffe6a8;
+    --radius:22px; --shadow:0 14px 34px -18px rgba(150,110,90,.45);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:'Pretendard Variable',Pretendard,-apple-system,sans-serif;
+    background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.55}
+  img{display:block;max-width:100%}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+
+  /* announcement */
+  .notice{background:var(--peach);color:#fff;text-align:center;
+    font-size:12.5px;font-weight:600;letter-spacing:.02em;padding:8px}
+
+  /* nav */
+  nav{position:sticky;top:0;z-index:50;background:rgba(255,250,245,.88);
+    backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+  .nav-in{display:flex;align-items:center;gap:34px;height:74px}
+  .logo{font-weight:800;font-size:22px;letter-spacing:.04em;display:flex;align-items:center;gap:8px}
+  .logo .dot{width:30px;height:30px;border-radius:50%;
+    background:radial-gradient(circle at 32% 30%,#fff 0 14%,var(--peach) 16%);
+    box-shadow:inset 0 -4px 8px rgba(240,111,140,.4)}
+  .menu{display:flex;gap:26px;font-size:15px;font-weight:600}
+  .menu a{padding:6px 0;position:relative;color:var(--sub)}
+  .menu a:hover,.menu a.on{color:var(--ink)}
+  .menu a.on::after{content:"";position:absolute;left:0;right:0;bottom:-2px;
+    height:3px;border-radius:3px;background:var(--peach)}
+  .nav-ic{margin-left:auto;display:flex;gap:10px}
+  .ic{width:40px;height:40px;border-radius:50%;background:#fff;border:1px solid var(--line);
+    display:grid;place-items:center;font-size:16px;cursor:pointer;transition:.2s}
+  .ic:hover{background:var(--peach);border-color:var(--peach);transform:translateY(-2px)}
+
+  /* hero */
+  .hero{padding:64px 0 30px}
+  .hero-in{display:grid;grid-template-columns:1fr 1.05fr;gap:50px;align-items:center}
+  .tag-pill{display:inline-flex;align-items:center;gap:6px;background:#fff;
+    border:1px solid var(--line);color:var(--peach-deep);font-weight:700;
+    font-size:13px;padding:7px 14px;border-radius:999px;margin-bottom:20px}
+  .hero h1{font-size:46px;font-weight:800;line-height:1.25;letter-spacing:-.02em}
+  .hero h1 b{color:var(--peach-deep)}
+  .hero p{margin-top:16px;color:var(--sub);font-size:16px;max-width:380px}
+  .hero-cta{margin-top:28px;display:flex;gap:12px}
+  .btn{border:none;cursor:pointer;font-family:inherit;font-weight:700;font-size:15px;
+    padding:14px 26px;border-radius:999px;transition:.2s}
+  .btn-fill{background:var(--peach);color:#fff;box-shadow:0 10px 22px -10px var(--peach-deep)}
+  .btn-fill:hover{background:var(--peach-deep);transform:translateY(-2px)}
+  .btn-ghost{background:#fff;border:1px solid var(--line);color:var(--ink)}
+  .btn-ghost:hover{border-color:var(--peach)}
+  .hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .hero-grid figure{border-radius:var(--radius);overflow:hidden;background:#fff;
+    box-shadow:var(--shadow);aspect-ratio:1}
+  .hero-grid figure:nth-child(1){transform:rotate(-3deg)}
+  .hero-grid figure:nth-child(2){transform:rotate(2deg);margin-top:24px}
+  .hero-grid figure:nth-child(3){transform:rotate(2.5deg)}
+  .hero-grid figure:nth-child(4){transform:rotate(-2deg);margin-top:-18px}
+  .hero-grid img{width:100%;height:100%;object-fit:cover}
+
+  /* marquee strip */
+  .strip{margin:36px 0;background:var(--lav);color:#5a4f7a;font-weight:700;
+    font-size:14px;padding:13px;text-align:center;letter-spacing:.04em;
+    border-radius:14px}
+
+  /* section head */
+  .sec{padding:38px 0}
+  .sec-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:24px}
+  .sec-head h2{font-size:27px;font-weight:800;letter-spacing:-.01em}
+  .sec-head h2 span{color:var(--peach-deep)}
+  .sec-head p{color:var(--sub);font-size:14px;margin-top:4px}
+  .more{font-size:14px;font-weight:700;color:var(--sub)}
+
+  /* chips */
+  .chips{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:28px}
+  .chip{background:#fff;border:1px solid var(--line);border-radius:999px;
+    padding:9px 18px;font-size:14px;font-weight:600;color:var(--sub);cursor:pointer;transition:.2s}
+  .chip:hover{border-color:var(--peach)}
+  .chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+  /* product grid */
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:26px}
+  .card{background:var(--surface);border-radius:var(--radius);overflow:hidden;
+    border:1px solid var(--line);cursor:pointer;transition:.25s}
+  .card:hover{transform:translateY(-7px);box-shadow:var(--shadow);border-color:transparent}
+  .thumb{position:relative;aspect-ratio:1;background:#faf3ec}
+  .thumb img{width:100%;height:100%;object-fit:cover}
+  .badge{position:absolute;top:12px;left:12px;font-size:11px;font-weight:800;
+    padding:5px 10px;border-radius:999px;color:#fff;letter-spacing:.03em}
+  .b-new{background:var(--peach)}
+  .b-best{background:#7fc6a8}
+  .b-soldout{background:#b9aea4}
+  .like{position:absolute;top:10px;right:10px;width:34px;height:34px;border-radius:50%;
+    background:rgba(255,255,255,.92);display:grid;place-items:center;font-size:15px}
+  .card-body{padding:15px 16px 18px}
+  .card-cat{font-size:11.5px;font-weight:700;color:var(--peach-deep);letter-spacing:.04em}
+  .card-name{font-size:15px;font-weight:700;margin:5px 0 9px;line-height:1.4}
+  .card-price{font-size:16px;font-weight:800}
+  .card-price small{font-size:12px;font-weight:600;color:var(--sub)}
+
+  /* detail preview */
+  .detail{background:#fff;border:1px solid var(--line);border-radius:30px;
+    padding:36px;display:grid;grid-template-columns:1fr 1fr;gap:42px;margin-top:14px}
+  .d-gallery .d-main{border-radius:18px;overflow:hidden;background:#faf3ec;aspect-ratio:1}
+  .d-main img{width:100%;height:100%;object-fit:cover}
+  .d-thumbs{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+  .d-thumbs div{border-radius:12px;overflow:hidden;aspect-ratio:1;background:#faf3ec;
+    border:2px solid transparent;cursor:pointer}
+  .d-thumbs div.on{border-color:var(--peach)}
+  .d-thumbs img{width:100%;height:100%;object-fit:cover}
+  .d-info .d-cat{color:var(--peach-deep);font-weight:700;font-size:13px}
+  .d-info h3{font-size:26px;font-weight:800;margin:8px 0 4px}
+  .d-stars{color:#f5b942;font-size:14px}
+  .d-stars span{color:var(--sub);margin-left:6px}
+  .d-price{font-size:30px;font-weight:800;margin:18px 0}
+  .d-row{display:flex;gap:8px;border-top:1px dashed var(--line);padding-top:16px;margin-top:6px}
+  .d-row .k{width:78px;color:var(--sub);font-size:14px;font-weight:600;flex:none}
+  .d-row .v{font-size:14px}
+  .opt{display:flex;gap:8px;flex-wrap:wrap}
+  .opt b{padding:7px 13px;border:1px solid var(--line);border-radius:10px;
+    font-size:13px;font-weight:600;cursor:pointer}
+  .opt b.on{border-color:var(--peach);background:#fff5f7;color:var(--peach-deep)}
+  .qty{display:flex;align-items:center;border:1px solid var(--line);border-radius:10px;width:fit-content}
+  .qty button{width:34px;height:34px;border:none;background:none;font-size:16px;cursor:pointer}
+  .qty span{width:40px;text-align:center;font-weight:700}
+  .d-buy{display:flex;gap:10px;margin-top:24px}
+  .d-buy .btn{flex:1}
+  .d-tabs{display:flex;gap:8px;margin-top:28px}
+  .d-tabs b{flex:1;text-align:center;font-size:13px;font-weight:700;color:var(--sub);
+    padding:11px;background:#faf3ec;border-radius:10px}
+  .d-tabs b.on{background:var(--ink);color:#fff}
+
+  /* footer */
+  footer{margin-top:60px;background:#fff;border-top:1px solid var(--line);padding:46px 0 34px}
+  .foot-in{display:flex;justify-content:space-between;gap:30px;flex-wrap:wrap}
+  .foot-in h4{font-size:18px;font-weight:800;margin-bottom:10px}
+  .foot-in p{color:var(--sub);font-size:13px;line-height:1.9}
+  .fcol b{font-size:13px;display:block;margin-bottom:8px}
+  .fcol a{display:block;color:var(--sub);font-size:13px;line-height:2}
+  .copy{text-align:center;color:var(--sub);font-size:12px;margin-top:34px}
+
+  @media(max-width:900px){
+    .hero-in,.detail{grid-template-columns:1fr}
+    .grid{grid-template-columns:repeat(2,1fr)}
+    .hero h1{font-size:34px}
+    .menu{display:none}
+  }
+</style>
+</head>
+<body>
+<div class="notice">🎀 신규회원 3,000원 적립 · 30,000원 이상 무료배송 🎀</div>
+
+<nav>
+  <div class="wrap nav-in">
+    <div class="logo"><span class="dot"></span>seoti</div>
+    <div class="menu">
+      <a class="on">전체상품</a><a>메모 스티커</a><a>마스킹테이프</a>
+      <a>키링·굿즈</a><a>투명스티커</a><a>작가소개</a>
+    </div>
+    <div class="nav-ic">
+      <div class="ic">🔍</div><div class="ic">♡</div><div class="ic">🛒</div>
+    </div>
+  </div>
+</nav>
+
+<header class="hero wrap">
+  <div class="hero-in">
+    <div>
+      <span class="tag-pill">✦ 다꾸 일러스트 작가 서티</span>
+      <h1>오늘 하루를<br><b>말랑하게</b> 채우는<br>작은 스티커들</h1>
+      <p>메모지부터 마스킹테이프, 키링까지. 서티 작가의 손그림 감성을 그대로 담은 다꾸 아이템을 만나보세요.</p>
+      <div class="hero-cta">
+        <button class="btn btn-fill">신상품 보러가기</button>
+        <button class="btn btn-ghost">베스트 모음 ♡</button>
+      </div>
+    </div>
+    <div class="hero-grid">
+      <figure><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/3d92c3f2ae8a816bb0aaf8374372b46a.png" alt=""></figure>
+      <figure><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/8844055f11daba2bd37b69a6150cdac6.png" alt=""></figure>
+      <figure><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202508/d9342a7de8b65e19f073f6f99139560d.png" alt=""></figure>
+      <figure><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/655ded5da50146cf19dbaa537f0378da.png" alt=""></figure>
+    </div>
+  </div>
+</header>
+
+<div class="wrap"><div class="strip">⭐ 이번 주 인기 1위 · 서티 설탕 눈마을 스티커 — 재입고 완료!</div></div>
+
+<section class="sec wrap">
+  <div class="sec-head">
+    <div>
+      <h2>지금 <span>신상품</span></h2>
+      <p>2026년 봄, 새로 나온 따끈따끈한 다꾸템</p>
+    </div>
+    <a class="more">전체보기 →</a>
+  </div>
+  <div class="chips">
+    <span class="chip on">전체</span><span class="chip">메모 스티커</span>
+    <span class="chip">마스킹테이프</span><span class="chip">투명스티커</span>
+    <span class="chip">키링·굿즈</span><span class="chip">조각 스티커</span>
+  </div>
+  <div class="grid" id="grid"></div>
+</section>
+
+<section class="sec wrap">
+  <div class="sec-head"><div><h2>제품 <span>상세</span> 페이지</h2>
+    <p>이런 레이아웃으로 각 제품을 소개합니다</p></div></div>
+  <div class="detail">
+    <div class="d-gallery">
+      <div class="d-main"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/a157d261092510f1542550274972a939.png" alt=""></div>
+      <div class="d-thumbs">
+        <div class="on"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/a157d261092510f1542550274972a939.png"></div>
+        <div><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/bc4816b7234830cacfd8e73dbc81ebcb.png"></div>
+        <div><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/3dba9ab4bcc29cf34566d08a48284e13.png"></div>
+        <div><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202512/6df4ff16a044b3cd8dde5d8b78447e35.png"></div>
+      </div>
+    </div>
+    <div class="d-info">
+      <div class="d-cat">메모 스티커</div>
+      <h3>서티 설탕 눈마을 스티커</h3>
+      <div class="d-stars">★★★★★ <span>리뷰 128개</span></div>
+      <div class="d-price">3,500<small style="font-size:16px"> 원</small></div>
+      <div class="d-row"><div class="k">옵션</div><div class="v opt">
+        <b class="on">단품</b><b>2개 세트</b><b>4개 세트 (10%↓)</b></div></div>
+      <div class="d-row"><div class="k">수량</div><div class="v">
+        <div class="qty"><button>−</button><span>1</span><button>+</button></div></div></div>
+      <div class="d-row"><div class="k">배송</div><div class="v">택배 2,900원 · 30,000원 이상 무료</div></div>
+      <div class="d-row"><div class="k">사이즈</div><div class="v">135 × 105 mm · 다이컷 스티커</div></div>
+      <div class="d-buy">
+        <button class="btn btn-ghost">장바구니</button>
+        <button class="btn btn-fill">바로 구매하기</button>
+      </div>
+      <div class="d-tabs"><b class="on">상세정보</b><b>사용예시</b><b>리뷰 128</b><b>배송·교환</b></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-in">
+    <div style="max-width:280px">
+      <h4>seoti ⟡</h4>
+      <p>손그림으로 채우는 다꾸의 즐거움.<br>서티 작가의 공식 스토어입니다.</p>
+    </div>
+    <div class="fcol"><b>SHOP</b><a>신상품</a><a>베스트</a><a>메모 스티커</a><a>마스킹테이프</a></div>
+    <div class="fcol"><b>CS</b><a>공지사항</a><a>자주묻는질문</a><a>1:1 문의</a><a>배송조회</a></div>
+    <div class="fcol"><b>FOLLOW</b><a>인스타그램</a><a>트위터</a><a>네이버 블로그</a></div>
+  </div>
+  <div class="copy">© 2026 SEOTI. 본 페이지는 디자인 시안용 목업입니다.</div>
+</footer>
+
+<script>
+const products=[
+ {c:"메모 스티커",n:"롱 메모 스티커팩",p:3500,b:"new",img:"202602/bc4816b7234830cacfd8e73dbc81ebcb"},
+ {c:"메모 스티커",n:"스위티 메모 스티커팩",p:3500,b:"new",img:"202602/3d92c3f2ae8a816bb0aaf8374372b46a"},
+ {c:"메모 스티커",n:"설탕 눈마을 스티커",p:3500,b:"best",img:"202602/a157d261092510f1542550274972a939"},
+ {c:"메모 스티커",n:"학교괴담 스티커",p:3500,b:"new",img:"202602/8844055f11daba2bd37b69a6150cdac6"},
+ {c:"메모 스티커",n:"메모빈티지 스티커팩",p:2500,b:"",img:"202602/3dba9ab4bcc29cf34566d08a48284e13"},
+ {c:"조각 스티커",n:"초록책장 스티커",p:3500,b:"best",img:"202512/6df4ff16a044b3cd8dde5d8b78447e35"},
+ {c:"메모 스티커",n:"다이어리 스티코",p:3500,b:"",img:"202512/cb676b86854d5dc018ea0576b99c897a"},
+ {c:"조각 스티커",n:"숭숭이일기 스티커 2",p:3000,b:"",img:"202508/b09269ce7d3efc87ebf20224eced08ae"},
+ {c:"메모 스티커",n:"선샤인데이 스티커",p:3500,b:"best",img:"202508/d9342a7de8b65e19f073f6f99139560d"},
+ {c:"마스킹테이프",n:"키스컷 마스킹테이프 2",p:6500,b:"new",img:"202508/13260f931f04e15ddc8bb56a20dc0e90"},
+ {c:"투명스티커",n:"냠냠만두 투명 스티커",p:3000,b:"",img:"202410/e80feba7a57b4fcf1a3364e5cfbb40d6"},
+ {c:"키링·굿즈",n:"크레페 말랑 키링",p:2500,b:"soldout",img:"202503/58dafda9eee23c1a553c073971af033c"},
+];
+const bmap={new:["b-new","NEW"],best:["b-best","BEST"],soldout:["b-soldout","SOLD OUT"]};
+document.getElementById('grid').innerHTML=products.map(x=>`
+ <article class="card">
+   <div class="thumb">
+     ${x.b?`<span class="badge ${bmap[x.b][0]}">${bmap[x.b][1]}</span>`:""}
+     <div class="like">♡</div>
+     <img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/${x.img}.png" alt="${x.n}">
+   </div>
+   <div class="card-body">
+     <div class="card-cat">${x.c}</div>
+     <div class="card-name">서티 ${x.n}</div>
+     <div class="card-price">${x.p.toLocaleString()}<small> 원</small></div>
+   </div>
+ </article>`).join('');
+</script>
+</body>
+</html>

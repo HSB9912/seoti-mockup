@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>서티 SEOTI 웹사이트 — 디자인 시안 비교 허브</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css" />
+<style>
+  :root{--bg:#f4f1ec;--paper:#fff;--ink:#1c1916;--sub:#857f78;--line:#e6e0d8;--accent:#e8503a;--ok:#3aa872}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Pretendard Variable',Pretendard,sans-serif;background:var(--bg);
+    color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.55;padding:50px 24px 90px}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1240px;margin:0 auto}
+
+  .en{font-size:.72em;opacity:.45;margin-left:6px;font-weight:500;letter-spacing:.02em;text-transform:none;font-style:normal}
+
+  .head{text-align:center;margin-bottom:44px}
+  .head .tag{display:inline-block;background:var(--ink);color:#fff;font-size:11px;font-weight:800;
+    letter-spacing:.18em;text-transform:uppercase;padding:6px 14px;border-radius:99px}
+  .head h1{font-size:38px;font-weight:800;letter-spacing:-.025em;margin:16px 0 10px;line-height:1.15}
+  .head h1 em{font-style:normal;color:var(--accent)}
+  .head p{color:var(--sub);font-size:14.5px;max-width:680px;margin:0 auto;line-height:1.7}
+
+  .legend{background:var(--paper);border:1px solid var(--line);border-radius:14px;
+    padding:20px 24px;margin:24px auto 0;max-width:820px;font-size:13.5px;color:var(--sub);line-height:1.8;text-align:left}
+  .legend b{color:var(--ink);font-weight:800}
+
+  /* TOC */
+  .toc{margin-top:30px;background:var(--paper);border:1px solid var(--line);border-radius:14px;
+    padding:18px 22px;display:grid;grid-template-columns:repeat(5,1fr);gap:10px;font-size:13px;font-weight:600}
+  .toc a{padding:8px 12px;background:var(--bg);border-radius:8px;color:var(--ink);text-align:center;cursor:pointer}
+  .toc a:hover{background:var(--ink);color:#fff}
+  .toc a .v{font-weight:800;font-size:10px;letter-spacing:.08em;color:var(--accent);text-transform:uppercase;display:block}
+
+  .group{margin-top:54px;scroll-margin-top:20px}
+  .group-h{display:flex;justify-content:space-between;align-items:flex-end;
+    padding-bottom:14px;border-bottom:1px solid var(--ink);margin-bottom:24px;gap:20px;flex-wrap:wrap}
+  .group-h .eyebrow{font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
+  .group-h h2{font-size:26px;font-weight:800;letter-spacing:-.02em;margin-top:4px}
+  .group-h p{color:var(--sub);font-size:14px;margin-top:5px;max-width:520px}
+  .group-h .right{text-align:right}
+  .group-h .right b{font-size:13px;color:var(--ink);font-weight:800;display:block}
+  .group-h .right small{font-size:12px;color:var(--sub)}
+
+  .cards{display:grid;gap:16px}
+  .cards.c3{grid-template-columns:repeat(3,1fr)}
+  .cards.c2{grid-template-columns:repeat(2,1fr)}
+  .cards.c1{grid-template-columns:1fr}
+
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:16px;overflow:hidden;
+    text-decoration:none;color:inherit;display:flex;flex-direction:column;transition:.2s}
+  .card:hover{transform:translateY(-4px);box-shadow:0 22px 50px -22px rgba(50,40,30,.4);border-color:transparent}
+
+  .preview{height:130px;display:grid;place-items:center;font-size:42px;position:relative;overflow:hidden}
+  .preview b{position:absolute;top:14px;right:14px;background:var(--ink);color:#fff;
+    font-size:11px;font-weight:800;letter-spacing:.1em;padding:4px 10px;border-radius:99px;text-transform:uppercase}
+  .p-soft{background:linear-gradient(135deg,#ffe1e8 0%,#fff3d9 100%)}
+  .p-min{background:linear-gradient(135deg,#fafaf8 0%,#e8e6e0 100%)}
+  .p-pop{background:linear-gradient(135deg,#ffd9ec 0%,#d9f0ff 100%)}
+  .p-form{background:linear-gradient(135deg,#faf6ef 0%,#ece4d4 100%)}
+  .p-drawer{background:linear-gradient(135deg,#fff5e9 0%,#ffe1ec 100%)}
+  .p-card{background:linear-gradient(135deg,#f5fff7 0%,#e8f4eb 100%)}
+  .p-board{background:linear-gradient(135deg,#f5f5ee 0%,#dad4c5 100%)}
+  .p-sb{background:linear-gradient(135deg,#f4f1ec 0%,#dcd6cc 100%)}
+  .p-top{background:linear-gradient(135deg,#f0f4ed 0%,#dde5d6 100%)}
+  .p-tree{background:linear-gradient(135deg,#faf7f3 0%,#e8e1d4 100%)}
+  .p-detail{background:linear-gradient(135deg,#f5f1eb 0%,#ede4d4 100%)}
+  .p-cart{background:linear-gradient(135deg,#fbf8f1 0%,#e9e2cf 100%)}
+  .p-checkout{background:linear-gradient(135deg,#f0ece3 0%,#dad3c0 100%)}
+  .p-login{background:linear-gradient(135deg,#f6efe6 0%,#e0d4bf 100%)}
+  .p-split{background:linear-gradient(135deg,#fff5f0 0%,#f3e0d3 100%)}
+  .p-mypage{background:linear-gradient(135deg,#eef4f1 0%,#d4e2da 100%)}
+  .p-dash{background:linear-gradient(135deg,#f7f5f0 0%,#e3dccb 100%)}
+  .p-edit{background:linear-gradient(135deg,#faf3ec 0%,#ecdfcc 100%)}
+  .p-gal{background:linear-gradient(135deg,#fff0e6 0%,#f3d8c7 100%)}
+  .p-feed{background:linear-gradient(135deg,#fff4d9 0%,#f3d99e 100%)}
+  .p-grid{background:linear-gradient(135deg,#ffe9d6 0%,#f0d2b3 100%)}
+  .p-ext{background:linear-gradient(135deg,#f3eef7 0%,#dccfeb 100%)}
+
+  .body{padding:18px 20px 20px;flex:1;display:flex;flex-direction:column}
+  .body .ttl{display:flex;align-items:baseline;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+  .body .var{font-size:10.5px;font-weight:800;letter-spacing:.14em;color:var(--accent);
+    background:#fff;border:1px solid var(--accent);padding:3px 9px;border-radius:99px}
+  .body h3{font-size:16px;font-weight:800;letter-spacing:-.01em}
+  .body p{font-size:12.5px;color:var(--sub);margin-top:6px;line-height:1.7;flex:1}
+  .traits{display:flex;flex-wrap:wrap;gap:5px;margin:10px 0}
+  .traits b{font-size:10.5px;font-weight:700;background:#f5f1ea;border:1px solid var(--line);
+    padding:3px 8px;border-radius:99px;color:var(--sub)}
+  .go{margin-top:auto;padding-top:8px;font-size:13px;font-weight:800;color:var(--accent);display:flex;justify-content:space-between;align-items:center}
+
+  .note{margin-top:70px;background:var(--paper);border:1px solid var(--line);
+    border-radius:16px;padding:24px 28px;font-size:13.5px;color:var(--sub);line-height:1.8}
+  .note h4{font-size:14px;color:var(--ink);font-weight:800;margin-bottom:6px}
+  .note b{color:var(--ink)}
+
+  @media(max-width:920px){.cards.c3,.cards.c2{grid-template-columns:1fr}.toc{grid-template-columns:1fr 1fr}.head h1{font-size:28px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="head">
+    <span class="tag">SEOTI · MOCKUP HUB</span>
+    <h1>서티 작가 웹사이트 — <em>기능별 시안</em> 비교</h1>
+    <p>메인 스토어는 <b>B 시안(모던 미니멀)</b>로 확정되었습니다. 아래 기능별로 A/B(/C) 변형이 있으니, 마음에 드는 조합을 골라주세요. 변형끼리는 <b>레이아웃 · 상호작용 · 시각 스타일</b>이 모두 다릅니다.</p>
+    <div class="legend">
+      <b>고르는 법</b> · 각 카드를 열어 직접 클릭·스크롤해보세요. 같은 데이터를 다른 화면 구성으로 보여줍니다.<br>
+      <b>최종 선택</b> · "대량주문=B, Q&A=A, 관리자=C, 상품상세=B..." 식으로 알려주시면 그 조합으로 합쳐서 본격 개발에 들어갑니다.<br>
+      <b>전달용 안내문</b> · 압축파일 안의 <b>READ_ME_FIRST.txt</b>에 보는 법이 자세히 적혀있어요.
+    </div>
+  </header>
+
+  <!-- TOC -->
+  <nav class="toc">
+    <a href="#main"><span class="v">메인</span>스토어 (확정)</a>
+    <a href="#detail"><span class="v">A·B</span>상품 상세</a>
+    <a href="#cart"><span class="v">A·B</span>장바구니·결제</a>
+    <a href="#auth"><span class="v">A·B</span>로그인·가입</a>
+    <a href="#mypage"><span class="v">A·B</span>마이페이지</a>
+    <a href="#bulk"><span class="v">A·B·C</span>대량주문</a>
+    <a href="#qna"><span class="v">A·B</span>Q&A</a>
+    <a href="#about"><span class="v">A·B</span>About</a>
+    <a href="#notice"><span class="v">A·B</span>공지·이벤트</a>
+    <a href="#admin"><span class="v">A·B·C+</span>관리자</a>
+  </nav>
+
+  <!-- ============ MAIN STORE (CONFIRMED) ============ -->
+  <section class="group" id="main">
+    <div class="group-h">
+      <div><span class="eyebrow">메인 스토어 (확정)<i class="en">Storefront</i></span>
+        <h2>모던 미니멀 스토어</h2>
+        <p>고객이 보는 메인 페이지. 재고 자동표시 + 대량주문/Q&A 연결.</p>
+      </div>
+      <div class="right"><b>✓ 확정</b><small>B 시안</small></div>
+    </div>
+    <div class="cards c1">
+      <a class="card" href="mockup-b-minimal.html">
+        <div class="preview p-min">⬜<b>FINAL</b></div>
+        <div class="body">
+          <div class="ttl"><span class="var">확정 · B</span><h3>모던 미니멀 스토어</h3></div>
+          <p>화이트 배경 + 큰 이미지 + 갤러리형 그리드. 상품카드에 "재고 부족·품절" 자동 배지. 상단 네비에 대량주문 / Q&A 연결.</p>
+          <div class="traits"><b>화이트</b><b>갤러리</b><b>재고 자동표시</b></div>
+          <div class="go"><span>스토어 메인 열기</span><span>→</span></div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ============ PRODUCT DETAIL ============ -->
+  <section class="group" id="detail">
+    <div class="group-h">
+      <div><span class="eyebrow">상품 상세 페이지<i class="en">Product Detail</i></span>
+        <h2>개별 상품 페이지 — 2가지 변형</h2>
+        <p>리뷰 시스템 포함 · 재입고 알림 · 관련 상품 추천</p>
+      </div>
+      <div class="right"><b>2개 변형</b><small>A · B</small></div>
+    </div>
+    <div class="cards c2">
+      <a class="card" href="product-detail-a.html">
+        <div class="preview p-detail">📄<b>A</b></div>
+        <div class="body">
+          <div class="ttl"><span class="var">변형 A</span><h3>좌측 갤러리 + 우측 정보판</h3></div>
+          <p>왼쪽에 스티키 이미지 갤러리(메인+썸네일 그리드), 오른쪽에 고정 정보판(가격·옵션·구매). 리뷰는 별점 통계 + 카드 리스트 + 펼침 답글. 정적이고 정돈된 느낌.</p>
+          <div class="traits"><b>스티키 갤러리</b><b>리뷰 통계</b><b>차분함</b></div>
+          <div class="go"><span>변형 A 열기</span><span>→</span></div>
+        </div>
+      </a>
+      <a class="card" href="product-detail-b.html">
+        <div class="preview p-gal">🎞<b>B</b></div>
+        <div class="body">
+          <div class="ttl"><span class="var">변형 B</span><h3>가로 슬라이드 갤러리 + 하단 정보</h3></div>
+          <p>풀와이드 캐러셀로 큰 이미지 슬라이드. 정보가 그 아래 2열 배치. 사진 리뷰가 8개 그리드로 시각적으로 강조. 하단 고정 구매 바. 역동적이고 시각 중심.</p>
+          <div class="traits"><b>캐러셀</b><b>사진 리뷰 강조</b><b>고정 구매바</b></div>
+          <div class="go"><span>변형 B 열기</span><span>→</span></div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ============ CART / CHECKOUT ============ -->
+  <section class="group" id="cart">
+    <div class="group-h">
+      <div><span class="eyebrow">장바구니 → 결제<i class="en">Cart & Checkout</i></span>
+        <h2>장바구니·결제 흐름 — 2가지 변형</h2>
+        <p><b style="color:var(--accent)">비회원 결제 가능</b> · 회원 결제도 가능</p>
+      </div>
+      <div class="right"><b>2개 변형</b><small>A · B</small></div>
+    </div>
+    <div class="cards c2">
+      <a class="card" href="cart-checkout-a.html">
+        <div class="preview p-cart">📋<b>A</b></div>
+        <div class="body">
+          <div class="ttl"><span class="var">변형 A</span><h3>다단계 위저드 (4단계)</h3></div>
+          <p>장바구니 → 주문서 → 결제 → 완료의 4단계 위저드. 각 단계가 분리되어 집중도 높음. 회원/비회원 토글, 결제수단 카드 선택, 약관 체크까지 단계별로.</p>
+          <div class="traits"><b>4단계 위저드</b><b>비회원 결제</b><b>단계 명확</b></div>
+          <div class="go"><span>변형 A 열기</span><span>→</span></div>
+        </div>
+      </a>
+      <a class="card" href="cart-checkout-b.html">
+        <div class="preview p-checkout">📃<b>B</b></div>
+        <div class="body">
+          <div class="ttl"><span class="var">변형 B</span><h3>단일 페이지 체크아웃</h3></div>
+          <p>한 화면에서 장바구니·주문자·배송·결제·약관까지 모두 입력. 우측에 스티키 요약 패널. 스크롤 한 번에 끝까지 — 빠르고 효율적.</p>
+          <div class="traits"><b>단일 페이지</b><b>스티키 요약</b><b>비회원 결제</b><b>빠름</b></div>
+          <div class="go"><span>변형 B 열기</span><span>→</span></div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ============ AUTH ============ -->
+  <section class="group" id="auth">
+    <div class="group-h">
+      <div><span class="eyebrow">로그인 · 회원가입<i class="en">Authentication</i></span>
+        <h2>로그인/회원가입 — 2가지 변형</h2>
+        <p>이메일·SNS 로그인 / 비회원 주문 진입점 포함</p>
+      </div>
+      <div class="right"><b>2개 변형</b><small>A · B</small></div>
+    </div>
+    <div class="cards c2">
+      <a class="card" href="auth-a.html">
+        <div class="preview p-login">🔐<b>A</b></div>
+        <div class="body">
+          <div class="ttl"><span class="var">변형 A</span><h3>중앙 카드 + 탭 전환</h3></div>
+          <p>중앙에 카드 한 장, 상단 탭으로 로그인 ↔ 회원가입 ↔ 비번찾기 전환. 카카오·네이버·Google 소셜 로그인. 비회원 주문 안내 박스도 함께.</p>
+          <div class="traits"><b>탭 전환</b><b>소셜 로그인</b><b>간단명료</b></div>
+          <div class="go"><span>변형 A 열기</span><span>→</span></div>
+        </div>
+      </a>
+      <a class="card" href="auth-b.html">
+        <div class="preview p-split">🖼<b>B</b></div>
+        <div class="body">
+          <div class="ttl"><span class="var">변형 B</span><h3>좌우 분할 (브랜드 비주얼 + 폼)</h3></div>
+          <p>왼쪽에 흩어진 스티커 콜라주가 있는 브랜드 비주얼, 오른쪽에 폼. 밑줄 인풋의 미니멀 입력. 브랜드 인상 강하고 분위기 있음.</p>
+          <div class="traits"><b>좌우 분할</b><b>브랜드 비주얼</b><b>밑줄 인풋</b></div>
+          <div class="go"><span>변형 B 열기</span><span>→</span></div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ============ MYPAGE ============ -->
+  <section class="group" id="mypage">
+    <div class="group-h">
+      <div><span class="eyebrow">마이페이지<i class="en">My Page</i></span>
+        <h2>마이페이지 — 2가지 변형</h2>
+        <p>주문조회 · 위시리스트 · 적립금 · 쿠폰 · 리뷰 · 회원정보</p>
+      </div>
+      <div class="right"><b>2개 변형</b><small>A · B</small></div>
+    </div>
+    <div class="cards c2">
+      <a class="card" href="mypage-a.html">
+        <div class="preview p-mypage">👤<b>A</b></div>
+        <div class="body">
+          <div class="ttl"><span class="var">변형 A</span><h3>좌측 사이드바 + 상단 요약카드</h3></div>
+          <p>상단에 4개 요약 카드(적립금/쿠폰/미작성 리뷰/진행중 주문), 왼쪽 사이드바로 섹션 전환. 익숙하고 정보 중심.</p>
+          <div class="traits"><b>사이드바</b><b>표 중심</b><b>익숙함</b></div>
+          <div class="go"><span>변형 A 열기</span><span>→</span></div>
+        </div>
+      </a>
+      <a class="card" href="mypage-b.html">
+        <div class="preview p-dash">▦<b>B</b></div>
+        <div class="body">
+          <div class="ttl"><span class="var">변형 B</span><h3>상단 탭 + 대시보드 카드</h3></div>
+          <p>큰 인사말 카드 + 가로 알약형 탭 메뉴. 콘텐츠는 둥근 카드 + 그리드. 라운드한 모서리, 부드러운 색감, 모던한 스타트업 톤.</p>
+          <div class="traits"><b>탭 메뉴</b><b>둥근 카드</b><b>모던</b></div>
+          <div class="go"><span>변형 B 열기</span><span>→</span></div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ============ BULK ORDER ============ -->
+  <section class="group" id="bulk">
+    <div class="group-h">
+      <div><span class="eyebrow">대량주문<i class="en">Bulk Order</i></span>
+        <h2>대량주문 견적 — 3가지 변형</h2>
+        <p>국내·해외 모두 사용. 사진 보고 옆에서 수량을 정하고, 견적 → 입금 → 배송까지 안내.</p>
+      </div>
+      <div class="right"><b>3개 변형</b><small>A · B · C</small></div>
+    </div>
+    <div class="cards c3">
+      <a class="card" href="customer-bulk-order.html">
+        <div class="preview p-soft">📋<b>A</b></div>
+        <div class="body">
+          <div class="ttl"><span class="var">변형 A</span><h3>다단계 위저드 + 사이드 카트</h3></div>
+          <p>1·2·3 단계로 화면이 바뀌는 방식. 상품 그리드 + 우측 고정 카트. 단계가 명확.</p>
+          <div class="traits"><b>위저드</b><b>사이드 카트</b><b>화이트</b></div>
+          <div class="go"><span>변형 A</span><span>→</span></div>
+        </div>
+      </a>
+      <a class="card" href="customer-bulk-order-b.html">
+        <div class="preview p-form">📝<b>B</b></div>
+        <div class="body">
+          <div class="ttl"><span class="var">변형 B</span><h3>단일 페이지 폼 + 가로 리스트</h3></div>
+          <p>한 화면에 모든 정보. 상품은 가로 리스트형(테이블). 정보 밀도 높음.</p>
+          <div class="traits"><b>단일 페이지</b><b>리스트</b><b>밑줄 폼</b></div>
+          <div class="go"><span>변형 B</span><span>→</span></div>
+        </div>
+      </a>
+      <a class="card" href="customer-bulk-order-c.html">
+        <div class="preview p-drawer">🎀<b>C</b></div>
+        <div class="body">
+          <div class="ttl"><span class="var">변형 C</span><h3>플로팅 드로어 + 따뜻한 톤</h3></div>
+          <p>+ 담기 → 우하단 카트 → 오른쪽에서 드로어 슬라이드. 모바일 친화적.</p>
+          <div class="traits"><b>드로어</b><b>둥근 카드</b><b>파스텔</b></div>
+          <div class="go"><span>변형 C</span><span>→</span></div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ============ Q&A ============ -->
+  <section class="group" id="qna">
+    <div class="group-h">
+      <div><span class="eyebrow">Q&A 문의<i class="en">Customer Q&A</i></span>
+        <h2>Q&A 페이지 — 2가지 변형</h2>
+        <p>배송·제품·결제 등 문의를 받고 답하는 화면.</p>
+      </div>
+      <div class="right"><b>2개 변형</b><small>A · B</small></div>
+    </div>
+    <div class="cards c2">
+      <a class="card" href="customer-qna-a.html">
+        <div class="preview p-card">💬<b>A</b></div>
+        <div class="body">
+          <div class="ttl"><span class="var">변형 A</span><h3>카드 리스트 + 펼치기 답변</h3></div>
+          <p>큰 Q/A 카드, 클릭하면 아래로 답변이 펼쳐짐. 친근·캐주얼.</p>
+          <div class="traits"><b>카드형</b><b>펼치기</b><b>친근함</b></div>
+          <div class="go"><span>변형 A</span><span>→</span></div>
+        </div>
+      </a>
+      <a class="card" href="customer-qna-b.html">
+        <div class="preview p-board">📋<b>B</b></div>
+        <div class="body">
+          <div class="ttl"><span class="var">변형 B</span><h3>게시판형 + 좌측 카테고리 사이드바</h3></div>
+          <p>전통적인 고객센터 게시판 스타일. 좌측 필터, 표 리스트, 인라인 상세.</p>
+          <div class="traits"><b>게시판</b><b>사이드바</b><b>표</b></div>
+          <div class="go"><span>변형 B</span><span>→</span></div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ============ ABOUT ============ -->
+  <section class="group" id="about">
+    <div class="group-h">
+      <div><span class="eyebrow">About — 작가 소개<i class="en">Artist Page</i></span>
+        <h2>About 페이지 — 2가지 변형</h2>
+        <p>작가 소개 · 작업 과정 · 컬렉션 · 인스타 피드 · 콜라보 문의</p>
+      </div>
+      <div class="right"><b>2개 변형</b><small>A · B</small></div>
+    </div>
+    <div class="cards c2">
+      <a class="card" href="about-a.html">
+        <div class="preview p-feed">✍️<b>A</b></div>
+        <div class="body">
+          <div class="ttl"><span class="var">변형 A</span><h3>긴 글 스크롤 (에디토리얼)</h3></div>
+          <p>잡지 기사처럼 긴 글과 이미지가 교차하는 구조. 작업 과정 4단계, 컬렉션 그리드, 인스타 피드. 작가의 이야기에 집중.</p>
+          <div class="traits"><b>에디토리얼</b><b>긴 글</b><b>인스타 피드</b></div>
+          <div class="go"><span>변형 A 열기</span><span>→</span></div>
+        </div>
+      </a>
+      <a class="card" href="about-b.html">
+        <div class="preview p-grid">🎨<b>B</b></div>
+        <div class="body">
+          <div class="ttl"><span class="var">변형 B</span><h3>갤러리/포트폴리오</h3></div>
+          <p>모자이크 히어로 + 통계 + 대표작 3점 (좌우 교차 레이아웃) + 타임라인 + 인용구. 비주얼이 글보다 우선, 작품 자체에 집중.</p>
+          <div class="traits"><b>갤러리</b><b>모자이크</b><b>타임라인</b><b>비주얼 중심</b></div>
+          <div class="go"><span>변형 B 열기</span><span>→</span></div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ============ NOTICE ============ -->
+  <section class="group" id="notice">
+    <div class="group-h">
+      <div><span class="eyebrow">공지사항 · 이벤트<i class="en">News & Events</i></span>
+        <h2>공지·이벤트 페이지 — 2가지 변형</h2>
+        <p>이벤트 · 신상 입고 · 재입고 · 공지를 알리는 페이지</p>
+      </div>
+      <div class="right"><b>2개 변형</b><small>A · B</small></div>
+    </div>
+    <div class="cards c2">
+      <a class="card" href="notice-a.html">
+        <div class="preview p-board">📰<b>A</b></div>
+        <div class="body">
+          <div class="ttl"><span class="var">변형 A</span><h3>리스트형 + 상단 배너</h3></div>
+          <p>현재 진행중인 가장 큰 이벤트가 상단에 큰 배너로. 아래로 리스트 형식의 공지/이벤트 항목들. 정보 위주.</p>
+          <div class="traits"><b>리스트</b><b>배너</b><b>정보 우선</b></div>
+          <div class="go"><span>변형 A 열기</span><span>→</span></div>
+        </div>
+      </a>
+      <a class="card" href="notice-b.html">
+        <div class="preview p-card">🎫<b>B</b></div>
+        <div class="body">
+          <div class="ttl"><span class="var">변형 B</span><h3>카드 그리드</h3></div>
+          <p>상단에 대형 피처드 카드, 그 아래 3열 카드 그리드. 라이브 진행중 표시. 비주얼이 풍부하고 인스타 같은 느낌.</p>
+          <div class="traits"><b>카드 그리드</b><b>비주얼</b><b>라이브 표시</b></div>
+          <div class="go"><span>변형 B 열기</span><span>→</span></div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ============ ADMIN ============ -->
+  <section class="group" id="admin">
+    <div class="group-h">
+      <div><span class="eyebrow">관리자 페이지<i class="en">Admin Panel</i></span>
+        <h2>관리자 — 3가지 변형 + 확장 기능</h2>
+        <p>매출·재고·상품등록·대량주문·Q&A 답변·실적 + 회원·리뷰·공지·쿠폰 관리</p>
+      </div>
+      <div class="right"><b>3개 + 확장</b><small>A · B · C + 확장</small></div>
+    </div>
+    <div class="cards c3" style="margin-bottom:16px">
+      <a class="card" href="admin-a.html">
+        <div class="preview p-sb">🗂<b>A</b></div>
+        <div class="body">
+          <div class="ttl"><span class="var">변형 A</span><h3>클래식 사이드바형</h3></div>
+          <p>좌측 메뉴 + 상단 검색바. 전통적인 어드민 패턴. 표 위주의 콘텐츠. 익숙해서 학습 부담 적음.</p>
+          <div class="traits"><b>사이드바</b><b>표 중심</b><b>안정적</b></div>
+          <div class="go"><span>변형 A</span><span>→</span></div>
+        </div>
+      </a>
+      <a class="card" href="admin-b.html">
+        <div class="preview p-top">🎴<b>B</b></div>
+        <div class="body">
+          <div class="ttl"><span class="var">변형 B</span><h3>상단 네비 + 카드형 대시보드</h3></div>
+          <p>상단 가로 네비. 둥근 카드 · 선 그래프 · 칸반 보드. Linear/Notion 같은 스타트업 느낌.</p>
+          <div class="traits"><b>상단 네비</b><b>카드</b><b>칸반</b></div>
+          <div class="go"><span>변형 B</span><span>→</span></div>
+        </div>
+      </a>
+      <a class="card" href="admin-c.html">
+        <div class="preview p-tree">📁<b>C</b></div>
+        <div class="body">
+          <div class="ttl"><span class="var">변형 C</span><h3>노션형 트리 사이드바</h3></div>
+          <p>슬림한 좌측 트리 메뉴 + 노션처럼 여백 많고 콘텐츠 중심. 모노스페이스 숫자, 콜아웃, 미니멀 표.</p>
+          <div class="traits"><b>트리</b><b>콘텐츠 중심</b><b>미니멀</b></div>
+          <div class="go"><span>변형 C</span><span>→</span></div>
+        </div>
+      </a>
+    </div>
+    <div class="cards c1">
+      <a class="card" href="admin-extensions.html">
+        <div class="preview p-ext">🛠<b>+ 확장</b></div>
+        <div class="body">
+          <div class="ttl"><span class="var">관리자 확장</span><h3>회원 · 리뷰 · 공지 · 쿠폰 관리 (추가 기능)</h3></div>
+          <p>위 A/B/C 어드민에 추가될 <b style="color:var(--accent)">확장 섹션</b>들을 한 자리에 모은 페이지입니다. 회원 등급별 관리, 리뷰 답글, 이벤트/공지 작성·예약 게시, 쿠폰 생성 및 통계까지. 어드민 변형을 정하시면 이 기능들이 그 변형에 자연스럽게 통합됩니다.</p>
+          <div class="traits"><b>회원 관리</b><b>리뷰 답글</b><b>이벤트 작성</b><b>쿠폰 생성</b></div>
+          <div class="go"><span>관리자 확장 기능 열어보기</span><span>→</span></div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <div class="note">
+    <h4>💡 안내</h4>
+    모든 변형은 실제 서티 작가의 28개 제품 이미지를 그대로 불러옵니다(인터넷 필요).
+    <b>"대량주문=B, Q&A=A, 관리자=C, 상품상세=A, 결제=B, 로그인=A, 마이=B, About=B, 공지=A"</b> 처럼 조합만 정해주시면 그 방향으로 합쳐서 본격 개발에 들어갑니다.
+    변형 안에서 <b>"이건 좋은데 저 부분만 다른 시안 거"</b> 같은 부분 선택도 가능합니다.<br><br>
+    <b>전달용</b> — <b>seoti-mockup 폴더 전체를 zip으로 압축</b>해서 보내시고, <b>index.html을 더블클릭</b>하면 전체 비교가 가능합니다. 압축파일 안에 <b>READ_ME_FIRST.txt</b> 보는 법 안내문도 함께 들어있어요.
+  </div>
+</div>
+</body>
+</html>
