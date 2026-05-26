@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>서티 SEOTI · Admin · 비즈니스 관리</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css" />
+<style>
+:root{
+  --bg:#fefefc;--paper:#fff;--ink:#202020;--sub:#878680;--faint:#d4d2cd;
+  --line:#ededeb;--line2:#dfddd6;--accent:#a06440;--hover:#f5f4f0;
+  --ok:#3a8a6a;--warn:#b07a2a;--bad:#b03a3a;--info:#3a82d6
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Pretendard Variable',Pretendard,sans-serif;background:var(--paper);
+  color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.5;font-size:13.5px}
+a{color:inherit;text-decoration:none}img{display:block;max-width:100%}
+button,input,select{font-family:inherit}
+.en{font-size:.7em;opacity:.42;margin-left:5px;font-weight:500;letter-spacing:.02em;text-transform:none;font-style:normal}
+.mono{font-family:'SF Mono','Menlo','Consolas',monospace;font-variant-numeric:tabular-nums}
+
+.app{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+
+/* SIDEBAR — Notion-like */
+.sb{background:#f9f8f4;border-right:1px solid var(--line);font-size:13px;display:flex;flex-direction:column}
+.sb-h{padding:14px 14px 8px;display:flex;align-items:center;gap:8px}
+.sb-h .av{width:24px;height:24px;border-radius:5px;background:var(--accent);color:#fff;
+  display:grid;place-items:center;font-weight:800;font-size:11px}
+.sb-h b{font-size:13.5px;font-weight:800}
+.sb-h small{font-size:11px;color:var(--sub);margin-left:auto}
+.sb-search{margin:8px 10px 14px;background:var(--paper);border:1px solid var(--line);
+  border-radius:5px;padding:7px 10px;font-size:12.5px;outline:none}
+.sb-tree{flex:1;overflow-y:auto;padding:0 6px 12px}
+
+.grp{margin-bottom:4px}
+.gh{display:flex;align-items:center;gap:5px;padding:5px 8px;cursor:pointer;color:var(--sub);
+  font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.gh:hover{color:var(--ink)}
+.gh .chev{font-size:9px;width:10px;transition:.15s;color:var(--faint)}
+.grp.open .gh .chev{transform:rotate(90deg)}
+.gc{display:none}.grp.open .gc{display:block}
+
+.item{display:flex;align-items:center;gap:8px;padding:5px 8px 5px 22px;cursor:pointer;
+  border-radius:4px;color:var(--sub);font-weight:600;margin:1px 0;font-size:13px}
+.item:hover{background:var(--hover);color:var(--ink)}
+.item.on{background:var(--ink);color:#fff}
+.item .ico{width:14px;text-align:center;font-size:13px;flex:none}
+.item .badge{margin-left:auto;font-size:10.5px;color:var(--faint);font-weight:700}
+.item.on .badge{color:rgba(255,255,255,.6)}
+.item.alert .badge{color:var(--bad);font-weight:800}
+.item.on.alert .badge{color:#ffb3a8}
+
+.sb-bot{padding:10px 14px;border-top:1px solid var(--line);display:flex;align-items:center;gap:8px;
+  font-size:12.5px;color:var(--sub)}
+.sb-bot b{color:var(--ink);font-weight:700}
+
+/* MAIN */
+.main{display:flex;flex-direction:column;min-width:0}
+.top{padding:14px 28px;display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--line)}
+.crumb{font-size:13px;color:var(--sub)}
+.crumb b{color:var(--ink);font-weight:700}
+.crumb .sep{color:var(--faint);margin:0 6px}
+.top .r{margin-left:auto;display:flex;gap:6px;align-items:center;color:var(--sub);font-size:12.5px}
+.top .r a{padding:6px 10px;border-radius:5px;cursor:pointer}
+.top .r a:hover{background:var(--hover);color:var(--ink)}
+
+.content{padding:28px 36px 60px;flex:1;overflow-y:auto;max-width:1320px;width:100%}
+
+/* page header (Notion-style) */
+.ph{margin-bottom:24px}
+.ph .ico{font-size:32px;display:block;line-height:1;margin-bottom:8px;color:var(--accent)}
+.ph h1{font-size:30px;font-weight:800;letter-spacing:-.02em;line-height:1.15;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.ph h1 small{font-size:12.5px;color:var(--sub);font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.ph .desc{font-size:13.5px;color:var(--sub);margin-top:8px;max-width:600px;line-height:1.7}
+.ph .meta{display:flex;gap:30px;margin-top:16px;padding:12px 0;border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);font-size:12.5px;flex-wrap:wrap}
+.ph .meta div{display:flex;gap:8px}.ph .meta b{color:var(--sub);font-weight:600}.ph .meta span{color:var(--ink);font-weight:700}
+
+/* sections */
+.sect{display:none}.sect.on{display:block}
+
+/* KPI */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid var(--line);
+  border-radius:6px;overflow:hidden;margin-bottom:20px}
+.kpis .ki{padding:16px 20px;border-right:1px solid var(--line)}
+.kpis .ki:last-child{border-right:none}
+.kpis .k{font-size:11.5px;color:var(--sub);font-weight:600}
+.kpis .v{font-size:22px;font-weight:800;margin:5px 0 3px;letter-spacing:-.015em}
+.kpis .d{font-size:11.5px;color:var(--ok);font-weight:700}
+.kpis .d.down{color:var(--bad)}
+.kpis .ki.alert{background:linear-gradient(180deg,#fff8ef,#fff)}
+.kpis .ki.alert .v{color:var(--accent)}
+.kpis .ki.bad{background:linear-gradient(180deg,#fff4f2,#fff)}
+.kpis .ki.bad .v{color:var(--bad)}
+
+/* blocks */
+.blk{margin-bottom:30px}
+.blk-h{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px;gap:10px;flex-wrap:wrap}
+.blk h2{font-size:17px;font-weight:800;letter-spacing:-.01em;display:flex;align-items:center;gap:8px}
+.blk h2 .h-cnt{font-size:12px;color:var(--sub);font-weight:600}
+
+/* controls bar */
+.controls{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.controls .seg{display:inline-flex;background:var(--paper);border:1px solid var(--line);padding:3px;border-radius:6px}
+.controls .seg a{padding:6px 12px;font-size:12px;font-weight:700;color:var(--sub);cursor:pointer;border-radius:4px}
+.controls .seg a.on{background:var(--ink);color:#fff}
+.controls .search{background:var(--hover);border:1px solid var(--line);padding:7px 12px;font-size:12.5px;outline:none;border-radius:5px;width:220px;margin-left:auto}
+.btn{font-size:12.5px;font-weight:600;padding:7px 13px;border:1px solid var(--line);
+  background:var(--paper);color:var(--ink);cursor:pointer;border-radius:5px}
+.btn:hover{background:var(--hover)}
+.btn-p{background:var(--ink);color:#fff;border-color:var(--ink)}
+.btn-p:hover{background:#3a3a3a}
+
+/* table */
+table.t{width:100%;border-collapse:collapse;font-size:13px}
+.t th{font-size:11px;font-weight:700;color:var(--sub);text-align:left;padding:9px 10px;
+  border-bottom:1px solid var(--line);background:none;letter-spacing:.02em}
+.t td{padding:11px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+.t tr:hover td{background:var(--hover)}
+.t td .nm{font-weight:700}
+.t td.tnum{font-variant-numeric:tabular-nums;text-align:right}
+.t td.tnum.big{font-weight:800;color:var(--ink)}
+.t td a.edit{color:var(--sub);font-size:11.5px;font-weight:600;cursor:pointer}
+.t td a.edit:hover{color:var(--ink)}
+.t th.right{text-align:right}
+.t .check{width:32px;text-align:center}
+.t .check input{width:14px;height:14px;accent-color:var(--accent)}
+
+/* tag/pill */
+.tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:3px;
+  background:var(--hover);color:var(--sub);letter-spacing:.02em}
+.tag.ok{background:#e7f4ec;color:var(--ok)}
+.tag.warn{background:#faf0d8;color:var(--warn)}
+.tag.bad{background:#f9e5e5;color:var(--bad)}
+.tag.info{background:#e6eff9;color:var(--info)}
+.tag.office{background:#e6eff9;color:var(--info)}
+.tag.tax{background:#f9e5e5;color:var(--bad)}
+.tag.muted{background:var(--hover);color:var(--sub)}
+
+/* callout */
+.callout{display:flex;gap:14px;background:#fef5e7;border:1px solid #f0d9a0;border-radius:6px;
+  padding:14px 18px;margin-bottom:24px}
+.callout.warn{background:#fdf0eb;border-color:#f0c5b3}
+.callout.bad{background:#fdebeb;border-color:#f0b3b3}
+.callout.ok{background:#eaf6ee;border-color:#bce0c8}
+.callout .ic{font-size:18px;flex:none}
+.callout b{font-weight:700;display:block;margin-bottom:3px}
+.callout p{font-size:12.5px;color:var(--sub);line-height:1.6}
+.callout .actions{margin-left:auto;display:flex;gap:6px;align-items:center}
+
+/* vendor compact card */
+.vendor-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.vc{padding:14px 16px;border:1px solid var(--line);border-radius:6px;background:var(--paper)}
+.vc:hover{background:var(--hover)}
+.vc-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
+.vc-top h3{font-size:14px;font-weight:800}
+.vc .meta{font-size:12px;color:var(--sub);display:grid;grid-template-columns:80px 1fr;gap:3px 10px;margin-top:6px}
+.vc .meta b{font-weight:600}
+.vc .com{font-size:11px;font-weight:800;color:var(--accent);background:#fff5e7;padding:2px 7px;border-radius:3px}
+.vc .com.empty{color:var(--sub);background:var(--hover)}
+
+/* progress bar inline */
+.bar-wrap{display:flex;align-items:center;gap:10px;font-size:12px;padding:7px 0}
+.bar-wrap .name{width:120px;color:var(--sub)}
+.bar-wrap .bar{flex:1;height:6px;background:var(--hover);border-radius:99px;overflow:hidden;max-width:300px}
+.bar-wrap .bar div{height:100%;background:var(--accent);border-radius:99px}
+.bar-wrap .amt{width:110px;text-align:right;font-weight:800}.bar-wrap .pct{width:50px;text-align:right;color:var(--sub)}
+
+/* upgrade note (notion comparison) */
+.upgrade{background:linear-gradient(180deg,#f9f8f4,#fff);border:1px dashed var(--accent);border-radius:8px;padding:14px 18px;margin:14px 0;font-size:12.5px;color:var(--sub);line-height:1.7}
+.upgrade b{color:var(--accent);font-weight:800}
+.upgrade ul{margin:6px 0 0 18px}
+.upgrade li{margin:2px 0}
+
+@media(max-width:920px){.app{grid-template-columns:1fr}.sb{display:none}.kpis{grid-template-columns:1fr 1fr}.vendor-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sb">
+    <div class="sb-h">
+      <div class="av">서</div>
+      <b>SEOTI</b>
+      <small>Admin</small>
+    </div>
+    <input class="sb-search" placeholder="Quick search... ⌘K">
+    <div class="sb-tree">
+      <div class="grp open">
+        <div class="gh"><span class="chev">▸</span>운영<i class="en">Operations</i></div>
+        <div class="gc">
+          <a class="item" href="admin-c.html"><span class="ico">▦</span>대시보드<span class="badge"></span></a>
+          <a class="item" href="admin-c.html"><span class="ico">📈</span>판매 실적<span class="badge"></span></a>
+        </div>
+      </div>
+      <div class="grp open">
+        <div class="gh"><span class="chev">▸</span>상품·재고<i class="en">Inventory</i></div>
+        <div class="gc">
+          <a class="item" href="admin-c.html"><span class="ico">🏷</span>상품<span class="badge">43</span></a>
+          <a class="item" href="admin-c.html"><span class="ico">📦</span>재고<span class="badge">3</span></a>
+        </div>
+      </div>
+      <div class="grp open">
+        <div class="gh"><span class="chev">▸</span>비즈니스<i class="en">Business</i></div>
+        <div class="gc">
+          <a class="item on" data-go="overview"><span class="ico">📊</span>대시보드</a>
+          <a class="item" data-go="vendors"><span class="ico">🏪</span>입점처 관리<span class="badge">9</span></a>
+          <a class="item alert" data-go="settlements"><span class="ico">💰</span>정산 관리<span class="badge">6</span></a>
+          <a class="item" data-go="tax"><span class="ico">🧾</span>세금·관리비<span class="badge">6</span></a>
+        </div>
+      </div>
+      <div class="grp">
+        <div class="gh"><span class="chev">▸</span>주문<i class="en">Orders</i></div>
+        <div class="gc">
+          <a class="item" href="admin-c.html"><span class="ico">🚚</span>일반 주문</a>
+          <a class="item" href="admin-c.html"><span class="ico">📋</span>Group Order</a>
+        </div>
+      </div>
+    </div>
+    <div class="sb-bot">
+      <span style="width:18px;height:18px;background:var(--accent);color:#fff;border-radius:3px;display:grid;place-items:center;font-size:10px;font-weight:800">서</span>
+      <span><b>서티</b> · 관리자</span>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="top">
+      <div class="crumb">
+        <span>비즈니스</span><span class="sep">/</span><b id="crumbNow">대시보드</b>
+      </div>
+      <div class="r">
+        <a>🔔</a><a>📥 내보내기</a><a>⋯</a>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ================ OVERVIEW ================ -->
+      <section class="sect on" data-s="overview">
+        <div class="ph">
+          <span class="ico">📊</span>
+          <h1>비즈니스 대시보드 <small>2026년 1~5월</small></h1>
+          <p class="desc">입점처·정산·세금·관리비를 한 자리에서. 노션에서 분산 관리하던 데이터를 자동 합산·필터·알림과 함께 보여줍니다.</p>
+          <div class="meta">
+            <div><b>총 입점처</b><span id="ovVendors">—</span></div>
+            <div><b>이번 분기 정산</b><span id="ovSettlements">—</span></div>
+            <div><b>확인 필요 건</b><span id="ovAlert" style="color:var(--bad)">—</span></div>
+            <div><b>세금·관리비 누적</b><span id="ovExpense">—</span></div>
+          </div>
+        </div>
+
+        <div class="callout warn">
+          <span class="ic">⚠️</span>
+          <div><b>처리가 필요한 항목 <span id="alertCount" style="color:var(--bad)">—</span>건</b>
+            <p>아래 "정산 관리" 페이지에서 빠르게 확인할 수 있어요. 미입금·서류 미접수 등의 사유로 "확인 필요" 상태인 정산들입니다.</p>
+          </div>
+          <div class="actions"><button class="btn btn-p" data-go="settlements">확인하러 가기 →</button></div>
+        </div>
+
+        <div class="blk">
+          <h2>주요 지표 <span class="h-cnt">· 1~5월 누적</span></h2>
+          <div class="kpis">
+            <div class="ki"><div class="k">총 정산 금액 (합계)</div><div class="v mono" id="kpiTotalSettlement">—</div><div class="d" id="kpiTotalCount">—</div></div>
+            <div class="ki"><div class="k">공급가 합계</div><div class="v mono" id="kpiTotalSupply">—</div><div class="d">VAT 별도</div></div>
+            <div class="ki"><div class="k">부가세 합계</div><div class="v mono" id="kpiTotalVat">—</div><div class="d">신고 기준</div></div>
+            <div class="ki bad"><div class="k">확인 필요 금액</div><div class="v mono" id="kpiPending">—</div><div class="d down" id="kpiPendingCount">—</div></div>
+          </div>
+        </div>
+
+        <div class="blk">
+          <h2>입점처별 매출 <span class="h-cnt">· 누적 정산 기준</span></h2>
+          <div id="vendorBars"></div>
+        </div>
+
+        <div class="blk">
+          <h2>분류별 세금·관리비 <span class="h-cnt">· 1~5월 누적</span></h2>
+          <div class="vendor-grid" id="expenseSummary"></div>
+        </div>
+
+        <div class="upgrade">
+          <b>💡 노션에서 이렇게 달라졌어요</b>
+          <ul>
+            <li><b>자동 합산</b> — 입점처별·분류별 매출/세금이 페이지 새로고침 없이 즉시 계산됨</li>
+            <li><b>확인 필요 알림</b> — "완료" 외 상태는 자동으로 빨간 배지로 표시</li>
+            <li><b>한 곳에 통합</b> — 입점처/정산/세금이 따로 페이지 안 만들어도 사이드바에서 클릭만으로 이동</li>
+            <li><b>모바일 대응</b> — 노션과 달리 핸드폰에서도 동일하게 보임</li>
+            <li><b>CSV/PDF 내보내기</b> 한 번에 (계획)</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- ================ VENDORS ================ -->
+      <section class="sect" data-s="vendors">
+        <div class="ph">
+          <span class="ico">🏪</span>
+          <h1>입점처 관리 <small>9개 매장</small></h1>
+          <p class="desc">정기 입점처 정보와 수수료율. 새 입점처 추가는 오른쪽 버튼.</p>
+        </div>
+
+        <div class="controls">
+          <span class="seg"><a class="on">전체 9</a><a>온라인</a><a>오프라인</a><a>수수료 미정 7</a></span>
+          <input class="search" placeholder="🔍 이름·담당자 검색">
+          <button class="btn">📥 CSV</button>
+          <button class="btn btn-p">＋ 새 입점처</button>
+        </div>
+
+        <div class="blk">
+          <table class="t" id="vendorTable"></table>
+        </div>
+      </section>
+
+      <!-- ================ SETTLEMENTS ================ -->
+      <section class="sect" data-s="settlements">
+        <div class="ph">
+          <span class="ico">💰</span>
+          <h1>정산 관리 <small>총 33건 · 1~4월</small></h1>
+          <p class="desc">입점처별 월별 정산 내역. <b style="color:var(--bad)">"확인 필요"</b>는 미입금 또는 추가 검증이 필요한 항목이에요.</p>
+        </div>
+
+        <div class="kpis" style="margin-bottom:20px">
+          <div class="ki"><div class="k">전체 정산</div><div class="v mono" id="sumTotal">—</div><div class="d" id="sumTotalCount">—</div></div>
+          <div class="ki"><div class="k">공급가</div><div class="v mono" id="sumSupply">—</div><div class="d">VAT 별도</div></div>
+          <div class="ki"><div class="k">부가세</div><div class="v mono" id="sumVat">—</div><div class="d">10%</div></div>
+          <div class="ki alert"><div class="k">확인 필요</div><div class="v mono" id="sumPending">—</div><div class="d down" id="sumPendingCount">—</div></div>
+        </div>
+
+        <div class="controls">
+          <span class="seg"><a class="on" data-fs="all">전체</a><a data-fs="확인 필요">확인 필요 ⚠</a><a data-fs="완료">완료</a></span>
+          <span class="seg"><a data-grp="flat">평면</a><a class="on" data-grp="month">월별</a><a data-grp="vendor">입점처별</a></span>
+          <input class="search" placeholder="🔍 제목·입점처 검색" id="settlementSearch" style="margin-left:auto">
+          <button class="btn">📥 CSV</button>
+        </div>
+        <div id="vendorFilter" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;font-size:12px">
+          <a class="on" data-fv="all" style="padding:4px 10px;background:var(--ink);color:#fff;border-radius:99px;cursor:pointer;font-weight:700">모든 입점처</a>
+        </div>
+
+        <div class="blk">
+          <table class="t" id="settlementTable"></table>
+        </div>
+      </section>
+
+      <!-- ================ TAX & EXPENSE ================ -->
+      <section class="sect" data-s="tax">
+        <div class="ph">
+          <span class="ico">🧾</span>
+          <h1>세금·관리비 납부 내역 <small>1~5월</small></h1>
+          <p class="desc">사무실 임대료·관리비, 종합소득세 등 정기 납부 항목 기록. 노션의 "세금·관리비 납부 내역" 페이지를 옮겨왔어요.</p>
+        </div>
+
+        <div class="kpis" style="margin-bottom:20px">
+          <div class="ki"><div class="k">전체 납부</div><div class="v mono" id="taxTotal">—</div><div class="d" id="taxCount">—</div></div>
+          <div class="ki"><div class="k">사무실 관련</div><div class="v mono" id="taxOffice">—</div><div class="d">전대료·관리비</div></div>
+          <div class="ki"><div class="k">세금 납부</div><div class="v mono" id="taxTax">—</div><div class="d">소득세·지방세</div></div>
+          <div class="ki"><div class="k">월평균</div><div class="v mono" id="taxAvg">—</div><div class="d">5개월 기준</div></div>
+        </div>
+
+        <div class="controls">
+          <span class="seg"><a class="on" data-ft="all">전체</a><a data-ft="사무실">사무실</a><a data-ft="세금">세금</a></span>
+          <input class="search" placeholder="🔍 항목 검색" id="taxSearch">
+          <button class="btn">📥 CSV</button>
+          <button class="btn btn-p">＋ 새 항목</button>
+        </div>
+
+        <div class="blk">
+          <table class="t" id="taxTable"></table>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<script>
+// ====================== DATA ======================
+const VENDORS = [
+  {id:1,name:"슈가판타지",biz_no:"403-35-00782",manager:"박상종",biz_type:"도매 및 소매업",biz_category:"문구, 소품, 디자인상품",email:"sugarfantasy@naver.com",address:"",commission:30},
+  {id:2,name:"본부대로",biz_no:"280-34-01594",manager:"김민정",biz_type:"소매업",biz_category:"문구 및 잡화",email:"hqbbdr@gmail.com",address:"서울특별시 마포구 와우산로29길 12 2층",commission:30},
+  {id:3,name:"메링",biz_no:"489-16-01450",manager:"황인구",biz_type:"도매 및 소매업",biz_category:"전자상거래 소매업",email:"mering.official@gmail.com",address:"대구시 달서구 학산로7길 84, 2층",commission:null},
+  {id:4,name:"두근두근 문구점",biz_no:"770-09-01101",manager:"원선영",biz_type:"도매 및 소매업",biz_category:"문구용품 소매업",email:"dudumoon@naver.com",address:"서울특별시 동작구 동작대로 13길 3, 1층",commission:null},
+  {id:5,name:"플레이",biz_no:"666-54-00254",manager:"최윤정",biz_type:"도매 및 소매업",biz_category:"문구,음료,잡화,전자상거래",email:"official_play1985@naver.com",address:"",commission:null},
+  {id:6,name:"소소로와",biz_no:"663-11-00938",manager:"이슬",biz_type:"도매 및 소매업",biz_category:"전자상거래업",email:"lss3178@naver.com",address:"대전광역시 중구 대종로 451, 2층",commission:null},
+  {id:7,name:"위드유",biz_no:"379-02-01573",manager:"장은정",biz_type:"도매 및 소매업",biz_category:"도.소매 및 소비자용품수리업",email:"withyou_tax@hueround.net",address:"충청남도 천안시 서북구 원두정3길 6 (두정동) 401호",commission:null},
+  {id:8,name:"수집수집",biz_no:"669-47-00731",manager:"권성실",biz_type:"도매 및 소매업",biz_category:"전자상거래업",email:"soo_zipx2@naver.com",address:"경기도 의정부시 평화로555-1,2층(의정부동)",commission:null},
+  {id:9,name:"동구리코로로",biz_no:"110-23-46409",manager:"이용상",biz_type:"도매 및 소매업",biz_category:"전자상거래 소매업|해외직구대행업",email:"donguricororo@naver.com",address:"",commission:null}
+];
+
+const SETTLEMENTS = [
+  {id:1,title:"1월_플레이",vendor:"플레이",settlement_date:"2026-04-21",paid_date:null,status:"완료",total:119300,supply:108455,vat:10845},
+  {id:2,title:"2월_플레이",vendor:"플레이",settlement_date:"2026-04-21",paid_date:null,status:"완료",total:696850,supply:633500,vat:63350},
+  {id:3,title:"3월_플레이",vendor:"플레이",settlement_date:"2026-04-21",paid_date:null,status:"완료",total:250600,supply:227818,vat:22782},
+  {id:4,title:"4월_플레이",vendor:"플레이",settlement_date:"2026-05-26",paid_date:null,status:"확인 필요",total:303800,supply:276182,vat:27618},
+  {id:5,title:"1월_위드유",vendor:"위드유",settlement_date:"2026-04-21",paid_date:null,status:"완료",total:289900,supply:263545,vat:26355},
+  {id:6,title:"2월_위드유",vendor:"위드유",settlement_date:"2026-04-21",paid_date:null,status:"완료",total:697650,supply:634227,vat:63423},
+  {id:7,title:"3월_위드유",vendor:"위드유",settlement_date:"2026-04-21",paid_date:null,status:"완료",total:545750,supply:496136,vat:49614},
+  {id:8,title:"4월_위드유",vendor:"위드유",settlement_date:"2026-05-26",paid_date:null,status:"확인 필요",total:491500,supply:446818,vat:44682},
+  {id:9,title:"12월_슈가판타지",vendor:"슈가판타지",settlement_date:"2026-03-11",paid_date:null,status:"완료",total:487199,supply:442908,vat:44291},
+  {id:10,title:"1월_수집수집",vendor:"수집수집",settlement_date:"2026-04-21",paid_date:null,status:"완료",total:243600,supply:221455,vat:22145},
+  {id:11,title:"2월_수집수집",vendor:"수집수집",settlement_date:"2026-04-21",paid_date:null,status:"완료",total:138600,supply:126000,vat:12600},
+  {id:12,title:"3월_수집수집",vendor:"수집수집",settlement_date:"2026-04-21",paid_date:null,status:"완료",total:95900,supply:87182,vat:8718},
+  {id:13,title:"4월_수집수집",vendor:"수집수집",settlement_date:"2026-05-26",paid_date:null,status:"확인 필요",total:186900,supply:169909,vat:16991},
+  {id:14,title:"1월_소소로와",vendor:"소소로와",settlement_date:"2026-04-21",paid_date:null,status:"완료",total:254100,supply:231000,vat:23100},
+  {id:15,title:"2월_소소로와",vendor:"소소로와",settlement_date:"2026-04-21",paid_date:null,status:"완료",total:673125,supply:611932,vat:61193},
+  {id:16,title:"3월_소소로와",vendor:"소소로와",settlement_date:"2026-04-21",paid_date:null,status:"완료",total:645750,supply:587045,vat:58705},
+  {id:17,title:"4월_소소로와",vendor:"소소로와",settlement_date:"2026-05-26",paid_date:null,status:"완료",total:366000,supply:332727,vat:33273},
+  {id:18,title:"1월_본부대로",vendor:"본부대로",settlement_date:"2026-03-11",paid_date:null,status:"완료",total:862050,supply:783682,vat:78368},
+  {id:19,title:"2월_본부대로",vendor:"본부대로",settlement_date:"2026-03-09",paid_date:"2026-03-10",status:"완료",total:2313150,supply:2102864,vat:210286},
+  {id:20,title:"3월_본부대로",vendor:"본부대로",settlement_date:"2026-04-21",paid_date:null,status:"완료",total:1822450,supply:1656773,vat:165677},
+  {id:21,title:"4월_본부대로",vendor:"본부대로",settlement_date:"2026-05-26",paid_date:null,status:"확인 필요",total:1020600,supply:927818,vat:92782},
+  {id:22,title:"1월_메링",vendor:"메링",settlement_date:"2026-03-11",paid_date:"2026-02-10",status:"완료",total:72625,supply:66023,vat:6602},
+  {id:23,title:"2월_메링",vendor:"메링",settlement_date:"2026-03-11",paid_date:null,status:"완료",total:174650,supply:158773,vat:15877},
+  {id:24,title:"3월_메링",vendor:"메링",settlement_date:"2026-04-21",paid_date:null,status:"완료",total:11000,supply:10000,vat:1000},
+  {id:25,title:"4월_메링",vendor:"메링",settlement_date:"2026-05-26",paid_date:null,status:"완료",total:10300,supply:9364,vat:936},
+  {id:26,title:"1월_두두문",vendor:"두근두근 문구점",settlement_date:"2026-03-11",paid_date:null,status:"완료",total:677250,supply:615682,vat:61568},
+  {id:27,title:"2월_두두문",vendor:"두근두근 문구점",settlement_date:"2026-03-11",paid_date:null,status:"완료",total:1272250,supply:1156591,vat:115659},
+  {id:28,title:"3월_두두문",vendor:"두근두근 문구점",settlement_date:"2026-04-21",paid_date:null,status:"완료",total:814450,supply:740409,vat:74041},
+  {id:29,title:"4월_두두문",vendor:"두근두근 문구점",settlement_date:"2026-05-26",paid_date:null,status:"완료",total:852250,supply:774773,vat:77477},
+  {id:30,title:"1월_동구리",vendor:"동구리코로로",settlement_date:"2026-04-21",paid_date:null,status:"확인 필요",total:116200,supply:105636,vat:10564},
+  {id:31,title:"2월_동구리",vendor:"동구리코로로",settlement_date:"2026-04-21",paid_date:null,status:"완료",total:34650,supply:31500,vat:3150},
+  {id:32,title:"3월_동구리",vendor:"동구리코로로",settlement_date:"2026-04-21",paid_date:null,status:"완료",total:10500,supply:9545,vat:955},
+  {id:33,title:"4월_동구리",vendor:"동구리코로로",settlement_date:"2026-05-26",paid_date:null,status:"확인 필요",total:29750,supply:27045,vat:2705}
+];
+
+const TAX = [
+  {id:1,item:"5월 전대료",date:"2026-05-26",category:"사무실",amount:1327700},
+  {id:2,item:"4월 관리비",date:"2026-05-26",category:"사무실",amount:145670},
+  {id:3,item:"종합소득세",date:"2026-05-26",category:"세금",amount:1081440},
+  {id:4,item:"지방소득세",date:"2026-05-26",category:"세금",amount:108150},
+  {id:5,item:"3월 관리비",date:"2026-04-21",category:"사무실",amount:176630},
+  {id:6,item:"4월 전대료",date:"2026-04-21",category:"사무실",amount:1327700}
+];
+
+// ====================== HELPERS ======================
+const fmt = n => "₩" + n.toLocaleString();
+const fmtCompact = n => n >= 1e6 ? "₩" + (n/1e6).toFixed(1) + "M" : "₩" + (n/1e3).toFixed(0) + "k";
+
+function statusTag(s){
+  if (s === "완료") return `<span class="tag ok">완료</span>`;
+  if (s === "확인 필요") return `<span class="tag bad">⚠ 확인 필요</span>`;
+  return `<span class="tag muted">${s}</span>`;
+}
+
+function categoryTag(c){
+  if (c === "사무실") return `<span class="tag office">사무실</span>`;
+  if (c === "세금") return `<span class="tag tax">세금</span>`;
+  return `<span class="tag muted">${c}</span>`;
+}
+
+// ====================== OVERVIEW ======================
+function renderOverview(){
+  const totalSettlement = SETTLEMENTS.reduce((a,s) => a + s.total, 0);
+  const totalSupply = SETTLEMENTS.reduce((a,s) => a + s.supply, 0);
+  const totalVat = SETTLEMENTS.reduce((a,s) => a + s.vat, 0);
+  const pending = SETTLEMENTS.filter(s => s.status === "확인 필요");
+  const pendingTotal = pending.reduce((a,s) => a + s.total, 0);
+  const totalTax = TAX.reduce((a,t) => a + t.amount, 0);
+  const totalOffice = TAX.filter(t => t.category === "사무실").reduce((a,t) => a + t.amount, 0);
+  const totalTaxOnly = TAX.filter(t => t.category === "세금").reduce((a,t) => a + t.amount, 0);
+
+  document.getElementById('ovVendors').textContent = VENDORS.length + "개";
+  document.getElementById('ovSettlements').textContent = SETTLEMENTS.length + "건";
+  document.getElementById('ovAlert').textContent = pending.length + "건";
+  document.getElementById('ovExpense').textContent = fmt(totalTax);
+  document.getElementById('alertCount').textContent = pending.length;
+
+  document.getElementById('kpiTotalSettlement').textContent = fmt(totalSettlement);
+  document.getElementById('kpiTotalCount').textContent = SETTLEMENTS.length + "건 / 9개 입점처";
+  document.getElementById('kpiTotalSupply').textContent = fmt(totalSupply);
+  document.getElementById('kpiTotalVat').textContent = fmt(totalVat);
+  document.getElementById('kpiPending').textContent = fmt(pendingTotal);
+  document.getElementById('kpiPendingCount').textContent = "▼ " + pending.length + "건 확인 필요";
+
+  // Vendor bars
+  const byVendor = {};
+  SETTLEMENTS.forEach(s => byVendor[s.vendor] = (byVendor[s.vendor] || 0) + s.total);
+  const sorted = Object.entries(byVendor).sort((a,b) => b[1] - a[1]);
+  const max = sorted[0][1];
+  document.getElementById('vendorBars').innerHTML = sorted.map(([v, amt]) => `
+    <div class="bar-wrap">
+      <span class="name">${v}</span>
+      <div class="bar"><div style="width:${(amt/max*100).toFixed(0)}%"></div></div>
+      <span class="amt mono">${fmt(amt)}</span>
+      <span class="pct mono">${(amt/totalSettlement*100).toFixed(0)}%</span>
+    </div>`).join('');
+
+  // Expense summary
+  document.getElementById('expenseSummary').innerHTML = `
+    <div class="vc">
+      <div class="vc-top"><h3>사무실</h3><span class="com">${(totalOffice/totalTax*100).toFixed(0)}%</span></div>
+      <div class="meta">
+        <b>전대료·관리비</b><span class="mono">${fmt(totalOffice)}</span>
+        <b>건수</b><span>${TAX.filter(t => t.category === "사무실").length}건</span>
+      </div>
+    </div>
+    <div class="vc">
+      <div class="vc-top"><h3>세금</h3><span class="com" style="background:#fdebeb;color:var(--bad)">${(totalTaxOnly/totalTax*100).toFixed(0)}%</span></div>
+      <div class="meta">
+        <b>종소세·지방세</b><span class="mono">${fmt(totalTaxOnly)}</span>
+        <b>건수</b><span>${TAX.filter(t => t.category === "세금").length}건</span>
+      </div>
+    </div>
+  `;
+}
+
+// ====================== VENDORS ======================
+function renderVendors(){
+  // Calculate per-vendor totals
+  const vendorStats = {};
+  SETTLEMENTS.forEach(s => {
+    if (!vendorStats[s.vendor]) vendorStats[s.vendor] = {count:0, total:0, pending:0};
+    vendorStats[s.vendor].count++;
+    vendorStats[s.vendor].total += s.total;
+    if (s.status === "확인 필요") vendorStats[s.vendor].pending++;
+  });
+
+  const html = `
+    <thead><tr>
+      <th class="check"><input type="checkbox"></th>
+      <th>매장명 · 사업자번호</th>
+      <th>담당자</th>
+      <th>업종 / 카테고리</th>
+      <th>이메일</th>
+      <th>수수료</th>
+      <th class="right">누적 정산</th>
+      <th>정산 건수</th>
+      <th></th>
+    </tr></thead>
+    <tbody>
+    ${VENDORS.map(v => {
+      const st = vendorStats[v.name] || {count:0, total:0, pending:0};
+      return `
+      <tr data-vendor="${v.name}" style="cursor:pointer" title="클릭하면 이 입점처의 정산만 보입니다">
+        <td class="check"><input type="checkbox"></td>
+        <td><span class="nm">${v.name}</span><br><small style="color:var(--sub);font-size:11px" class="mono">${v.biz_no}</small></td>
+        <td>${v.manager}<br><small style="color:var(--sub);font-size:11px">${v.address ? v.address.split(' ').slice(0,2).join(' ') : '—'}</small></td>
+        <td><small>${v.biz_type}</small><br><small style="color:var(--sub);font-size:11px">${v.biz_category}</small></td>
+        <td><small class="mono">${v.email}</small></td>
+        <td>${v.commission ? `<span class="tag" style="background:#fff5e7;color:var(--accent);font-weight:800">${v.commission}%</span>` : `<span class="tag muted">미정</span>`}</td>
+        <td class="tnum big mono">${st.total ? "₩"+st.total.toLocaleString() : "—"}</td>
+        <td><small>${st.count}건${st.pending ? ` <span class="tag bad" style="font-size:10px">⚠ ${st.pending}</span>` : ''}</small></td>
+        <td><a class="edit">편집</a></td>
+      </tr>`;
+    }).join('')}
+    </tbody>`;
+  document.getElementById('vendorTable').innerHTML = html;
+}
+
+// ====================== SETTLEMENTS ======================
+let sFilterStatus = "all", sFilterVendor = "all", sSearch = "", sGroupBy = "month";
+
+function renderSettlements(){
+  // vendor filter pills
+  const uniqueVendors = [...new Set(SETTLEMENTS.map(s => s.vendor))];
+  document.getElementById('vendorFilter').innerHTML =
+    `<a class="${sFilterVendor === 'all' ? 'on' : ''}" data-fv="all" style="padding:4px 10px;background:${sFilterVendor==='all'?'var(--ink)':'var(--paper)'};color:${sFilterVendor==='all'?'#fff':'var(--sub)'};border:1px solid var(--line);border-radius:99px;cursor:pointer;font-weight:700">모든 입점처</a>` +
+    uniqueVendors.map(v => `<a class="${sFilterVendor === v ? 'on' : ''}" data-fv="${v}" style="padding:4px 10px;background:${sFilterVendor===v?'var(--ink)':'var(--paper)'};color:${sFilterVendor===v?'#fff':'var(--sub)'};border:1px solid var(--line);border-radius:99px;cursor:pointer;font-weight:600">${v}</a>`).join('');
+
+  // filter rows
+  let rows = SETTLEMENTS.filter(s => {
+    if (sFilterStatus !== "all" && s.status !== sFilterStatus) return false;
+    if (sFilterVendor !== "all" && s.vendor !== sFilterVendor) return false;
+    if (sSearch && !(s.title.includes(sSearch) || s.vendor.includes(sSearch))) return false;
+    return true;
+  });
+
+  // totals for current view
+  const t = rows.reduce((a,s) => a + s.total, 0);
+  const sup = rows.reduce((a,s) => a + s.supply, 0);
+  const v = rows.reduce((a,s) => a + s.vat, 0);
+  const p = rows.filter(s => s.status === "확인 필요");
+  const pT = p.reduce((a,s) => a + s.total, 0);
+
+  document.getElementById('sumTotal').textContent = fmt(t);
+  document.getElementById('sumTotalCount').textContent = rows.length + "건";
+  document.getElementById('sumSupply').textContent = fmt(sup);
+  document.getElementById('sumVat').textContent = fmt(v);
+  document.getElementById('sumPending').textContent = fmt(pT);
+  document.getElementById('sumPendingCount').textContent = "▼ " + p.length + "건";
+
+  // GROUPING
+  let bodyHTML = "";
+  const rowHTML = s => `
+    <tr>
+      <td class="check"><input type="checkbox"></td>
+      <td><span class="nm">${s.title}</span></td>
+      <td>${s.vendor}</td>
+      <td class="mono"><small>${s.settlement_date}</small></td>
+      <td class="mono"><small style="color:${s.paid_date ? 'var(--ok)' : 'var(--sub)'}">${s.paid_date || "—"}</small></td>
+      <td class="tnum big mono">${s.total.toLocaleString()}</td>
+      <td class="tnum mono"><small>${s.supply.toLocaleString()}</small></td>
+      <td class="tnum mono"><small>${s.vat.toLocaleString()}</small></td>
+      <td>${statusTag(s.status)}</td>
+      <td><a class="edit">편집</a></td>
+    </tr>`;
+
+  if (sGroupBy === "flat") {
+    bodyHTML = rows.map(rowHTML).join('');
+  } else if (sGroupBy === "month") {
+    // group by 추출 from title (1월, 2월...)
+    const groups = {};
+    rows.forEach(s => {
+      const m = s.title.match(/^(\d+월)/);
+      const key = m ? m[1] : "기타";
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(s);
+    });
+    const order = ["12월","1월","2월","3월","4월","5월","기타"];
+    order.filter(k => groups[k]).forEach(k => {
+      const gRows = groups[k];
+      const gT = gRows.reduce((a,s)=>a+s.total,0);
+      const gP = gRows.filter(s=>s.status==="확인 필요").length;
+      bodyHTML += `<tr style="background:var(--hover)"><td colspan="10" style="padding:9px 10px;font-weight:800;font-size:12.5px">
+        📅 ${k} <small style="color:var(--sub);font-weight:600;margin-left:8px">${gRows.length}건 · 합계 ₩${gT.toLocaleString()}${gP?` · <span style="color:var(--bad)">⚠ ${gP}건</span>`:''}</small>
+      </td></tr>`;
+      bodyHTML += gRows.map(rowHTML).join('');
+    });
+  } else if (sGroupBy === "vendor") {
+    const groups = {};
+    rows.forEach(s => {
+      if (!groups[s.vendor]) groups[s.vendor] = [];
+      groups[s.vendor].push(s);
+    });
+    Object.entries(groups).sort((a,b) => b[1].reduce((x,s)=>x+s.total,0) - a[1].reduce((x,s)=>x+s.total,0)).forEach(([vendor, gRows]) => {
+      const gT = gRows.reduce((a,s)=>a+s.total,0);
+      const gP = gRows.filter(s=>s.status==="확인 필요").length;
+      bodyHTML += `<tr style="background:var(--hover)"><td colspan="10" style="padding:9px 10px;font-weight:800;font-size:12.5px">
+        🏪 ${vendor} <small style="color:var(--sub);font-weight:600;margin-left:8px">${gRows.length}건 · 합계 ₩${gT.toLocaleString()}${gP?` · <span style="color:var(--bad)">⚠ ${gP}건</span>`:''}</small>
+      </td></tr>`;
+      bodyHTML += gRows.map(rowHTML).join('');
+    });
+  }
+
+  const html = `
+    <thead><tr>
+      <th class="check"><input type="checkbox"></th>
+      <th>제목</th><th>입점처</th><th>정산일</th><th>입금일</th>
+      <th class="right">매출 합계</th>
+      <th class="right">공급가</th>
+      <th class="right">부가세</th>
+      <th>상태</th>
+      <th>액션</th>
+    </tr></thead>
+    <tbody>${bodyHTML}</tbody>
+    <tfoot><tr style="background:var(--ink);color:#fff">
+      <td></td>
+      <td colspan="4" style="padding:11px 10px;font-weight:800">전체 합계 (${rows.length}건)</td>
+      <td class="tnum mono" style="padding:11px 10px;font-weight:800;color:#fff">₩${t.toLocaleString()}</td>
+      <td class="tnum mono" style="padding:11px 10px;color:rgba(255,255,255,.7)">${sup.toLocaleString()}</td>
+      <td class="tnum mono" style="padding:11px 10px;color:rgba(255,255,255,.7)">${v.toLocaleString()}</td>
+      <td colspan="2" style="padding:11px 10px;color:rgba(255,255,255,.7)">${p.length?`⚠ 미처리 ${p.length}건`:''}</td>
+    </tr></tfoot>`;
+  document.getElementById('settlementTable').innerHTML = html;
+}
+
+// ====================== TAX ======================
+let tFilter = "all", tSearch = "";
+
+function renderTax(){
+  let rows = TAX.filter(t => {
+    if (tFilter !== "all" && t.category !== tFilter) return false;
+    if (tSearch && !t.item.includes(tSearch)) return false;
+    return true;
+  });
+
+  const total = rows.reduce((a,t) => a + t.amount, 0);
+  const office = rows.filter(t => t.category === "사무실").reduce((a,t) => a + t.amount, 0);
+  const tax = rows.filter(t => t.category === "세금").reduce((a,t) => a + t.amount, 0);
+
+  document.getElementById('taxTotal').textContent = fmt(total);
+  document.getElementById('taxCount').textContent = rows.length + "건";
+  document.getElementById('taxOffice').textContent = fmt(office);
+  document.getElementById('taxTax').textContent = fmt(tax);
+  document.getElementById('taxAvg').textContent = fmt(Math.round(total / 5));
+
+  // Group by month
+  const groups = {};
+  rows.forEach(t => {
+    const m = t.date.slice(0,7); // YYYY-MM
+    if (!groups[m]) groups[m] = [];
+    groups[m].push(t);
+  });
+
+  let bodyHTML = "";
+  Object.keys(groups).sort().reverse().forEach(m => {
+    const gRows = groups[m];
+    const gT = gRows.reduce((a,t)=>a+t.amount,0);
+    bodyHTML += `<tr style="background:var(--hover)"><td colspan="7" style="padding:9px 10px;font-weight:800;font-size:12.5px">
+      📅 ${m} <small style="color:var(--sub);font-weight:600;margin-left:8px">${gRows.length}건 · 소계 ₩${gT.toLocaleString()}</small>
+    </td></tr>`;
+    bodyHTML += gRows.map(t => `
+      <tr>
+        <td class="check"><input type="checkbox"></td>
+        <td><span class="nm">${t.item}</span></td>
+        <td class="mono"><small>${t.date}</small></td>
+        <td>${categoryTag(t.category)}</td>
+        <td class="tnum big mono">${t.amount.toLocaleString()}</td>
+        <td><small style="color:var(--sub)">—</small></td>
+        <td><a class="edit">편집</a></td>
+      </tr>`).join('');
+  });
+
+  const html = `
+    <thead><tr>
+      <th class="check"><input type="checkbox"></th>
+      <th>항목</th><th>날짜</th><th>분류</th>
+      <th class="right">금액</th>
+      <th>비고</th><th>액션</th>
+    </tr></thead>
+    <tbody>${bodyHTML}</tbody>
+    <tfoot><tr style="background:var(--ink);color:#fff">
+      <td></td>
+      <td colspan="3" style="padding:11px 10px;font-weight:800">전체 합계 (${rows.length}건)</td>
+      <td class="tnum mono" style="padding:11px 10px;font-weight:800;color:#fff">₩${total.toLocaleString()}</td>
+      <td colspan="2" style="padding:11px 10px;color:rgba(255,255,255,.7);font-size:11px">사무실 ${office.toLocaleString()} · 세금 ${tax.toLocaleString()}</td>
+    </tr></tfoot>`;
+  document.getElementById('taxTable').innerHTML = html;
+}
+
+// ====================== ROUTING & EVENTS ======================
+const labels = {overview:"대시보드", vendors:"입점처 관리", settlements:"정산 관리", tax:"세금·관리비"};
+
+document.addEventListener('click', e => {
+  const gh = e.target.closest('.gh');
+  if (gh) { gh.parentElement.classList.toggle('open'); return; }
+
+  const go = e.target.closest('[data-go]');
+  if (go) {
+    const k = go.dataset.go;
+    document.querySelectorAll('.sect').forEach(s => s.classList.toggle('on', s.dataset.s === k));
+    document.querySelectorAll('.item[data-go]').forEach(a => a.classList.toggle('on', a.dataset.go === k));
+    document.getElementById('crumbNow').textContent = labels[k] || "";
+    document.querySelector('.content')?.scrollTo?.({top:0});
+    return;
+  }
+
+  // Vendor row click → drill to settlements
+  const vendorRow = e.target.closest('tr[data-vendor]');
+  if (vendorRow && !e.target.closest('input,button,a.edit')) {
+    sFilterVendor = vendorRow.dataset.vendor;
+    sFilterStatus = "all";
+    document.querySelector('[data-go="settlements"]')?.click();
+    return;
+  }
+
+  // Group toggle
+  const grp = e.target.closest('[data-grp]');
+  if (grp) {
+    sGroupBy = grp.dataset.grp;
+    document.querySelectorAll('[data-grp]').forEach(a => a.classList.toggle('on', a.dataset.grp === sGroupBy));
+    renderSettlements();
+    return;
+  }
+
+  const fs = e.target.closest('[data-fs]');
+  if (fs) {
+    sFilterStatus = fs.dataset.fs;
+    document.querySelectorAll('[data-fs]').forEach(a => a.classList.toggle('on', a.dataset.fs === sFilterStatus));
+    renderSettlements();
+    return;
+  }
+
+  const fv = e.target.closest('[data-fv]');
+  if (fv) {
+    sFilterVendor = fv.dataset.fv;
+    renderSettlements();
+    return;
+  }
+
+  const ft = e.target.closest('[data-ft]');
+  if (ft) {
+    tFilter = ft.dataset.ft;
+    document.querySelectorAll('[data-ft]').forEach(a => a.classList.toggle('on', a.dataset.ft === tFilter));
+    renderTax();
+    return;
+  }
+});
+
+document.getElementById('settlementSearch').addEventListener('input', e => {
+  sSearch = e.target.value.trim();
+  renderSettlements();
+});
+document.getElementById('taxSearch').addEventListener('input', e => {
+  tSearch = e.target.value.trim();
+  renderTax();
+});
+
+// initial render
+renderOverview();
+renderVendors();
+renderSettlements();
+renderTax();
+</script>
+</body>
+</html>
