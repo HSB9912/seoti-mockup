@@ -76,12 +76,12 @@
     letter-spacing:.08em;text-transform:uppercase;padding:8px 13px;color:#fff;
     background:rgba(22,20,18,.78);backdrop-filter:blur(4px);
     display:flex;justify-content:space-between;align-items:center}
-  .stock.low{background:rgba(232,80,58,.92)}
-  .stock.out{background:rgba(140,135,129,.92)}
-  .stock.ok{background:rgba(22,20,18,.65)}
+  .stock.in{background:rgba(22,20,18,.55)}
+  .stock.out{background:rgba(232,80,58,.92)}
+  .stock.disc{background:rgba(120,115,108,.85)}
   .stock .dot{width:7px;height:7px;border-radius:50%;background:#7fd296;display:inline-block;margin-right:6px}
-  .stock.low .dot{background:#ffd23f}
   .stock.out .dot{background:#fff}
+  .stock.disc .dot{background:#dad5cf}
   .top-bar{background:var(--ink);color:#fff;text-align:center;padding:9px;font-size:12.5px;
     font-weight:600;letter-spacing:.04em}
   .top-bar a{color:#fff;text-decoration:underline;text-underline-offset:3px;margin-left:6px}
@@ -148,14 +148,14 @@
 </head>
 <body>
 
-<div class="top-bar">📦 해외·대량주문은 견적 신청 페이지에서 한번에 — <a href="customer-bulk-order.html">Bulk Order →</a></div>
+<div class="top-bar">📦 해외·Group Order은 견적 신청 페이지에서 한번에 — <a href="customer-bulk-order.html">Group Order →</a></div>
 
 <nav>
   <div class="wrap nav-in">
     <div class="logo">Seoti</div>
     <div class="menu">
       <a class="on">All</a><a>메모 스티커</a><a>마스킹테이프</a>
-      <a>투명스티커</a><a>키링·굿즈</a><a href="customer-bulk-order.html">대량주문</a>
+      <a>투명스티커</a><a>키링·굿즈</a><a href="customer-bulk-order.html">Group Order</a>
       <a href="customer-qna.html">Q&A</a><a>Studio</a>
     </div>
     <div class="nav-r"><a>Search</a><a>Wishlist</a><a class="cart">Cart (0)</a></div>
@@ -211,17 +211,10 @@
         <div class="ct">메모 스티커 · No.03</div>
         <h3>서티 설탕 눈마을 스티커</h3>
         <p class="desc">눈 내리는 작은 마을을 담은 다이컷 메모 스티커. 다이어리 한 켠, 편지 봉투 어디에 붙여도 잘 어울립니다.</p>
-        <div class="d-price">₩ 3,500</div>
         <div class="spec"><span class="k">사이즈</span><span>135 × 105 mm</span></div>
         <div class="spec"><span class="k">소재</span><span>아트지 다이컷 / 유광 코팅</span></div>
-        <div class="spec"><span class="k">배송</span><span>택배 2,900원 · 30,000원↑ 무료</span></div>
-        <div class="opt-line">
-          <b class="on">단품</b><b>2개 세트</b><b>4개 세트</b>
-        </div>
-        <div class="buy">
-          <button class="cart">장바구니</button>
-          <button class="now">바로 구매 — ₩3,500</button>
-        </div>
+        <div class="spec"><span class="k">발매</span><span>2026.02</span></div>
+        <div class="spec"><span class="k">상태</span><span style="display:inline-flex;align-items:center;gap:7px"><span style="width:7px;height:7px;border-radius:50%;background:#7fd296;display:inline-block"></span>재고 있음</span></div>
       </div>
     </div>
   </div>
@@ -243,39 +236,42 @@
 </footer>
 
 <script>
+// 재고 상태(state): in=재고 있음 / out=일시품절 / disc=단종
 const products=[
- {c:"메모 스티커",n:"롱 메모 스티커팩",p:3500,t:"new",s:42,img:"202602/bc4816b7234830cacfd8e73dbc81ebcb"},
- {c:"메모 스티커",n:"스위티 메모 스티커팩",p:3500,t:"new",s:18,img:"202602/3d92c3f2ae8a816bb0aaf8374372b46a"},
- {c:"메모 스티커",n:"설탕 눈마을 스티커",p:3500,t:"best",s:6,img:"202602/a157d261092510f1542550274972a939"},
- {c:"메모 스티커",n:"학교괴담 스티커",p:3500,t:"new",s:31,img:"202602/8844055f11daba2bd37b69a6150cdac6"},
- {c:"메모 스티커",n:"메모빈티지 스티커팩",p:2500,t:"",s:24,img:"202602/3dba9ab4bcc29cf34566d08a48284e13"},
- {c:"조각 스티커",n:"초록책장 스티커",p:3500,t:"best",s:3,img:"202512/6df4ff16a044b3cd8dde5d8b78447e35"},
- {c:"메모 스티커",n:"다이어리 스티코",p:3500,t:"",s:55,img:"202512/cb676b86854d5dc018ea0576b99c897a"},
- {c:"메모 스티커",n:"선샤인데이 스티커",p:3500,t:"best",s:9,img:"202508/d9342a7de8b65e19f073f6f99139560d"},
- {c:"마스킹테이프",n:"키스컷 마스킹테이프 2",p:6500,t:"new",s:27,img:"202508/13260f931f04e15ddc8bb56a20dc0e90"},
- {c:"투명스티커",n:"냠냠만두 투명 스티커",p:3000,t:"",s:14,img:"202410/e80feba7a57b4fcf1a3364e5cfbb40d6"},
- {c:"키링·굿즈",n:"크레페 말랑 키링",p:2500,t:"sold",s:0,img:"202503/58dafda9eee23c1a553c073971af033c"},
- {c:"메모 스티커",n:"눈송이 여행 스티커",p:3500,t:"new",s:21,img:"202602/655ded5da50146cf19dbaa537f0378da"},
+ {c:"메모 스티커",n:"롱 메모 스티커팩",t:"new",state:"in",img:"202602/bc4816b7234830cacfd8e73dbc81ebcb"},
+ {c:"메모 스티커",n:"스위티 메모 스티커팩",t:"new",state:"in",img:"202602/3d92c3f2ae8a816bb0aaf8374372b46a"},
+ {c:"메모 스티커",n:"설탕 눈마을 스티커",t:"best",state:"in",img:"202602/a157d261092510f1542550274972a939"},
+ {c:"메모 스티커",n:"학교괴담 스티커",t:"new",state:"in",img:"202602/8844055f11daba2bd37b69a6150cdac6"},
+ {c:"메모 스티커",n:"메모빈티지 스티커팩",t:"",state:"out",img:"202602/3dba9ab4bcc29cf34566d08a48284e13"},
+ {c:"조각 스티커",n:"초록책장 스티커",t:"best",state:"in",img:"202512/6df4ff16a044b3cd8dde5d8b78447e35"},
+ {c:"메모 스티커",n:"다이어리 스티코",t:"",state:"in",img:"202512/cb676b86854d5dc018ea0576b99c897a"},
+ {c:"메모 스티커",n:"선샤인데이 스티커",t:"best",state:"in",img:"202508/d9342a7de8b65e19f073f6f99139560d"},
+ {c:"마스킹테이프",n:"키스컷 마스킹테이프 2",t:"new",state:"in",img:"202508/13260f931f04e15ddc8bb56a20dc0e90"},
+ {c:"투명스티커",n:"냠냠만두 투명 스티커",t:"",state:"in",img:"202410/e80feba7a57b4fcf1a3364e5cfbb40d6"},
+ {c:"키링·굿즈",n:"크레페 말랑 키링",t:"",state:"disc",img:"202503/58dafda9eee23c1a553c073971af033c"},
+ {c:"메모 스티커",n:"눈송이 여행 스티커",t:"new",state:"in",img:"202602/655ded5da50146cf19dbaa537f0378da"},
 ];
-function stockBadge(s){
- if(s===0)return `<div class="stock out"><span><span class="dot"></span>SOLD OUT</span><span>재고 0</span></div>`;
- if(s<=5)return  `<div class="stock low"><span><span class="dot"></span>품절 임박</span><span>${s}개 남음</span></div>`;
- if(s<=10)return `<div class="stock ok"><span><span class="dot"></span>재고 적음</span><span>${s}개</span></div>`;
- return "";
+const stateMap={
+  in:  {cls:"in",  label:"재고 있음", note:""},
+  out: {cls:"out", label:"일시품절", note:"재입고 예정"},
+  disc:{cls:"disc",label:"단종",     note:"Archive"}
+};
+function stockBadge(state){
+  const s=stateMap[state]||stateMap.in;
+  return `<div class="stock ${s.cls}"><span><span class="dot"></span>${s.label}</span><span>${s.note}</span></div>`;
 }
-const tmap={new:["new","New"],best:["","Best"],sold:["sold","Sold out"]};
+const tmap={new:["new","New"],best:["","Best"]};
 document.getElementById('grid').innerHTML=products.map((x,i)=>`
  <article class="card">
    <div class="frame">
      <span class="idx">${String(i+1).padStart(2,'0')} / ${products.length}</span>
      ${x.t?`<span class="tag ${tmap[x.t][0]}">${tmap[x.t][1]}</span>`:""}
      <img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/${x.img}.png" alt="${x.n}">
-     ${stockBadge(x.s)}
-     <div class="quick" style="bottom:${x.s<=10?"32px":"0"}">Quick view</div>
+     ${stockBadge(x.state)}
+     <div class="quick" style="bottom:32px">View</div>
    </div>
    <div class="card-meta">
-     <div><div class="nm">서티 ${x.n}</div><div class="ct">${x.c} · 재고 ${x.s}</div></div>
-     <div class="pr">₩${x.p.toLocaleString()}</div>
+     <div><div class="nm">서티 ${x.n}</div><div class="ct">${x.c}</div></div>
    </div>
  </article>`).join('');
 </script>

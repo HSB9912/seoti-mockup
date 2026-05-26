@@ -159,7 +159,7 @@
     display:grid;place-items:center;color:var(--sub);font-size:12.5px;cursor:pointer;text-align:center;padding:14px}
   .img-up:hover{border-color:var(--accent);color:var(--accent)}
 
-  /* bulk order rows */
+  /* Group Order rows */
   .bo-row{display:grid;grid-template-columns:80px 1fr 1fr 100px 130px;gap:14px;
     padding:12px;border:1px solid var(--line);border-radius:6px;margin-bottom:8px;align-items:center;font-size:13px}
   .bo-row:hover{background:var(--hover);cursor:pointer}
@@ -211,7 +211,7 @@
         <div class="gh"><span class="chev">▸</span>주문<i class="en">Orders</i></div>
         <div class="gc">
           <div class="item"><span class="ico">🚚</span>일반 주문<span class="badge">147</span></div>
-          <div class="item alert" data-go="bulk"><span class="ico">📋</span>대량주문<span class="badge">5</span></div>
+          <div class="item alert" data-go="bulk"><span class="ico">📋</span>Group Order<span class="badge">5</span></div>
           <div class="item"><span class="ico">↩</span>반품·교환<span class="badge">2</span></div>
         </div>
       </div>
@@ -268,7 +268,7 @@
         <div class="callout warn">
           <span class="ic">⚠️</span>
           <div><b>처리가 필요한 항목 3건</b>
-            <p>품절 임박 상품 3개 · 미답변 Q&A 8건 · 견적 대기 대량주문 3건 — 사이드바에서 바로 이동할 수 있어요.</p></div>
+            <p>품절 임박 상품 3개 · 미답변 Q&A 8건 · 견적 대기 Group Order 3건 — 사이드바에서 바로 이동할 수 있어요.</p></div>
         </div>
 
         <div class="blk">
@@ -377,11 +377,11 @@
         </div>
       </section>
 
-      <!-- 대량주문 -->
+      <!-- Group Order -->
       <section class="sect" data-s="bulk">
         <div class="ph">
           <span class="ico">📋</span>
-          <h1>대량주문 견적 <small>5건 대기 · 평균 회신 18h</small></h1>
+          <h1>Group Order 견적 <small>5건 대기 · 평균 회신 18h</small></h1>
           <p class="desc">고객이 보낸 견적 요청을 한 줄씩 확인하고, 클릭해서 금액·배송정보를 입력 후 회신할 수 있어요.</p>
         </div>
         <div class="blk">
@@ -516,7 +516,7 @@ document.getElementById('stockT').innerHTML=`
  </tr>`;}).join('')}</tbody>`;
 
 const labels={dash:"대시보드",products:"상품",stock:"재고 관리",add:"새 상품 등록",
-  bulk:"대량주문",qna:"Q&A",analytics:"판매 실적"};
+  bulk:"Group Order",qna:"Q&A",analytics:"판매 실적"};
 document.addEventListener('click',e=>{
   const gh=e.target.closest('.gh');
   if(gh){gh.parentElement.classList.toggle('open');return;}

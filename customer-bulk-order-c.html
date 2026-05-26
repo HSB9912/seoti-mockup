@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>서티 SEOTI · 대량주문 변형 C — 사이드 드로어</title>
+<title>서티 SEOTI · Group Order 변형 C — 사이드 드로어</title>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css" />
 <style>
   :root{
@@ -179,13 +179,13 @@
 <nav>
   <div class="wrap nav-in">
     <a class="logo" href="mockup-b-minimal.html"><span class="dot"></span>seoti</a>
-    <div class="crumb">스토어 · <b style="color:var(--ink)">대량주문 견적</b></div>
+    <div class="crumb">스토어 · <b style="color:var(--ink)">Group Order 견적</b></div>
     <div class="nav-r"><a class="back" href="mockup-b-minimal.html">← 돌아가기</a></div>
   </div>
 </nav>
 
 <header class="hero">
-  <span class="kick">대량주문 <i class="en">Bulk Order</i></span>
+  <span class="kick">Group Order <i class="en">Group Order</i></span>
   <h1>마음에 드는 제품을 <b>담아주세요</b><br>견적 보내드릴게요</h1>
   <p>+ 버튼으로 원하는 만큼 담으면, 우측 하단 장바구니에서 한 번에 견적을 신청할 수 있어요.</p>
 </header>
@@ -216,9 +216,33 @@
       <div class="pi-row"><span class="k">국제송금<i class="en">Intl.</i></span><span class="v">Wise · PayPal · seoti.studio@gmail.com</span></div>
     </div>
     <div class="pi-help">
-      <b>이렇게 진행돼요 <i class="en">How It Works</i></b>
-      ① 제품 담기 → ② 우측 하단 장바구니에서 정보 입력 → ③ 견적 회신 (24h 내) → ④ 입금 → ⑤ 발송<br><br>
-      입금 시 이름 끝에 <b style="color:var(--gold)">참조번호</b>를 함께 적어주세요. 입금 확인 후 1~2영업일 내 출고됩니다.
+      <b>진행 순서 <i class="en">4-Step Flow</i></b>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px">
+        <div style="background:rgba(255,255,255,.08);padding:12px;border-radius:10px;border:1px dashed rgba(255,255,255,.25)">
+          <div style="font-size:18px;font-weight:800;color:var(--gold)">①</div>
+          <div style="font-size:13px;font-weight:800;color:#fff;margin-top:4px">고객 주문</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.55);margin-top:2px">제품·수량·정보 보내기</div>
+        </div>
+        <div style="background:rgba(255,255,255,.08);padding:12px;border-radius:10px;border:1px dashed rgba(255,255,255,.25)">
+          <div style="font-size:18px;font-weight:800;color:var(--gold)">②</div>
+          <div style="font-size:13px;font-weight:800;color:#fff;margin-top:4px">입금 요청</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.55);margin-top:2px">주문 확인 후 견적·계좌 안내</div>
+        </div>
+        <div style="background:rgba(255,255,255,.08);padding:12px;border-radius:10px;border:1px dashed rgba(255,255,255,.25)">
+          <div style="font-size:18px;font-weight:800;color:var(--gold)">③</div>
+          <div style="font-size:13px;font-weight:800;color:#fff;margin-top:4px">고객 입금</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.55);margin-top:2px">참조번호로 송금</div>
+        </div>
+        <div style="background:rgba(255,255,255,.08);padding:12px;border-radius:10px;border:1px dashed rgba(255,255,255,.25)">
+          <div style="font-size:18px;font-weight:800;color:var(--gold)">④</div>
+          <div style="font-size:13px;font-weight:800;color:#fff;margin-top:4px">상품 배송</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.55);margin-top:2px">입금 확인 → 1~2영업일</div>
+        </div>
+      </div>
+      <div style="margin-top:14px;padding:11px 14px;background:rgba(203,162,75,.15);border-left:3px solid var(--gold);border-radius:4px;font-size:12.5px">
+        <b style="color:var(--gold);font-size:12px;margin-bottom:2px">💡 단가 안내</b>
+        대량주문은 <b style="color:#fff">수량별 할인율</b>이 다르게 적용됩니다 — 정확한 단가는 ②번 단계에서 견적과 함께 안내드려요.
+      </div>
     </div>
   </div>
 </main>
