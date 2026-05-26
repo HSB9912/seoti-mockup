@@ -178,9 +178,14 @@
 
 <div id="seoti-nav"></div>
 
-<div style="background:var(--ink);color:#fff;padding:11px 24px;font-size:12.5px;font-weight:600;display:flex;justify-content:center;align-items:center;gap:14px;flex-wrap:wrap">
-  <span>🔒 <b>Group Order는 회원 전용 페이지입니다</b> — 로그인 후 이용 가능 · 폰번호 없이 가입 가능 (해외 OK)</span>
-  <a href="auth-b.html" style="background:var(--peach);color:#fff;padding:5px 14px;border-radius:99px;font-weight:800;letter-spacing:.04em;text-decoration:none">로그인 / 가입 →</a>
+<div id="loginGate" style="background:var(--ink);color:#fff;padding:11px 24px;font-size:12.5px;font-weight:600;display:flex;justify-content:center;align-items:center;gap:14px;flex-wrap:wrap">
+  <span>🔒 <b>Group Order는 회원 전용 페이지입니다</b> — 로그인 후 견적 신청 가능 · 폰번호 없이 가입 가능 (해외 OK)</span>
+  <a href="auth-b.html" id="gotoLogin" style="background:var(--peach);color:#fff;padding:5px 14px;border-radius:99px;font-weight:800;letter-spacing:.04em;text-decoration:none">로그인 / 가입 →</a>
+</div>
+<div id="welcomeBar" style="display:none;background:linear-gradient(90deg,#bfe3d2,#fff);color:var(--ink);padding:10px 24px;font-size:12.5px;font-weight:600;justify-content:center;align-items:center;gap:14px;flex-wrap:wrap">
+  <span>✓ <b data-user-nick>—</b>님으로 로그인되었어요. 견적 신청 가능합니다.</span>
+  <a href="mypage-b.html" style="background:#fff;color:var(--ink);padding:5px 14px;border-radius:99px;font-weight:800;letter-spacing:.04em;text-decoration:none;border:1px solid var(--ink)">마이페이지 →</a>
+  <a id="logoutLink" style="color:var(--sub);font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:3px">로그아웃</a>
 </div>
 
 <header class="hero">
@@ -376,6 +381,52 @@ document.addEventListener('click',e=>{
 });
 document.getElementById('search').addEventListener('input',e=>{search=e.target.value.trim();render();});
 render();
+</script>
+<script src="assets/app.js"></script>
+<script>
+// Group Order — auth check & gating
+(function(){
+  function syncLoginUI(){
+    const logged = SEOTI.api.isLoggedIn();
+    document.getElementById('loginGate').style.display = logged ? 'none' : 'flex';
+    document.getElementById('welcomeBar').style.display = logged ? 'flex' : 'none';
+    const sb = document.getElementById('submit');
+    if (sb) sb.textContent = logged ? '견적 요청 보내기 →' : '로그인 후 신청 가능 →';
+  }
+  syncLoginUI();
+  window.addEventListener('seoti-state-change', syncLoginUI);
+
+  document.getElementById('logoutLink')?.addEventListener('click', ()=>{
+    SEOTI.api.logout();
+  });
+
+  document.getElementById('gotoLogin')?.addEventListener('click', e=>{
+    e.preventDefault();
+    sessionStorage.setItem('seoti_redirect_after_login', 'customer-bulk-order-c.html');
+    sessionStorage.setItem('seoti_auth_reason', 'Group Order는 회원 전용입니다');
+    location.href = 'auth-b.html';
+  });
+
+  // Hook submit button — auth check on click
+  document.getElementById('submit')?.addEventListener('click', e=>{
+    if (!SEOTI.api.isLoggedIn()) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      sessionStorage.setItem('seoti_redirect_after_login', 'customer-bulk-order-c.html');
+      sessionStorage.setItem('seoti_auth_reason', 'Group Order는 회원 전용입니다');
+      SEOTI.toast('로그인 후 견적 신청이 가능해요', 'warn');
+      setTimeout(()=> location.href = 'auth-b.html', 800);
+      return;
+    }
+    // 로그인된 상태: 견적 요청 처리 (실제는 Supabase로 저장)
+    const items = Object.keys(cart).filter(k=>cart[k]>0).map(k=>({
+      ...products[k], qty:cart[k]
+    }));
+    if (!items.length) { SEOTI.toast('최소 1개 이상 담아주세요', 'warn'); return; }
+    SEOTI.toast(`견적 요청이 접수되었어요 (${items.length}품목)`, 'success');
+    setTimeout(()=> { closeD(); }, 800);
+  }, true); // capture phase to run before existing handlers
+})();
 </script>
 <script src="assets/nav.js"></script>
 </body>

@@ -196,21 +196,29 @@ footer{padding:30px 0;font-size:12.5px;color:var(--sub);text-align:center;border
 
       <div class="opt-row">
         <label>옵션<i class="en">Option</i></label>
-        <div class="opts"><b class="on">단품</b><b>2개 세트</b><b>4개 세트 (10%↓)</b></div>
+        <div class="opts" id="optsBox">
+          <b class="on" data-opt="단품" data-mul="1">단품</b>
+          <b data-opt="2개 세트" data-mul="2">2개 세트</b>
+          <b data-opt="4개 세트" data-mul="3.6">4개 세트 (10%↓)</b>
+        </div>
       </div>
       <div class="opt-row">
         <label>수량<i class="en">Qty</i></label>
-        <div class="qty"><button>−</button><span>1</span><button>＋</button></div>
+        <div class="qty"><button id="qtyDec">−</button><span id="qtyVal">1</span><button id="qtyInc">＋</button></div>
       </div>
 
-      <div class="summary"><span class="k">총 주문금액</span><span class="v">3,500원</span></div>
+      <div class="summary"><span class="k">총 주문금액</span><span class="v" id="totalAmount">3,500원</span></div>
 
       <div class="buy">
-        <button class="cart">🛒 장바구니</button>
-        <button class="now">바로 구매하기</button>
+        <button class="cart" id="addCartBtn">🛒 장바구니</button>
+        <button class="now" id="buyNowBtn">바로 구매하기</button>
       </div>
-      <div class="buy" style="margin-top:8px"><button class="restock">🔔 재입고 알림 신청</button></div>
-      <div class="share-row"><a>♡ 위시리스트</a><a>🔗 공유</a><a>📧 이메일 문의</a></div>
+      <div class="buy" style="margin-top:8px"><button class="restock" id="restockBtn">🔔 재입고 알림 신청</button></div>
+      <div class="share-row">
+        <a id="wishlistBtn" style="cursor:pointer">♡ 위시리스트</a>
+        <a id="shareBtn" style="cursor:pointer">🔗 공유</a>
+        <a href="customer-qna-b.html">📧 문의하기</a>
+      </div>
     </div>
   </div>
 
@@ -318,6 +326,109 @@ document.getElementById('thumbs').addEventListener('click',e=>{
 document.getElementById('writeBtn').addEventListener('click',()=>{
   document.getElementById('rForm').classList.toggle('on');
 });
+</script>
+<script src="assets/app.js"></script>
+<script>
+// Product detail — cart, wishlist, options, qty
+(function(){
+  const PRODUCT = {
+    id: 'sugar-snow-village',
+    name: '서티 설탕 눈마을 스티커',
+    cat: '메모 스티커',
+    price: 3500,
+    img: '202602/a157d261092510f1542550274972a939'
+  };
+  let qty = 1;
+  let selectedOpt = '단품';
+  let mul = 1; // 가격 배수 (단품=1, 2개세트=2, 4개세트=3.6)
+
+  function updateTotal() {
+    const total = Math.round(PRODUCT.price * mul * qty);
+    document.getElementById('totalAmount').textContent = total.toLocaleString() + '원';
+  }
+  updateTotal();
+
+  // Qty stepper
+  document.getElementById('qtyDec').addEventListener('click', () => {
+    if (qty > 1) { qty--; document.getElementById('qtyVal').textContent = qty; updateTotal(); }
+  });
+  document.getElementById('qtyInc').addEventListener('click', () => {
+    qty++; document.getElementById('qtyVal').textContent = qty; updateTotal();
+  });
+
+  // Option select
+  document.getElementById('optsBox').addEventListener('click', e => {
+    const b = e.target.closest('[data-opt]');
+    if (!b) return;
+    document.querySelectorAll('#optsBox b').forEach(x => x.classList.remove('on'));
+    b.classList.add('on');
+    selectedOpt = b.dataset.opt;
+    mul = parseFloat(b.dataset.mul);
+    updateTotal();
+  });
+
+  function getItem() {
+    return {
+      id: PRODUCT.id,
+      name: PRODUCT.name,
+      cat: PRODUCT.cat,
+      option: selectedOpt,
+      price: Math.round(PRODUCT.price * mul),
+      img: PRODUCT.img,
+      qty
+    };
+  }
+
+  // Add to cart
+  document.getElementById('addCartBtn').addEventListener('click', () => {
+    SEOTI.api.addToCart(getItem());
+  });
+
+  // Buy now → add to cart + go to checkout
+  document.getElementById('buyNowBtn').addEventListener('click', () => {
+    SEOTI.api.addToCart(getItem());
+    setTimeout(()=> location.href = 'cart-checkout-b.html', 600);
+  });
+
+  // Restock alert
+  document.getElementById('restockBtn').addEventListener('click', () => {
+    if (!SEOTI.api.isLoggedIn()) {
+      SEOTI.toast('로그인 후 알림을 받을 수 있어요', 'warn');
+      return;
+    }
+    SEOTI.toast('재입고 알림이 신청되었어요 🔔', 'success');
+  });
+
+  // Wishlist toggle
+  const wlBtn = document.getElementById('wishlistBtn');
+  function syncWishlistUI() {
+    const inWl = SEOTI.api.isInWishlist(PRODUCT.id);
+    wlBtn.innerHTML = inWl ? '<span style="color:#e8503a">♥</span> 위시리스트 ✓' : '♡ 위시리스트';
+  }
+  syncWishlistUI();
+  window.addEventListener('seoti-state-change', syncWishlistUI);
+  wlBtn.addEventListener('click', () => {
+    SEOTI.api.toggleWishlist({
+      id: PRODUCT.id, name: PRODUCT.name, cat: PRODUCT.cat,
+      price: PRODUCT.price, img: PRODUCT.img
+    });
+  });
+
+  // Share
+  document.getElementById('shareBtn').addEventListener('click', async () => {
+    const url = location.href;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: PRODUCT.name, url });
+      } else {
+        await navigator.clipboard.writeText(url);
+        SEOTI.toast('링크가 복사됐어요', 'success');
+      }
+    } catch (e) { /* user cancelled */ }
+  });
+
+  // Review form (existing)
+})();
 </script>
 <script src="assets/nav.js"></script>
 </body>

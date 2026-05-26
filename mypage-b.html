@@ -138,16 +138,18 @@ footer{padding:30px 0;font-size:12.5px;color:var(--sub);text-align:center}
 
 <header class="hero wrap">
   <div class="hero-card">
-    <div class="av">다</div>
+    <div class="av" id="userAv">서</div>
     <div>
-      <h1><b>다꾸요정</b>님, 어서오세요 🎀</h1>
-      <p>가입 20일 · 누적 구매 ₩87,500 · 14건 주문 · 평균 평점 ★ 4.8</p>
+      <h1><b data-user-nick>—</b>님, 어서오세요 🎀</h1>
+      <p><span data-user-email>—</span> · <span id="orderCount">0</span>건 주문 · 위시리스트 <span data-wishlist-count>0</span>개</p>
       <div class="level">
-        <span>골드</span><div class="bar"><div style="width:87%"></div></div><span>플래티넘까지 ₩12,500</span>
+        <span>일반회원</span><div class="bar"><div style="width:25%"></div></div><span style="font-size:11px;color:var(--sub)">시안용 — 등급 추후 도입</span>
       </div>
     </div>
     <div class="right">
-      <a>🔔 알림</a><a>⚙ 설정</a><a>로그아웃</a>
+      <a>🔔 알림</a>
+      <a href="cart-checkout-b.html">🛒 장바구니 <span data-cart-count>0</span></a>
+      <a id="logoutLink" style="cursor:pointer">로그아웃</a>
     </div>
   </div>
 </header>
@@ -168,10 +170,10 @@ footer{padding:30px 0;font-size:12.5px;color:var(--sub);text-align:center}
   <!-- 대시보드 -->
   <section class="sect on" data-s="dash">
     <div class="dash">
-      <div class="dc"><div class="ic d">📦</div><div class="k">진행중 주문</div><div class="v">1건</div><small>배송중</small></div>
-      <div class="dc"><div class="ic b">🎟</div><div class="k">사용 가능 쿠폰</div><div class="v">3장</div><small>가장 빠른 만료 5/31</small></div>
-      <div class="dc"><div class="ic c">⭐</div><div class="k">작성 가능 리뷰</div><div class="v">2건</div><small>이번 달 받은 후기 8건</small></div>
-      <div class="dc"><div class="ic a">♡</div><div class="k">위시리스트</div><div class="v">12개</div><small>1개 일시품절</small></div>
+      <div class="dc"><div class="ic d">📦</div><div class="k">전체 주문</div><div class="v" id="dcOrders">0건</div><small id="dcOrdersSub">아직 주문 없음</small></div>
+      <div class="dc"><div class="ic a">🛒</div><div class="k">장바구니</div><div class="v"><span data-cart-count>0</span>개</div><small>결제 대기</small></div>
+      <div class="dc"><div class="ic c">♡</div><div class="k">위시리스트</div><div class="v"><span data-wishlist-count>0</span>개</div><small>마음에 담은 작품</small></div>
+      <div class="dc"><div class="ic b">🎟</div><div class="k">쿠폰</div><div class="v">3장</div><small>가장 빠른 만료 5/31</small></div>
     </div>
     <div class="row r-3-1">
       <div class="card">
@@ -308,6 +310,105 @@ document.addEventListener('click',e=>{
   document.querySelectorAll('.sect').forEach(s=>s.classList.toggle('on',s.dataset.s===k));
   window.scrollTo({top:200,behavior:'smooth'});
 });
+</script>
+<script src="assets/app.js"></script>
+<script>
+// Mypage — require login & populate
+(function(){
+  if (!SEOTI.api.isLoggedIn()) {
+    sessionStorage.setItem('seoti_redirect_after_login', 'mypage-b.html');
+    sessionStorage.setItem('seoti_auth_reason', '마이페이지는 로그인이 필요합니다');
+    location.href = 'auth-b.html';
+    return;
+  }
+
+  const u = SEOTI.api.getUser();
+  // avatar — first char of nickname
+  document.getElementById('userAv').textContent = (u.nickname || '서').charAt(0);
+
+  // Orders
+  const orders = SEOTI.api.getOrders();
+  document.getElementById('orderCount').textContent = orders.length;
+  document.getElementById('dcOrders').textContent = orders.length + '건';
+  document.getElementById('dcOrdersSub').textContent = orders.length ? '최근 주문 ' + orders[0].id.slice(-8) : '아직 주문 없음';
+
+  // Render orders section dynamically (replaces hardcoded list)
+  const ordersSect = document.querySelector('section[data-s="orders"]');
+  if (ordersSect && orders.length === 0) {
+    ordersSect.innerHTML = `
+      <div style="text-align:center;padding:70px 20px;background:var(--paper);border:1px dashed var(--line);border-radius:14px">
+        <div style="font-size:42px;margin-bottom:14px;opacity:.4">📦</div>
+        <h3 style="font-size:18px;font-weight:800;margin-bottom:8px">아직 주문 내역이 없어요</h3>
+        <p style="font-size:13px;color:var(--sub);margin-bottom:22px">Collection에서 마음에 드는 작품을 만나보세요.</p>
+        <a href="mockup-b-minimal.html" class="btn btn-p" style="text-decoration:none;display:inline-block">Collection 보러가기 →</a>
+      </div>`;
+  } else if (ordersSect && orders.length) {
+    ordersSect.innerHTML = orders.map(o => `
+      <div class="o-card">
+        <div class="o-head"><div class="meta">주문번호 <b>${o.id}</b> · ${o.createdAt.slice(0,10)}</div><span class="o-stat warn">${o.status}</span></div>
+        ${o.items.slice(0,3).map(i => `
+          <div class="oi"><div class="tn"><img referrerpolicy="no-referrer" src="${SEOTI.img(i.img)}"></div>
+            <div><b>${i.name}</b><small>${i.option||'단품'} ×${i.qty}</small></div><span class="pr">${(i.price*i.qty).toLocaleString()}원</span></div>
+        `).join('')}
+        ${o.items.length>3?`<div class="oi"><small style="color:var(--sub)">+ 외 ${o.items.length-3}건</small></div>`:''}
+        <div class="o-foot"><span style="color:var(--sub)">${o.items.length}품목</span><span class="tot">${o.total.toLocaleString()}원</span></div>
+      </div>`).join('');
+  }
+
+  // Render wishlist section
+  const wishSect = document.querySelector('section[data-s="wish"]');
+  const wl = SEOTI.api.getWishlist();
+  if (wishSect) {
+    if (!wl.length) {
+      wishSect.innerHTML = `
+        <div style="text-align:center;padding:70px 20px;background:var(--paper);border:1px dashed var(--line);border-radius:14px">
+          <div style="font-size:42px;margin-bottom:14px;opacity:.4">♡</div>
+          <h3 style="font-size:18px;font-weight:800;margin-bottom:8px">위시리스트가 비어있어요</h3>
+          <p style="font-size:13px;color:var(--sub);margin-bottom:22px">Collection에서 마음에 드는 작품에 ♡ 눌러 담아보세요.</p>
+          <a href="mockup-b-minimal.html" class="btn btn-p" style="text-decoration:none;display:inline-block">Collection 보러가기 →</a>
+        </div>`;
+    } else {
+      wishSect.innerHTML = `<div class="wgrid">${wl.map(w => `
+        <a class="wi" data-id="${w.id}">
+          <div class="ph"><img referrerpolicy="no-referrer" src="${SEOTI.img(w.img)}">
+            <span class="heart" data-remove="${w.id}" style="cursor:pointer">♥</span>
+          </div>
+          <div class="b"><div class="ct">${w.cat||''}</div><h4>${w.name}</h4>
+            <div class="foot"><span class="price">${w.price?'₩'+w.price.toLocaleString():''}</span>
+              <button class="btn add-cart" data-id="${w.id}">담기</button></div></div>
+        </a>`).join('')}</div>`;
+    }
+  }
+
+  // Remove from wishlist / add to cart from wishlist
+  document.addEventListener('click', e => {
+    const rm = e.target.closest('[data-remove]');
+    if (rm) {
+      e.preventDefault();
+      SEOTI.api.toggleWishlist({id: rm.dataset.remove});
+      location.reload();
+      return;
+    }
+    const ac = e.target.closest('.add-cart');
+    if (ac) {
+      e.preventDefault();
+      const id = ac.dataset.id;
+      const w = SEOTI.api.getWishlist().find(x => x.id === id);
+      if (w && w.price) SEOTI.api.addToCart({id:w.id, name:w.name, price:w.price, img:w.img, qty:1});
+      else SEOTI.toast('단종/품절 상품입니다', 'warn');
+    }
+  });
+
+  // Logout
+  document.getElementById('logoutLink')?.addEventListener('click', ()=>{
+    SEOTI.api.logout();
+    setTimeout(()=> location.href='index.html', 500);
+  });
+
+  // 회원정보 page — populate inputs
+  const emailInput = document.querySelector('input[value*="@"]');
+  if (emailInput && u.email) emailInput.value = u.email;
+})();
 </script>
 <script src="assets/nav.js"></script>
 </body>

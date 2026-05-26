@@ -122,12 +122,60 @@ footer{padding:30px 0;font-size:12.5px;color:var(--sub);text-align:center;border
       <!-- generated -->
     </div>
 
-    <div class="upload-cta">
-      <b>+ 새 사진 올리기</b>
-      <p>다꾸 샘플, 작업 사진, 일상 등 무엇이든 자유롭게 추가하세요. (관리자 전용)</p>
+    <div class="upload-cta" id="uploadCta" style="cursor:pointer">
+      <b>＋ 새 사진 올리기</b>
+      <p>다꾸 샘플, 작업 사진, 일상 등 자유롭게 추가 · <b style="color:var(--accent)">관리자 전용</b></p>
+      <p style="font-size:11px;color:var(--faint);margin-top:6px">클릭해서 업로드 (Cloudflare Images 연동 예정)</p>
     </div>
   </section>
 </main>
+
+<!-- Upload Modal -->
+<div id="upModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(8px)">
+  <div style="background:#fff;max-width:540px;width:100%;padding:30px 32px;border-radius:10px;max-height:90vh;overflow-y:auto;font-family:Pretendard,sans-serif">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+      <div>
+        <div style="font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)">UPLOAD · Archive</div>
+        <h3 style="font-size:20px;font-weight:800;margin-top:4px">사진 올리기</h3>
+      </div>
+      <button id="upClose" style="background:none;border:none;font-size:22px;color:var(--sub);cursor:pointer">✕</button>
+    </div>
+
+    <div id="upDrop" style="border:2px dashed var(--line);border-radius:8px;padding:40px 20px;text-align:center;cursor:pointer;transition:.15s">
+      <div style="font-size:36px;margin-bottom:10px;opacity:.5">📷</div>
+      <div style="font-weight:700;font-size:14px;margin-bottom:4px">사진을 끌어다 놓거나 클릭</div>
+      <small style="color:var(--sub);font-size:12px">JPG·PNG·WEBP · 최대 10MB · 여러 장 가능</small>
+    </div>
+    <input id="upFile" type="file" accept="image/*" multiple style="display:none">
+
+    <div id="upPreview" style="margin-top:18px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px"></div>
+
+    <div style="margin-top:18px">
+      <label style="display:block;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--sub);margin-bottom:6px">분류</label>
+      <select id="upCat" style="width:100%;padding:11px 12px;border:1px solid var(--line);font-size:14px;outline:none;border-radius:5px;font-family:inherit">
+        <option value="다꾸">다꾸 샘플</option>
+        <option value="작업">작업 과정</option>
+        <option value="일상">일상·풍경</option>
+        <option value="콜라보">콜라보</option>
+      </select>
+    </div>
+
+    <div style="margin-top:14px">
+      <label style="display:block;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--sub);margin-bottom:6px">메모 (선택)</label>
+      <input id="upNote" type="text" placeholder="언제·무엇·생각 등" style="width:100%;padding:11px 12px;border:1px solid var(--line);font-size:14px;outline:none;border-radius:5px;font-family:inherit">
+    </div>
+
+    <div style="margin-top:18px;padding:12px 14px;background:#fef5e7;border-radius:6px;font-size:11.5px;color:var(--sub);line-height:1.6">
+      💡 <b style="color:var(--ink)">시안 단계</b> — 현재는 브라우저에서만 미리보기.<br>
+      실제 업로드는 <b>Cloudflare Images</b> 연동 후 활성화됩니다.
+    </div>
+
+    <div style="display:flex;gap:8px;margin-top:18px">
+      <button id="upCancel" style="flex:1;padding:13px;background:#fff;border:1px solid var(--line);font-weight:700;font-size:13.5px;cursor:pointer;border-radius:6px;font-family:inherit">취소</button>
+      <button id="upSubmit" style="flex:1;padding:13px;background:var(--ink);color:#fff;border:none;font-weight:800;font-size:13.5px;cursor:pointer;border-radius:6px;font-family:inherit">올리기</button>
+    </div>
+  </div>
+</div>
 
 <div class="lightbox" id="lightbox">
   <span class="close" id="lbClose">✕</span>
@@ -209,6 +257,87 @@ grid.addEventListener('click', e => {
 });
 document.getElementById('lbClose').onclick = () => lb.classList.remove('on');
 lb.onclick = e => { if (e.target === lb) lb.classList.remove('on'); };
+</script>
+<script src="assets/app.js"></script>
+<script>
+// Archive upload (preview only — Cloudflare Images 연동 자리)
+(function(){
+  const cta = document.getElementById('uploadCta');
+  const modal = document.getElementById('upModal');
+  const drop = document.getElementById('upDrop');
+  const file = document.getElementById('upFile');
+  const preview = document.getElementById('upPreview');
+  let pending = []; // {file, dataUrl}
+
+  function open(){ modal.style.display='flex'; }
+  function close(){ modal.style.display='none'; pending=[]; preview.innerHTML=''; file.value=''; }
+
+  cta.addEventListener('click', open);
+  document.getElementById('upClose').addEventListener('click', close);
+  document.getElementById('upCancel').addEventListener('click', close);
+  modal.addEventListener('click', e => { if (e.target === modal) close(); });
+
+  drop.addEventListener('click', () => file.click());
+
+  // Drag & drop
+  ['dragenter','dragover'].forEach(ev => drop.addEventListener(ev, e => {
+    e.preventDefault(); drop.style.borderColor = 'var(--accent)'; drop.style.background = '#fef5e7';
+  }));
+  ['dragleave','drop'].forEach(ev => drop.addEventListener(ev, e => {
+    e.preventDefault(); drop.style.borderColor = ''; drop.style.background = '';
+  }));
+  drop.addEventListener('drop', e => {
+    e.preventDefault();
+    handleFiles(e.dataTransfer.files);
+  });
+  file.addEventListener('change', e => handleFiles(e.target.files));
+
+  function handleFiles(fileList){
+    Array.from(fileList).slice(0, 8 - pending.length).forEach(f => {
+      if (!f.type.startsWith('image/')) return;
+      if (f.size > 10 * 1024 * 1024) {
+        SEOTI.toast('10MB 초과 파일은 업로드 불가', 'error');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = e => {
+        pending.push({ file: f, dataUrl: e.target.result });
+        renderPreview();
+      };
+      reader.readAsDataURL(f);
+    });
+  }
+
+  function renderPreview(){
+    preview.innerHTML = pending.map((p, i) => `
+      <div style="position:relative;aspect-ratio:1;background:#f4f1ec;overflow:hidden;border-radius:5px">
+        <img src="${p.dataUrl}" style="width:100%;height:100%;object-fit:cover">
+        <button data-rm="${i}" style="position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,.65);color:#fff;border:none;cursor:pointer;font-size:11px">✕</button>
+      </div>
+    `).join('');
+    preview.querySelectorAll('[data-rm]').forEach(b => b.addEventListener('click', () => {
+      pending.splice(+b.dataset.rm, 1);
+      renderPreview();
+    }));
+  }
+
+  document.getElementById('upSubmit').addEventListener('click', () => {
+    if (!pending.length) { SEOTI.toast('사진을 먼저 선택해주세요', 'warn'); return; }
+    const cat = document.getElementById('upCat').value;
+    const note = document.getElementById('upNote').value.trim();
+    SEOTI.toast(`${pending.length}장 업로드 준비 완료 (CF 연동 시 자동 처리)`, 'success');
+    /* TODO: Cloudflare Images 연동
+    // POST multipart to your /api/upload endpoint
+    // → server gets one-time upload URL from Cloudflare
+    //   const { uploadURL } = await fetch('/api/cf-upload-url', { method:'POST' }).then(r=>r.json());
+    // → upload binary
+    //   await fetch(uploadURL, { method:'POST', body: formData });
+    // → save image ID + cat + note to Supabase
+    //   await supabase.from('archive_photos').insert({ image_id, category: cat, note, ... });
+    */
+    setTimeout(close, 800);
+  });
+})();
 </script>
 <script src="assets/nav.js"></script>
 </body>

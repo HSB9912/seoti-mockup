@@ -257,14 +257,56 @@ document.getElementById('grid').innerHTML=products.map((x,i)=>`
      <span class="idx">${String(i+1).padStart(2,'0')} / ${products.length}</span>
      ${x.t?`<span class="tag ${tmap[x.t][0]}">${tmap[x.t][1]}</span>`:""}
      <img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/${x.img}.png" alt="${x.n}">
+     <button class="wl-heart" data-pid="${x.img}" data-pname="${x.n}" data-pcat="${x.c}" data-pimg="${x.img}" aria-label="위시리스트"
+       style="position:absolute;top:12px;right:12px;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.9);border:none;cursor:pointer;font-size:15px;color:#bdb8b1;display:grid;place-items:center;backdrop-filter:blur(4px);transition:.15s">♡</button>
      ${stockBadge(x.state)}
-     <div class="quick" style="bottom:32px">View</div>
+     <div class="quick" style="bottom:32px">View →</div>
    </div>
    <div class="card-meta">
      <div><div class="nm">서티 ${x.n}</div><div class="ct">${x.c}</div></div>
    </div>
  </article>`).join('');
+
+// Wishlist 동기화 — 카드의 하트 상태 갱신
+function syncWishlistHearts(){
+  document.querySelectorAll('.wl-heart').forEach(btn=>{
+    const id = btn.dataset.pid;
+    if (SEOTI.api.isInWishlist(id)) {
+      btn.innerHTML = '♥';
+      btn.style.color = '#e8503a';
+    } else {
+      btn.innerHTML = '♡';
+      btn.style.color = '#bdb8b1';
+    }
+  });
+}
+// app.js 로드 후 실행 (DOMContentLoaded 시점)
+if (window.SEOTI) {
+  syncWishlistHearts();
+  window.addEventListener('seoti-state-change', syncWishlistHearts);
+} else {
+  document.addEventListener('DOMContentLoaded', ()=>{ syncWishlistHearts(); window.addEventListener('seoti-state-change', syncWishlistHearts); });
+}
+
+// 카드 클릭 → 상품 상세로, 하트 클릭 → 위시 토글
+document.getElementById('grid').addEventListener('click', e=>{
+  const heart = e.target.closest('.wl-heart');
+  if (heart) {
+    e.preventDefault();
+    e.stopPropagation();
+    SEOTI.api.toggleWishlist({
+      id: heart.dataset.pid,
+      name: '서티 ' + heart.dataset.pname,
+      cat: heart.dataset.pcat,
+      img: heart.dataset.pimg
+    });
+    return;
+  }
+  const card = e.target.closest('.card');
+  if (card) location.href = 'product-detail-a.html';
+});
 </script>
+<script src="assets/app.js"></script>
 <script src="assets/nav.js"></script>
 </body>
 </html>

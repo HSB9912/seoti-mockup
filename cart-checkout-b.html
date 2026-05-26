@@ -122,38 +122,12 @@ footer{padding:30px 0;font-size:12.5px;color:var(--sub);text-align:center;border
     <div>
       <!-- 1. 장바구니 -->
       <div class="panel">
-        <h2><span class="n">1</span>장바구니<i class="en">Cart</i><small>4개 상품</small></h2>
-        <div class="cart-it">
-          <input type="checkbox" checked>
-          <div class="tn"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/a157d261092510f1542550274972a939.png"></div>
-          <div class="m"><b>서티 설탕 눈마을 스티커</b><small>단품 · 메모 스티커</small></div>
-          <div class="qty"><button>−</button><input value="2"><button>＋</button></div>
-          <div class="pr">7,000원</div>
-          <button class="rm">✕</button>
-        </div>
-        <div class="cart-it">
-          <input type="checkbox" checked>
-          <div class="tn"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/3d92c3f2ae8a816bb0aaf8374372b46a.png"></div>
-          <div class="m"><b>서티 스위티 메모 스티커팩</b><small>단품 · 메모 스티커</small></div>
-          <div class="qty"><button>−</button><input value="1"><button>＋</button></div>
-          <div class="pr">3,500원</div>
-          <button class="rm">✕</button>
-        </div>
-        <div class="cart-it">
-          <input type="checkbox" checked>
-          <div class="tn"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202508/13260f931f04e15ddc8bb56a20dc0e90.png"></div>
-          <div class="m"><b>서티 키스컷 마스킹테이프 2</b><small>단품 · 마스킹테이프</small></div>
-          <div class="qty"><button>−</button><input value="1"><button>＋</button></div>
-          <div class="pr">6,500원</div>
-          <button class="rm">✕</button>
-        </div>
-        <div class="cart-it">
-          <input type="checkbox" checked>
-          <div class="tn"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202410/e80feba7a57b4fcf1a3364e5cfbb40d6.png"></div>
-          <div class="m"><b>서티 냠냠만두 투명 스티커</b><small>단품 · 투명스티커</small></div>
-          <div class="qty"><button>−</button><input value="1"><button>＋</button></div>
-          <div class="pr">3,000원</div>
-          <button class="rm">✕</button>
+        <h2><span class="n">1</span>장바구니<i class="en">Cart</i><small><span id="cartTitleCount">0</span>개 상품</small></h2>
+        <div id="cartItems"></div>
+        <div id="cartEmpty" style="text-align:center;padding:50px 20px;display:none">
+          <div style="font-size:42px;margin-bottom:14px;opacity:.4">🛒</div>
+          <p style="font-size:13.5px;color:var(--sub);margin-bottom:18px">장바구니가 비어있어요</p>
+          <a href="mockup-b-minimal.html" style="background:var(--ink);color:#fff;padding:11px 22px;font-size:13px;font-weight:800;text-decoration:none;display:inline-block">Collection 보러가기 →</a>
         </div>
       </div>
 
@@ -227,21 +201,11 @@ footer{padding:30px 0;font-size:12.5px;color:var(--sub);text-align:center;border
 
     <!-- summary sticky -->
     <aside class="summary">
-      <h3>주문 요약<small>4개 상품</small></h3>
-      <div class="items">
-        <div class="it"><div class="tn"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/a157d261092510f1542550274972a939.png"></div><div class="m"><b>설탕 눈마을 스티커 ×2</b><small>단품</small></div><span class="pr">7,000</span></div>
-        <div class="it"><div class="tn"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/3d92c3f2ae8a816bb0aaf8374372b46a.png"></div><div class="m"><b>스위티 메모팩 ×1</b><small>단품</small></div><span class="pr">3,500</span></div>
-        <div class="it"><div class="tn"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202508/13260f931f04e15ddc8bb56a20dc0e90.png"></div><div class="m"><b>키스컷 마테 2 ×1</b><small>단품</small></div><span class="pr">6,500</span></div>
-        <div class="it"><div class="tn"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202410/e80feba7a57b4fcf1a3364e5cfbb40d6.png"></div><div class="m"><b>냠냠만두 ×1</b><small>단품</small></div><span class="pr">3,000</span></div>
-      </div>
-      <div class="calc">
-        <div class="row"><span>상품금액</span><span>20,000원</span></div>
-        <div class="row dis"><span>할인 (재구매 5%)</span><span>− 1,000원</span></div>
-        <div class="row sub"><span>배송비</span><span>2,900원</span></div>
-        <div class="row sub" style="font-size:11.5px;color:var(--accent);font-weight:700">+ 8,100원 더 담으면 무료배송</div>
-      </div>
-      <div class="tot"><div><div class="k">결제 금액</div><div style="font-size:11px;color:var(--sub)">VAT 포함</div></div><div class="v">21,900원</div></div>
-      <button class="pay">💳 21,900원 결제하기</button>
+      <h3>주문 요약<small><span id="summaryCount">0</span>개 상품</small></h3>
+      <div class="items" id="summaryItems"></div>
+      <div class="calc" id="summaryCalc"></div>
+      <div class="tot"><div><div class="k">결제 금액</div><div style="font-size:11px;color:var(--sub)">VAT 포함</div></div><div class="v" id="summaryTotal">0원</div></div>
+      <button class="pay" id="payBtn" disabled>장바구니가 비어있어요</button>
       <div class="pay-info">결제 시 위 약관에 동의한 것으로 간주됩니다 ·<br>비회원 주문조회는 주문번호+비밀번호로 가능</div>
     </aside>
   </div>
@@ -249,6 +213,124 @@ footer{padding:30px 0;font-size:12.5px;color:var(--sub);text-align:center;border
 
 <footer>© 2026 SEOTI — 디자인 시안용 목업 · 장바구니/결제 변형 B</footer>
 
+<script src="assets/app.js"></script>
+<script>
+// Cart/Checkout — render from store
+(function(){
+  const SHIPPING_FEE = 2900;
+  const FREE_OVER = 30000;
+
+  function render(){
+    const cart = SEOTI.api.getCart();
+    const subtotal = SEOTI.api.cartTotal();
+    const shipping = subtotal === 0 ? 0 : subtotal >= FREE_OVER ? 0 : SHIPPING_FEE;
+    const final = subtotal + shipping;
+
+    document.getElementById('cartTitleCount').textContent = cart.length;
+    document.getElementById('summaryCount').textContent = cart.length;
+
+    // Empty state
+    document.getElementById('cartEmpty').style.display = cart.length ? 'none' : 'block';
+
+    // Cart items (main)
+    document.getElementById('cartItems').innerHTML = cart.map(c => `
+      <div class="cart-it" data-id="${c.id}" data-option="${c.option||''}">
+        <input type="checkbox" checked>
+        <div class="tn"><img referrerpolicy="no-referrer" src="${SEOTI.img(c.img)}"></div>
+        <div class="m"><b>${c.name}</b><small>${c.option||'단품'}${c.cat?' · '+c.cat:''}</small></div>
+        <div class="qty">
+          <button data-act="dec">−</button>
+          <input value="${c.qty}" data-qty>
+          <button data-act="inc">＋</button>
+        </div>
+        <div class="pr">${(c.price*c.qty).toLocaleString()}원</div>
+        <button class="rm" data-act="rm">✕</button>
+      </div>`).join('');
+
+    // Summary items
+    document.getElementById('summaryItems').innerHTML = cart.map(c => `
+      <div class="it">
+        <div class="tn"><img referrerpolicy="no-referrer" src="${SEOTI.img(c.img)}"></div>
+        <div class="m"><b>${c.name.replace(/^서티 /,'')} ×${c.qty}</b><small>${c.option||'단품'}</small></div>
+        <span class="pr">${(c.price*c.qty).toLocaleString()}</span>
+      </div>`).join('');
+
+    // Calc
+    const remaining = Math.max(0, FREE_OVER - subtotal);
+    document.getElementById('summaryCalc').innerHTML = `
+      <div class="row"><span>상품금액</span><span>${subtotal.toLocaleString()}원</span></div>
+      <div class="row sub"><span>배송비</span><span>${shipping === 0 ? (subtotal>=FREE_OVER?'무료':'—') : shipping.toLocaleString()+'원'}</span></div>
+      ${remaining>0 && subtotal>0 ? `<div class="row sub" style="font-size:11.5px;color:var(--accent);font-weight:700">+ ${remaining.toLocaleString()}원 더 담으면 무료배송</div>` : ''}
+    `;
+
+    document.getElementById('summaryTotal').textContent = final.toLocaleString() + '원';
+
+    const payBtn = document.getElementById('payBtn');
+    if (cart.length === 0) {
+      payBtn.disabled = true;
+      payBtn.textContent = '장바구니가 비어있어요';
+    } else {
+      payBtn.disabled = false;
+      payBtn.textContent = `💳 ${final.toLocaleString()}원 결제하기`;
+    }
+  }
+
+  render();
+  window.addEventListener('seoti-state-change', render);
+
+  // Cart actions (event delegation)
+  document.getElementById('cartItems').addEventListener('click', e => {
+    const row = e.target.closest('.cart-it');
+    if (!row) return;
+    const id = row.dataset.id;
+    const option = row.dataset.option;
+    const act = e.target.dataset.act;
+    const cur = SEOTI.api.getCart().find(c => c.id === id && (c.option||'') === (option||''));
+    if (!cur) return;
+    if (act === 'inc') SEOTI.api.updateCartQty(id, option, cur.qty + 1);
+    if (act === 'dec') SEOTI.api.updateCartQty(id, option, cur.qty - 1);
+    if (act === 'rm') { SEOTI.api.removeFromCart(id, option); SEOTI.toast('상품이 제거되었어요'); }
+  });
+
+  document.getElementById('cartItems').addEventListener('change', e => {
+    if (!e.target.matches('[data-qty]')) return;
+    const row = e.target.closest('.cart-it');
+    const v = Math.max(1, parseInt(e.target.value) || 1);
+    SEOTI.api.updateCartQty(row.dataset.id, row.dataset.option, v);
+  });
+
+  // Payment
+  document.getElementById('payBtn').addEventListener('click', () => {
+    const cart = SEOTI.api.getCart();
+    if (!cart.length) return;
+    // 필수 동의 체크 확인
+    const required = document.querySelectorAll('.terms .t input[type=checkbox]');
+    let ok = true;
+    required.forEach((cb,i) => {
+      if (i < 3 && !cb.checked) ok = false;
+    });
+    if (!ok) {
+      SEOTI.toast('필수 약관에 동의해주세요', 'warn');
+      return;
+    }
+    const order = SEOTI.api.placeOrder({
+      method: document.querySelector('input[name="pay"]:checked')?.parentElement.textContent.trim() || '카드',
+      member: document.querySelector('input[name="who"]:checked')?.parentElement.textContent.trim() || '비회원'
+    });
+    SEOTI.toast(`주문 완료! ${order.id}`, 'success');
+    setTimeout(()=> {
+      if (SEOTI.api.isLoggedIn()) location.href = 'mypage-b.html';
+      else location.href = 'index.html';
+    }, 1500);
+  });
+
+  // 전체 동의 체크
+  const allCb = document.querySelector('.terms .all input[type=checkbox]');
+  if (allCb) allCb.addEventListener('change', () => {
+    document.querySelectorAll('.terms .t input[type=checkbox]').forEach(cb => cb.checked = allCb.checked);
+  });
+})();
+</script>
 <script src="assets/nav.js"></script>
 </body>
 </html>
