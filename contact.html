@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>서티 SEOTI · Contact</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css" />
+<style>
+:root{--bg:#fff;--ink:#161412;--sub:#8c8781;--faint:#bdb8b1;--line:#e7e4df;--paper:#f6f3ee;--accent:#e8503a}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Pretendard Variable',Pretendard,sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.55}
+img{display:block;max-width:100%}a{color:inherit;text-decoration:none}
+.wrap{max-width:980px;margin:0 auto;padding:0 32px}
+.en{font-size:.7em;opacity:.45;margin-left:5px;font-weight:500;letter-spacing:.02em;text-transform:none;font-style:normal}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--sub)}
+
+/* SEOTI NAV */
+.seoti-nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.seoti-nav-wrap{max-width:1240px;margin:0 auto;padding:0 32px;display:flex;align-items:center;height:62px;gap:30px}
+.seoti-logo{font-size:20px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
+.seoti-nav-menu{display:flex;gap:26px;margin-left:auto;font-size:13.5px;font-weight:600}
+.seoti-nav-menu a{color:var(--sub);transition:.15s}
+.seoti-nav-menu a:hover{color:var(--ink)}
+.seoti-nav-menu a.on{color:var(--ink)}
+.seoti-nav-menu a.on::before{content:"·";color:var(--accent);margin-right:5px;font-weight:800}
+@media(max-width:760px){.seoti-nav-menu{gap:14px;font-size:12.5px}.seoti-logo{font-size:17px}}
+
+/* hero */
+.ph{padding:80px 0 50px;text-align:center}
+.ph .eyebrow{margin-bottom:14px}
+.ph h1{font-size:54px;font-weight:800;letter-spacing:-.03em;line-height:1.1}
+.ph h1 em{font-style:normal;color:var(--accent)}
+.ph p{color:var(--sub);font-size:15px;margin-top:18px;line-height:1.8;max-width:520px;margin-left:auto;margin-right:auto}
+
+/* channels */
+.channels{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;padding:30px 0 50px}
+.ch{background:var(--paper);border:1px solid var(--line);padding:30px 28px;display:flex;flex-direction:column;justify-content:space-between;min-height:220px;cursor:pointer;transition:.15s}
+.ch:hover{border-color:var(--ink);background:#fff;transform:translateY(-3px)}
+.ch .icon{font-size:34px;line-height:1}
+.ch h3{font-size:18px;font-weight:800;letter-spacing:-.01em;margin-top:14px}
+.ch .at{font-size:14px;font-weight:700;color:var(--accent);margin-top:6px;word-break:break-all}
+.ch .desc{font-size:12.5px;color:var(--sub);line-height:1.7;margin-top:10px;flex:1}
+.ch .copy{margin-top:14px;font-size:11.5px;font-weight:800;color:var(--ink);text-transform:uppercase;letter-spacing:.08em}
+.ch .copy::after{content:" →"}
+.ch.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+.ch.primary h3{color:#fff}
+.ch.primary .desc{color:rgba(255,255,255,.6)}
+.ch.primary .copy{color:#fff}
+.ch.primary .at{color:var(--accent)}
+
+/* topic guide */
+.guide{background:var(--paper);padding:36px 40px;margin:20px 0 50px;border:1px solid var(--line)}
+.guide h3{font-size:16px;font-weight:800;letter-spacing:-.01em;margin-bottom:16px}
+.guide .topics{display:grid;grid-template-columns:repeat(2,1fr);gap:18px 30px}
+.topic{display:flex;gap:12px;font-size:13px}
+.topic b{display:block;font-weight:800;font-size:13.5px;margin-bottom:3px}
+.topic p{color:var(--sub);font-size:12.5px;line-height:1.7}
+.topic .arrow{color:var(--accent);font-weight:800;flex:none}
+
+/* office hours */
+.hours{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:20px 28px;background:var(--paper);border:1px solid var(--line);margin-bottom:50px;flex-wrap:wrap}
+.hours .k{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--sub)}
+.hours .v{font-size:14px;font-weight:700;margin-top:3px}
+.hours .v small{font-weight:500;color:var(--sub);margin-left:6px}
+
+/* about-mini */
+.about-mini{display:grid;grid-template-columns:1fr 1.5fr;gap:40px;align-items:center;padding:50px 0;border-top:1px solid var(--line)}
+.about-mini .photo{aspect-ratio:1;background:var(--paper);overflow:hidden}
+.about-mini .photo img{width:100%;height:100%;object-fit:cover}
+.about-mini h2{font-size:24px;font-weight:800;letter-spacing:-.02em;margin-bottom:14px}
+.about-mini p{font-size:14px;color:var(--ink);line-height:1.9;margin-bottom:14px}
+.about-mini p.sub{color:var(--sub);font-size:13px}
+.about-mini .read-more{display:inline-block;margin-top:10px;font-size:13px;font-weight:800;color:var(--accent)}
+.about-mini .read-more::after{content:" →"}
+
+footer{padding:30px 0;font-size:12.5px;color:var(--sub);text-align:center;border-top:1px solid var(--line)}
+
+@media(max-width:760px){
+  .ph h1{font-size:34px}
+  .channels{grid-template-columns:1fr}
+  .guide .topics{grid-template-columns:1fr}
+  .about-mini{grid-template-columns:1fr;gap:20px}
+}
+</style>
+</head>
+<body data-page="contact">
+
+<nav class="seoti-nav">
+  <div class="seoti-nav-wrap">
+    <a class="seoti-logo" href="index.html">Seoti</a>
+    <div class="seoti-nav-menu">
+      <a href="notice-b.html">Notice</a>
+      <a href="mockup-b-minimal.html">Collection</a>
+      <a href="archive.html">Archive</a>
+      <a href="customer-bulk-order-c.html">Group Order</a>
+      <a href="customer-qna-b.html">QnA</a>
+      <a href="contact.html" class="on">Contact</a>
+    </div>
+  </div>
+</nav>
+
+<header class="ph wrap">
+  <span class="eyebrow">Contact<i class="en">연락처</i></span>
+  <h1>편하게 <em>연락주세요</em>.</h1>
+  <p>제품 주문·QnA는 <a href="customer-qna-b.html" style="text-decoration:underline;text-underline-offset:3px;font-weight:700">QnA 페이지</a>에서 받습니다. 아래는 <b style="color:var(--ink)">콜라보·도매·라이선스·인터뷰</b> 등 비즈니스 문의용 채널입니다.</p>
+</header>
+
+<main class="wrap">
+  <!-- channels -->
+  <section class="channels">
+    <a class="ch primary" href="mailto:seoti.studio@gmail.com">
+      <div>
+        <div class="icon">✉️</div>
+        <h3>Email</h3>
+        <div class="at">seoti.studio@gmail.com</div>
+        <p class="desc">콜라보·도매·라이선스 등 공식 문의는 이메일로 부탁드려요. 영업일 기준 1~2일 내 회신.</p>
+      </div>
+      <span class="copy">메일 보내기</span>
+    </a>
+    <a class="ch" href="https://instagram.com/seoti.studio" target="_blank">
+      <div>
+        <div class="icon">📷</div>
+        <h3>Instagram</h3>
+        <div class="at">@seoti.studio</div>
+        <p class="desc">매일 한 컷의 그림 일기. 새 작품·통판·이벤트 소식이 가장 빠르게 올라옵니다.</p>
+      </div>
+      <span class="copy">팔로우하기</span>
+    </a>
+    <a class="ch" href="https://twitter.com/seoti_studio" target="_blank">
+      <div>
+        <div class="icon">𝕏</div>
+        <h3>Twitter / X</h3>
+        <div class="at">@seoti_studio</div>
+        <p class="desc">통판·재입고 알림은 트위터에서도 진행해요. 짧은 작업 노트도 종종 올립니다.</p>
+      </div>
+      <span class="copy">트위터 가기</span>
+    </a>
+  </section>
+
+  <!-- topic guide -->
+  <section class="guide">
+    <h3>어떤 이야기를 보내주실 건가요? <small style="font-size:12px;color:var(--sub);font-weight:600;margin-left:8px">채널 선택 가이드</small></h3>
+    <div class="topics">
+      <div class="topic"><span class="arrow">→</span><div><b>콜라보·캐릭터 라이선스</b><p>이메일로 회사·프로젝트 소개와 함께 보내주세요.</p></div></div>
+      <div class="topic"><span class="arrow">→</span><div><b>도매·입점 문의</b><p>이메일로 매장·온라인몰 정보 첨부.</p></div></div>
+      <div class="topic"><span class="arrow">→</span><div><b>인터뷰·매체 출연</b><p>이메일이 가장 빠릅니다.</p></div></div>
+      <div class="topic"><span class="arrow">→</span><div><b>제품 주문·교환·환불</b><p>QnA 페이지로 가주세요.</p></div></div>
+      <div class="topic"><span class="arrow">→</span><div><b>그룹오더 문의</b><p>Group Order 페이지에서 신청.</p></div></div>
+      <div class="topic"><span class="arrow">→</span><div><b>가벼운 인사·후기</b><p>인스타·트위터 DM 환영!</p></div></div>
+    </div>
+  </section>
+
+  <!-- office hours -->
+  <div class="hours">
+    <div>
+      <div class="k">응답 시간<i class="en">Reply Time</i></div>
+      <div class="v">평일 1~2영업일 <small>· 주말·공휴일 제외</small></div>
+    </div>
+    <div>
+      <div class="k">위치<i class="en">Based in</i></div>
+      <div class="v">Seoul, South Korea</div>
+    </div>
+    <div>
+      <div class="k">언어<i class="en">Languages</i></div>
+      <div class="v">한국어 · English</div>
+    </div>
+  </div>
+
+  <!-- about mini -->
+  <section class="about-mini">
+    <div class="photo"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/a157d261092510f1542550274972a939.png"></div>
+    <div>
+      <span class="eyebrow">About the Artist</span>
+      <h2 style="margin-top:12px">서티 (SEOTI)</h2>
+      <p>서울에서 활동하는 손그림 일러스트 작가. 다이어리·편지·노트 위 작은 풍경을 그립니다. 2022년부터 시작해 지금까지 43개의 컬렉션을 만들었어요.</p>
+      <p class="sub">"그림이 다른 사람의 하루를 잠시 멈추게 할 수 있다면, 그것만으로 충분하다고 생각해요."</p>
+      <a href="archive.html" class="read-more">Archive에서 작품 보기</a>
+    </div>
+  </section>
+</main>
+
+<footer>© 2026 SEOTI · Contact — 디자인 시안용 목업</footer>
+
+</body>
+</html>

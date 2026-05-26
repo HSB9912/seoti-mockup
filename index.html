@@ -3,255 +3,283 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>서티 SEOTI · 아카이브 사이트 — 초안</title>
+<title>서티 SEOTI · Artist Archive</title>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css" />
 <style>
-:root{--bg:#fafaf7;--paper:#fff;--ink:#1c1916;--sub:#857f78;--faint:#bdb8b1;--line:#e6e0d8;--accent:#e8503a;--ok:#3aa872}
+:root{--bg:#fff;--ink:#161412;--sub:#8c8781;--faint:#bdb8b1;--line:#e7e4df;--paper:#f6f3ee;--accent:#e8503a;--ok:#3aa872}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Pretendard Variable',Pretendard,sans-serif;background:var(--bg);
-  color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.55;padding:48px 24px 90px}
-a{color:inherit;text-decoration:none}
-.wrap{max-width:1140px;margin:0 auto}
+body{font-family:'Pretendard Variable',Pretendard,sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.55}
+img{display:block;max-width:100%}a{color:inherit;text-decoration:none}
+.wrap{max-width:1240px;margin:0 auto;padding:0 32px}
 .en{font-size:.7em;opacity:.45;margin-left:5px;font-weight:500;letter-spacing:.02em;text-transform:none;font-style:normal}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--sub)}
 
-.head{margin-bottom:36px}
-.head .tag{display:inline-flex;align-items:center;gap:8px;background:var(--ink);color:#fff;
-  font-size:11px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;padding:6px 14px;border-radius:99px}
-.head .tag .dot{width:7px;height:7px;background:#7fd296;border-radius:50%}
-.head h1{font-size:34px;font-weight:800;letter-spacing:-.025em;margin:14px 0 8px;line-height:1.15}
-.head h1 em{font-style:normal;color:var(--accent)}
-.head p{color:var(--sub);font-size:14.5px;max-width:680px;line-height:1.7}
+/* SEOTI NAV — standard across all pages */
+.seoti-nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.seoti-nav-wrap{max-width:1240px;margin:0 auto;padding:0 32px;display:flex;align-items:center;height:62px;gap:30px}
+.seoti-logo{font-size:20px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
+.seoti-nav-menu{display:flex;gap:26px;margin-left:auto;font-size:13.5px;font-weight:600}
+.seoti-nav-menu a{color:var(--sub);transition:.15s}
+.seoti-nav-menu a:hover{color:var(--ink)}
+.seoti-nav-menu a.on{color:var(--ink)}
+.seoti-nav-menu a.on::before{content:"·";color:var(--accent);margin-right:5px;font-weight:800}
+@media(max-width:760px){.seoti-nav-menu{gap:14px;font-size:12.5px}.seoti-logo{font-size:17px}}
 
-/* status bar */
-.status{background:var(--paper);border:1px solid var(--line);border-radius:14px;
-  padding:18px 24px;margin:24px 0 0;display:grid;grid-template-columns:repeat(3,1fr);gap:24px;font-size:13px}
-.status .k{font-size:10.5px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:var(--sub)}
-.status .v{font-size:14.5px;font-weight:700;margin-top:3px}
-.status .v em{font-style:normal;color:var(--accent)}
-.status .v small{font-weight:500;color:var(--sub)}
+/* hero */
+.hero{padding:90px 0 70px;border-bottom:1px solid var(--line)}
+.hero-top{display:grid;grid-template-columns:1.4fr 1fr;gap:60px;align-items:end}
+.hero h1{font-size:62px;font-weight:800;line-height:1.05;letter-spacing:-.035em}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.hero-meta{text-align:right}
+.hero-meta p{font-size:14px;color:var(--sub);margin-top:12px;line-height:1.8;max-width:260px;margin-left:auto}
+.hero-meta .stats{display:flex;gap:24px;justify-content:flex-end;margin-top:20px;font-size:11.5px;color:var(--sub)}
+.hero-meta .stats b{color:var(--ink);font-size:18px;font-weight:800;display:block;letter-spacing:-.01em}
 
-/* confirmed set — primary */
-.group{margin-top:42px}
-.group-h{display:flex;align-items:baseline;justify-content:space-between;
-  border-bottom:1px solid var(--ink);padding-bottom:10px;margin-bottom:18px;gap:14px}
-.group-h h2{font-size:22px;font-weight:800;letter-spacing:-.015em}
-.group-h .sub{font-size:12.5px;color:var(--sub);font-weight:600}
+.hero-strip{margin-top:48px;display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.hero-strip div{aspect-ratio:1;background:var(--paper);overflow:hidden}
+.hero-strip img{width:100%;height:100%;object-fit:cover;transition:.6s}
+.hero-strip div:hover img{transform:scale(1.05)}
 
-.confirmed{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.cc{display:flex;flex-direction:column;background:var(--paper);border:1px solid var(--line);
-  border-radius:12px;padding:16px 18px;transition:.15s;cursor:pointer}
-.cc:hover{border-color:var(--ink);transform:translateY(-2px)}
-.cc .top{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-.cc .num{font-size:11px;font-weight:800;color:var(--accent);letter-spacing:.06em}
-.cc .var{font-size:10.5px;font-weight:800;background:var(--ink);color:#fff;
-  padding:2px 7px;border-radius:99px;letter-spacing:.1em}
-.cc h3{font-size:15px;font-weight:800;letter-spacing:-.005em;margin-bottom:5px}
-.cc p{font-size:12px;color:var(--sub);line-height:1.6;flex:1}
-.cc .go{margin-top:10px;padding-top:8px;border-top:1px dashed var(--line);
-  font-size:12px;color:var(--accent);font-weight:800;display:flex;justify-content:space-between}
+/* section */
+.sec{padding:70px 0;border-bottom:1px solid var(--line)}
+.sec:last-child{border-bottom:none}
+.sec-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:32px;gap:20px;flex-wrap:wrap}
+.sec-head h2{font-size:28px;font-weight:800;letter-spacing:-.02em}
+.sec-head h2 small{font-size:13px;color:var(--sub);font-weight:600;margin-left:10px}
+.sec-head .more{font-size:13px;font-weight:700;color:var(--accent)}
+.sec-head .more:hover{text-decoration:underline;text-underline-offset:3px}
 
-/* next */
-.next{margin-top:36px;background:var(--paper);border:1.5px dashed var(--accent);border-radius:14px;
-  padding:22px 26px}
-.next .lbl{font-size:11px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:var(--accent)}
-.next h3{font-size:18px;font-weight:800;margin:6px 0 6px;letter-spacing:-.015em}
-.next p{color:var(--sub);font-size:13.5px;line-height:1.7}
-.next ul{margin-top:10px;padding-left:18px;color:var(--sub);font-size:13px;line-height:1.9}
-.next ul b{color:var(--ink)}
+/* notice list */
+.n-list{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.n-card{background:var(--paper);padding:20px 22px;border:1px solid var(--line);transition:.15s;cursor:pointer}
+.n-card:hover{border-color:var(--ink);background:#fff}
+.n-card .ty{font-size:10.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+.n-card h3{font-size:15.5px;font-weight:700;margin:6px 0 10px;line-height:1.4}
+.n-card p{font-size:12.5px;color:var(--sub);line-height:1.6}
+.n-card .dt{font-size:11.5px;color:var(--faint);margin-top:14px;font-weight:600}
 
-/* archived variants */
-.arch{margin-top:36px}
-.arch summary{cursor:pointer;font-size:13px;font-weight:700;color:var(--sub);padding:12px 16px;
-  background:var(--paper);border:1px solid var(--line);border-radius:10px;list-style:none}
-.arch summary::-webkit-details-marker{display:none}
-.arch summary::before{content:"▸ ";color:var(--accent);transition:transform .15s;display:inline-block;margin-right:4px}
-.arch[open] summary::before{transform:rotate(90deg)}
-.arch .body{padding:18px 4px}
-.arch h4{font-size:11.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--sub);margin:12px 0 8px}
-.arch .list{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px}
-.arch .list a{padding:8px 12px;font-size:12.5px;font-weight:600;background:var(--paper);border:1px solid var(--line);
-  border-radius:8px;color:var(--sub);display:flex;justify-content:space-between;align-items:center}
-.arch .list a:hover{border-color:var(--ink);color:var(--ink)}
-.arch .list a .v{font-size:10px;font-weight:800;color:var(--faint);letter-spacing:.08em}
+/* collection preview */
+.col-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.col-card{cursor:pointer}
+.col-card .ph{aspect-ratio:1;background:var(--paper);overflow:hidden;position:relative}
+.col-card .ph img{width:100%;height:100%;object-fit:cover;transition:.4s}
+.col-card:hover img{transform:scale(1.05)}
+.col-card .state{position:absolute;top:10px;right:10px;font-size:10px;font-weight:800;letter-spacing:.05em;padding:3px 8px;background:rgba(22,20,18,.65);color:#fff;text-transform:uppercase}
+.col-card .state.out{background:var(--accent)}
+.col-card .state.disc{background:rgba(120,115,108,.85)}
+.col-card .nm{font-size:14px;font-weight:700;margin-top:10px}
+.col-card .ct{font-size:11px;color:var(--sub);font-weight:600;letter-spacing:.04em;text-transform:uppercase;margin-top:3px}
 
-/* note */
-.note{margin-top:40px;background:var(--paper);border:1px solid var(--line);border-radius:12px;
-  padding:18px 22px;font-size:13px;color:var(--sub);line-height:1.8}
-.note b{color:var(--ink)}
+/* archive preview */
+.arc-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:4px}
+.arc-grid div{aspect-ratio:1;background:var(--paper);overflow:hidden;cursor:pointer}
+.arc-grid img{width:100%;height:100%;object-fit:cover;transition:.4s}
+.arc-grid div:hover img{transform:scale(1.06)}
 
-@media(max-width:780px){.confirmed{grid-template-columns:1fr 1fr}.status{grid-template-columns:1fr}}
-@media(max-width:520px){.confirmed{grid-template-columns:1fr}}
+/* CTA blocks */
+.cta-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.cta{background:var(--paper);padding:36px 38px;border:1px solid var(--line);display:flex;flex-direction:column;justify-content:space-between;min-height:200px}
+.cta .ty{font-size:11px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--accent)}
+.cta h3{font-size:24px;font-weight:800;margin:10px 0 8px;letter-spacing:-.015em;line-height:1.2}
+.cta p{font-size:13.5px;color:var(--sub);line-height:1.7;flex:1}
+.cta .go{margin-top:20px;font-size:13.5px;font-weight:800;color:var(--ink)}
+.cta .go::after{content:" →";color:var(--accent)}
+.cta:hover{border-color:var(--ink)}
+.cta.dark{background:var(--ink);color:#fff;border-color:var(--ink)}
+.cta.dark .ty{color:var(--accent)}
+.cta.dark p{color:rgba(255,255,255,.6)}
+.cta.dark .go{color:#fff}
+
+/* footer */
+footer{border-top:1px solid var(--ink);padding:50px 0 36px;background:var(--paper)}
+.foot-top{display:grid;grid-template-columns:2fr 1fr 1fr;gap:30px;margin-bottom:34px}
+.foot-top h4{font-size:22px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+.foot-top .lead{font-size:13px;color:var(--sub);margin-top:10px;max-width:320px;line-height:1.8}
+.foot-top h5{font-size:11px;font-weight:800;color:var(--sub);letter-spacing:.14em;text-transform:uppercase;margin-bottom:14px}
+.foot-top a{display:block;font-size:13.5px;font-weight:600;line-height:2.1;color:var(--sub)}
+.foot-top a:hover{color:var(--ink)}
+.foot-bot{padding-top:24px;border-top:1px solid var(--line);display:flex;justify-content:space-between;font-size:12px;color:var(--sub);flex-wrap:wrap;gap:10px}
+
+@media(max-width:880px){
+  .hero h1{font-size:38px}
+  .hero-top{grid-template-columns:1fr;gap:24px}
+  .hero-meta{text-align:left}.hero-meta p,.hero-meta .stats{margin-left:0;justify-content:flex-start}
+  .hero-strip{grid-template-columns:repeat(3,1fr)}
+  .n-list{grid-template-columns:1fr}
+  .col-grid{grid-template-columns:1fr 1fr}
+  .arc-grid{grid-template-columns:repeat(3,1fr)}
+  .cta-row{grid-template-columns:1fr}
+  .foot-top{grid-template-columns:1fr}
+  .seoti-nav-menu{display:none}
+}
 </style>
 </head>
-<body>
-<div class="wrap">
+<body data-page="home">
 
-  <header class="head">
-    <span class="tag"><span class="dot"></span>DRAFT · 초안 진행중</span>
-    <h1>서티 작품 <em>아카이브 사이트</em></h1>
-    <p>판매보다 작품 기록(아카이브)이 더 중요한 방향으로 정리 중. 확정된 페이지 셋을 중심으로 빠르게 초안 잡아갑니다. 매번 같이 보면서 조금씩 다듬는 흐름이에요.</p>
-
-    <div class="status">
-      <div><div class="k">방향성</div><div class="v"><em>작품 아카이브 중심</em> <small>· 스토어는 서브</small></div></div>
-      <div><div class="k">상태</div><div class="v">9개 변형 확정 ✓ <small>다음: 아카이브 페이지</small></div></div>
-      <div><div class="k">호스팅</div><div class="v"><a style="color:var(--accent);text-decoration:underline" href="https://hsb9912.github.io/seoti-mockup/" target="_blank">github.io에서 보기</a></div></div>
+<nav class="seoti-nav">
+  <div class="seoti-nav-wrap">
+    <a class="seoti-logo" href="index.html">Seoti</a>
+    <div class="seoti-nav-menu">
+      <a href="notice-b.html">Notice</a>
+      <a href="mockup-b-minimal.html">Collection</a>
+      <a href="archive.html">Archive</a>
+      <a href="customer-bulk-order-c.html">Group Order</a>
+      <a href="customer-qna-b.html">QnA</a>
+      <a href="contact.html">Contact</a>
     </div>
-  </header>
-
-  <!-- CONFIRMED SET -->
-  <section class="group">
-    <div class="group-h">
-      <h2>확정된 페이지 셋<i class="en">Confirmed Pages</i></h2>
-      <span class="sub">각 카드 클릭하면 그 페이지가 열려요</span>
-    </div>
-    <div class="confirmed">
-      <a class="cc" href="mockup-b-minimal.html">
-        <div class="top"><span class="num">①</span><span class="var">메인 B</span></div>
-        <h3>스토어 메인</h3>
-        <p>화이트 갤러리 그리드. 재고 상태(있음/단종/일시품절) 자동 표시.</p>
-        <div class="go"><span>mockup-b-minimal.html</span><span>→</span></div>
-      </a>
-      <a class="cc" href="product-detail-a.html">
-        <div class="top"><span class="num">②</span><span class="var">상세 A</span></div>
-        <h3>상품 상세 페이지</h3>
-        <p>좌 갤러리 + 우 정보판. 배송·적립 항목 제거됨. 발매·에디션 표시.</p>
-        <div class="go"><span>product-detail-a.html</span><span>→</span></div>
-      </a>
-      <a class="cc" href="cart-checkout-b.html">
-        <div class="top"><span class="num">③</span><span class="var">결제 B</span></div>
-        <h3>장바구니 · 결제</h3>
-        <p>단일 페이지 체크아웃. 비회원 결제 가능.</p>
-        <div class="go"><span>cart-checkout-b.html</span><span>→</span></div>
-      </a>
-      <a class="cc" href="auth-b.html">
-        <div class="top"><span class="num">④</span><span class="var">로그인 B</span></div>
-        <h3>로그인 · 회원가입</h3>
-        <p>좌우 분할 (스티커 콜라주 + 폼).</p>
-        <div class="go"><span>auth-b.html</span><span>→</span></div>
-      </a>
-      <a class="cc" href="mypage-b.html">
-        <div class="top"><span class="num">⑤</span><span class="var">마이 B</span></div>
-        <h3>마이페이지</h3>
-        <p>상단 탭 + 카드 대시보드.</p>
-        <div class="go"><span>mypage-b.html</span><span>→</span></div>
-      </a>
-      <a class="cc" href="customer-bulk-order-c.html">
-        <div class="top"><span class="num">⑥</span><span class="var">그룹 C</span></div>
-        <h3>Group Order</h3>
-        <p>플로팅 드로어 + 따뜻한 톤. (구 "대량주문")</p>
-        <div class="go"><span>customer-bulk-order-c.html</span><span>→</span></div>
-      </a>
-      <a class="cc" href="customer-qna-b.html">
-        <div class="top"><span class="num">⑦</span><span class="var">Q&A B</span></div>
-        <h3>고객 문의</h3>
-        <p>게시판형 + 좌측 카테고리 사이드바.</p>
-        <div class="go"><span>customer-qna-b.html</span><span>→</span></div>
-      </a>
-      <a class="cc" href="about-a.html">
-        <div class="top"><span class="num">⑧</span><span class="var">About A</span></div>
-        <h3>About (작가 소개)</h3>
-        <p>긴 글 에디토리얼.</p>
-        <div class="go"><span>about-a.html</span><span>→</span></div>
-      </a>
-      <a class="cc" href="notice-b.html">
-        <div class="top"><span class="num">⑨</span><span class="var">공지 B</span></div>
-        <h3>공지 · 이벤트</h3>
-        <p>카드 그리드 + 라이브 표시.</p>
-        <div class="go"><span>notice-b.html</span><span>→</span></div>
-      </a>
-      <a class="cc" href="admin-c.html">
-        <div class="top"><span class="num">⑩</span><span class="var">관리자 C</span></div>
-        <h3>관리자 (어드민)</h3>
-        <p>노션형 트리 사이드바.</p>
-        <div class="go"><span>admin-c.html</span><span>→</span></div>
-      </a>
-      <a class="cc" href="admin-extensions.html">
-        <div class="top"><span class="num">⑩+</span><span class="var" style="background:var(--accent)">확장</span></div>
-        <h3>관리자 확장</h3>
-        <p>회원 · 리뷰 · 공지 · 쿠폰 관리. 위 관리자에 통합 예정.</p>
-        <div class="go"><span>admin-extensions.html</span><span>→</span></div>
-      </a>
-    </div>
-  </section>
-
-  <!-- NEXT -->
-  <div class="next">
-    <span class="lbl">Next Up · 다음 작업</span>
-    <h3>작품 아카이브 페이지 설계</h3>
-    <p>아카이브가 메인이 되도록 다음 라운드에서 추가합니다. 예상 구성:</p>
-    <ul>
-      <li><b>연도별/주제별 작품 큐레이션</b> — 시간순 + 컬렉션별</li>
-      <li><b>각 작품 상세</b> — 비하인드, 스케치, 만든 이야기</li>
-      <li><b>현재 상태 표시</b> — 재고 있음 / 단종 / 일시품절</li>
-      <li><b>전시·콜라보 기록</b> (선택)</li>
-    </ul>
   </div>
+</nav>
 
-  <!-- ARCHIVED VARIANTS -->
-  <details class="arch">
-    <summary>이전 변형 시안들 (참고용 보관) — 클릭해서 펼치기</summary>
-    <div class="body">
-      <h4>대량주문 (Group Order)</h4>
-      <div class="list">
-        <a href="customer-bulk-order.html">변형 A · 다단계 위저드<span class="v">참고</span></a>
-        <a href="customer-bulk-order-b.html">변형 B · 단일 페이지<span class="v">참고</span></a>
-        <a href="customer-bulk-order-c.html">변형 C · 드로어<span class="v">✓ 선택</span></a>
-      </div>
-      <h4>Q&A</h4>
-      <div class="list">
-        <a href="customer-qna-a.html">변형 A · 카드 리스트<span class="v">참고</span></a>
-        <a href="customer-qna-b.html">변형 B · 게시판<span class="v">✓ 선택</span></a>
-      </div>
-      <h4>관리자</h4>
-      <div class="list">
-        <a href="admin-a.html">변형 A · 사이드바<span class="v">참고</span></a>
-        <a href="admin-b.html">변형 B · 상단 카드<span class="v">참고</span></a>
-        <a href="admin-c.html">변형 C · 노션 트리<span class="v">✓ 선택</span></a>
-      </div>
-      <h4>상품 상세</h4>
-      <div class="list">
-        <a href="product-detail-a.html">변형 A · 좌우 분할<span class="v">✓ 선택</span></a>
-        <a href="product-detail-b.html">변형 B · 캐러셀<span class="v">참고</span></a>
-      </div>
-      <h4>장바구니·결제</h4>
-      <div class="list">
-        <a href="cart-checkout-a.html">변형 A · 위저드<span class="v">참고</span></a>
-        <a href="cart-checkout-b.html">변형 B · 단일 페이지<span class="v">✓ 선택</span></a>
-      </div>
-      <h4>로그인 · 가입</h4>
-      <div class="list">
-        <a href="auth-a.html">변형 A · 탭 카드<span class="v">참고</span></a>
-        <a href="auth-b.html">변형 B · 좌우 분할<span class="v">✓ 선택</span></a>
-      </div>
-      <h4>마이페이지</h4>
-      <div class="list">
-        <a href="mypage-a.html">변형 A · 사이드바<span class="v">참고</span></a>
-        <a href="mypage-b.html">변형 B · 탭 카드<span class="v">✓ 선택</span></a>
-      </div>
-      <h4>About</h4>
-      <div class="list">
-        <a href="about-a.html">변형 A · 에디토리얼<span class="v">✓ 선택</span></a>
-        <a href="about-b.html">변형 B · 갤러리<span class="v">참고</span></a>
-      </div>
-      <h4>공지 · 이벤트</h4>
-      <div class="list">
-        <a href="notice-a.html">변형 A · 리스트<span class="v">참고</span></a>
-        <a href="notice-b.html">변형 B · 카드<span class="v">✓ 선택</span></a>
-      </div>
-      <h4>초기 메인 스토어 시안</h4>
-      <div class="list">
-        <a href="mockup-a-soft.html">시안 A · 소프트 파스텔<span class="v">참고</span></a>
-        <a href="mockup-b-minimal.html">시안 B · 모던 미니멀<span class="v">✓ 확정</span></a>
-        <a href="mockup-c-pop.html">시안 C · 팝 플레이풀<span class="v">참고</span></a>
+<!-- HERO -->
+<header class="hero wrap">
+  <div class="hero-top">
+    <div>
+      <span class="eyebrow">SEOTI Studio<i class="en">손그림 일러스트 아카이브</i></span>
+      <h1 style="margin-top:18px">다정한 종이 위의<br><em>작은 풍경들</em>.</h1>
+    </div>
+    <div class="hero-meta">
+      <p>2022년부터 손으로 그린 다꾸 일러스트·스티커·마스킹테이프를 기록하는 아카이브입니다.</p>
+      <div class="stats">
+        <div>출시 컬렉션<b>43</b></div>
+        <div>활동 연차<b>4년</b></div>
+        <div>배송 국가<b>28</b></div>
       </div>
     </div>
-  </details>
-
-  <div class="note">
-    <b>💡 진행 방식</b> · 매 라운드 작은 변경을 빠르게 반영 → GitHub Pages 자동 업데이트. 핸드폰에서 바로 확인 가능.<br>
-    <b>최근 변경</b> · 재고 3단계로 단순화, 상세 페이지에서 배송/적립 제거, "대량주문" → "Group Order"로 용어 통일.<br>
-    <b>다음 라운드</b> · 작품 아카이브 페이지 — 어떤 식으로 보일지 의견 주시면 그 방향으로 초안 잡습니다.
   </div>
-</div>
+  <div class="hero-strip">
+    <div><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/a157d261092510f1542550274972a939.png"></div>
+    <div><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/3d92c3f2ae8a816bb0aaf8374372b46a.png"></div>
+    <div><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/8844055f11daba2bd37b69a6150cdac6.png"></div>
+    <div><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202508/d9342a7de8b65e19f073f6f99139560d.png"></div>
+    <div><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202508/13260f931f04e15ddc8bb56a20dc0e90.png"></div>
+    <div><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/655ded5da50146cf19dbaa537f0378da.png"></div>
+  </div>
+</header>
+
+<!-- NOTICE PREVIEW -->
+<section class="sec wrap">
+  <div class="sec-head">
+    <h2>Notice <small>최근 소식 · 행사 · 입점처</small></h2>
+    <a class="more" href="notice-b.html">전체 보기 →</a>
+  </div>
+  <div class="n-list">
+    <div class="n-card">
+      <div class="ty">🎉 행사</div>
+      <h3>봄맞이 메모 스티커 2+1 행사 진행중</h3>
+      <p>메모 스티커 시리즈 2개 구매 시 1개 증정.</p>
+      <div class="dt">2026.05.15 ~ 05.31</div>
+    </div>
+    <div class="n-card">
+      <div class="ty">📦 통판 일정</div>
+      <h3>트웬티 통판 5월 30일 시작</h3>
+      <p>이번 통판 일정과 주문 가능 시간 안내.</p>
+      <div class="dt">2026.05.20</div>
+    </div>
+    <div class="n-card">
+      <div class="ty">🏪 입점처</div>
+      <h3>소소로와 신상 입고 안내</h3>
+      <p>설탕 눈마을 외 4종 소소로와 입점.</p>
+      <div class="dt">2026.05.18</div>
+    </div>
+  </div>
+</section>
+
+<!-- COLLECTION PREVIEW -->
+<section class="sec wrap">
+  <div class="sec-head">
+    <h2>Collection <small>최근 발매 작품</small></h2>
+    <a class="more" href="mockup-b-minimal.html">전체 Collection →</a>
+  </div>
+  <div class="col-grid">
+    <a class="col-card" href="product-detail-a.html">
+      <div class="ph"><span class="state">재고 있음</span><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/a157d261092510f1542550274972a939.png"></div>
+      <div class="nm">설탕 눈마을 스티커</div>
+      <div class="ct">메모 · 2026.02</div>
+    </a>
+    <a class="col-card" href="product-detail-a.html">
+      <div class="ph"><span class="state">재고 있음</span><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/8844055f11daba2bd37b69a6150cdac6.png"></div>
+      <div class="nm">학교괴담 스티커</div>
+      <div class="ct">메모 · 2026.02</div>
+    </a>
+    <a class="col-card" href="product-detail-a.html">
+      <div class="ph"><span class="state out">일시품절</span><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202512/6df4ff16a044b3cd8dde5d8b78447e35.png"></div>
+      <div class="nm">초록책장 스티커</div>
+      <div class="ct">조각 · 2025.12</div>
+    </a>
+    <a class="col-card" href="product-detail-a.html">
+      <div class="ph"><span class="state disc">단종</span><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202503/58dafda9eee23c1a553c073971af033c.png"></div>
+      <div class="nm">크레페 말랑 키링</div>
+      <div class="ct">굿즈 · 2025.03</div>
+    </a>
+  </div>
+</section>
+
+<!-- ARCHIVE PREVIEW -->
+<section class="sec wrap">
+  <div class="sec-head">
+    <h2>Archive <small>다꾸 샘플 · 작업 기록</small></h2>
+    <a class="more" href="archive.html">Archive 전체 →</a>
+  </div>
+  <div class="arc-grid">
+    <div><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/bc4816b7234830cacfd8e73dbc81ebcb.png"></div>
+    <div><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202508/d9342a7de8b65e19f073f6f99139560d.png"></div>
+    <div><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202512/cb676b86854d5dc018ea0576b99c897a.png"></div>
+    <div><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/3dba9ab4bcc29cf34566d08a48284e13.png"></div>
+    <div><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202410/e80feba7a57b4fcf1a3364e5cfbb40d6.png"></div>
+    <div><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202410/a20a1e98cd7574c0c8a6b6f025691a20.png"></div>
+    <div><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/655ded5da50146cf19dbaa537f0378da.png"></div>
+    <div><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202508/383bee900dbacb6369f996fc668c0f42.png"></div>
+    <div><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/3d92c3f2ae8a816bb0aaf8374372b46a.png"></div>
+    <div><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/a157d261092510f1542550274972a939.png"></div>
+    <div><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202508/13260f931f04e15ddc8bb56a20dc0e90.png"></div>
+    <div><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/879c65563f5176d1a3592b11970a68db.png"></div>
+  </div>
+</section>
+
+<!-- CTA: GROUP ORDER + CONTACT -->
+<section class="sec wrap">
+  <div class="cta-row">
+    <a class="cta dark" href="customer-bulk-order-c.html">
+      <span class="ty">For Bulk · Wholesale</span>
+      <h3>Group Order <i class="en">대량주문</i></h3>
+      <p>해외·국내 단체 주문 견적 신청. 수량별 할인율이 다르게 적용되며, 회원가입 후 이용 가능합니다.</p>
+      <span class="go">견적 요청 보내기</span>
+    </a>
+    <a class="cta" href="contact.html">
+      <span class="ty">Get in Touch</span>
+      <h3>Contact <i class="en">콜라보·문의</i></h3>
+      <p>일러스트 콜라보, 캐릭터 라이선스, 도매 등 비즈니스 문의는 이메일/DM으로 받습니다.</p>
+      <span class="go">연락처 보기</span>
+    </a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-top">
+      <div>
+        <h4>Seoti</h4>
+        <p class="lead">손그림 다꾸 일러스트 작가 서티의 공식 아카이브 사이트. 작은 종이 위의 다정한 하루.</p>
+      </div>
+      <div>
+        <h5>Site</h5>
+        <a href="notice-b.html">Notice</a>
+        <a href="mockup-b-minimal.html">Collection</a>
+        <a href="archive.html">Archive</a>
+      </div>
+      <div>
+        <h5>Help &amp; Contact</h5>
+        <a href="customer-bulk-order-c.html">Group Order</a>
+        <a href="customer-qna-b.html">QnA</a>
+        <a href="contact.html">Contact</a>
+      </div>
+    </div>
+    <div class="foot-bot">
+      <span>© 2026 SEOTI — Artist Archive · 디자인 시안용 목업</span>
+      <span>seoti.studio@gmail.com · @seoti.studio</span>
+    </div>
+  </div>
+</footer>
+
 </body>
 </html>

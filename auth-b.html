@@ -99,14 +99,15 @@ img{display:block;max-width:100%}a{color:inherit;text-decoration:none}button,inp
     <div class="quote">
       <div class="eyebrow">손그림 다꾸 일러스트<i class="en">Seoti Studio</i></div>
       <h2>오늘 하루를<br><em>말랑하게</em><br>채우는 작은 종이.</h2>
-      <p>서티 패밀리가 되시면 3,000원 신규 적립금, 매달 신상 알림, 회원 전용 세일을 가장 먼저 받아볼 수 있어요.</p>
+      <p>Group Order는 회원만 이용 가능합니다. 가입 후 그룹 주문 견적·내역·진행 상태를 한 곳에서 확인할 수 있어요.</p>
     </div>
   </div>
 
   <!-- RIGHT form -->
   <div class="form-side">
     <div class="form-top">
-      <a href="mockup-b-minimal.html">← 스토어로 돌아가기</a>
+      <span style="margin-right:auto;font-size:11px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--accent)">Group Order 전용 회원 페이지</span>
+      <a href="index.html">← 홈으로</a>
     </div>
     <div class="form-box">
       <div class="toggle">
@@ -116,8 +117,8 @@ img{display:block;max-width:100%}a{color:inherit;text-decoration:none}button,inp
 
       <!-- LOGIN -->
       <section class="sect on" data-s="login">
-        <h1>안녕하세요,<br>다시 오신 걸 환영해요.</h1>
-        <p class="desc">이메일과 비밀번호로 로그인 해주세요.</p>
+        <h1>다시 오신 걸<br>환영해요.</h1>
+        <p class="desc">Group Order를 이용하려면 로그인이 필요해요.</p>
         <div class="fld"><label>이메일<i class="en">Email</i></label><input type="email" placeholder="name@example.com"></div>
         <div class="fld"><label>비밀번호<i class="en">Password</i></label><input type="password" placeholder="••••••••"></div>
         <div class="opts">
@@ -130,26 +131,36 @@ img{display:block;max-width:100%}a{color:inherit;text-decoration:none}button,inp
           <a class="kakao">카카오</a><a class="naver">네이버</a><a>Google</a>
         </div>
         <div class="bottom-link">계정이 없으신가요?<a data-go="signup">회원가입 →</a></div>
-        <div class="guest-link">가입 없이 주문하실 건가요?<br><a href="cart-checkout-a.html">비회원 주문 →</a></div>
+        <div class="guest-link" style="background:var(--paper);padding:14px 18px;margin-top:18px;font-size:12.5px;color:var(--sub);line-height:1.7;border-radius:4px">
+          💡 <b style="color:var(--ink)">일반 페이지(Notice/Collection/Archive 등)는 가입 없이</b> 자유롭게 둘러보실 수 있어요. 회원가입은 Group Order 신청 시에만 필요합니다.
+        </div>
       </section>
 
       <!-- SIGNUP -->
       <section class="sect" data-s="signup">
-        <h1>서티 패밀리가<br>되어주세요 🎀</h1>
-        <p class="desc">신규회원 3,000P · 매주 신상 알림 · 회원 전용 세일</p>
-        <div class="fld"><label>이메일<i class="en">Email</i></label>
+        <h1>Group Order<br>회원가입.</h1>
+        <p class="desc">이메일만 있으면 가입 가능 — <b style="color:var(--ink)">폰번호 없이도 OK</b>. (해외 사용자 환영)</p>
+        <div class="fld"><label>이메일<i class="en">Email · required</i></label>
           <div class="send"><input type="email" placeholder="name@example.com"><button>인증발송</button></div>
         </div>
-        <div class="fld"><label>인증번호<i class="en">Code</i></label>
+        <div class="fld"><label>인증번호<i class="en">Code · required</i></label>
           <div class="send"><input placeholder="6자리" maxlength="6"><button>확인</button></div>
         </div>
         <div class="frow">
-          <div class="fld"><label>이름</label><input placeholder="홍길동"></div>
-          <div class="fld"><label>닉네임</label><input placeholder="다꾸요정"></div>
+          <div class="fld"><label>이름<i class="en">Name · required</i></label><input placeholder="홍길동 / Hong Gildong"></div>
+          <div class="fld"><label>국가<i class="en">Country</i></label>
+            <select style="padding:14px 0;border:none;border-bottom:1.5px solid var(--line);background:none;font-size:15px;outline:none;width:100%">
+              <option>🇰🇷 대한민국</option><option>🇯🇵 일본</option><option>🇺🇸 미국</option><option>🇪🇺 유럽</option><option>기타 / Other</option>
+            </select>
+          </div>
         </div>
-        <div class="fld"><label>비밀번호<i class="en">Password</i></label><input type="password" placeholder="영문+숫자 8자 이상"></div>
-        <div class="fld"><label>비밀번호 확인</label><input type="password" placeholder="다시 입력"></div>
-        <p class="terms-mini">가입 시 <a>이용약관</a> 및 <a>개인정보 처리방침</a>에 동의한 것으로 간주됩니다.</p>
+        <div class="fld"><label>비밀번호<i class="en">Password · required</i></label><input type="password" placeholder="영문+숫자 8자 이상"></div>
+        <div class="fld"><label>비밀번호 확인<i class="en">Confirm</i></label><input type="password" placeholder="다시 입력"></div>
+        <div class="fld"><label>휴대폰<i class="en">Phone · optional</i></label>
+          <input placeholder="010-0000-0000 (선택 — 국내 배송 알림용)">
+          <p style="font-size:11.5px;color:var(--sub);margin-top:6px">국내 배송 시 알림 받으려면 입력. 해외는 비워두셔도 됩니다.</p>
+        </div>
+        <p class="terms-mini">가입 시 <a>이용약관</a> · <a>개인정보 처리방침</a>에 동의한 것으로 간주됩니다.</p>
         <button class="submit" style="margin-top:18px">가입하고 시작하기</button>
         <div class="bottom-link">이미 회원이신가요?<a data-go="login">로그인 →</a></div>
       </section>

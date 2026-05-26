@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>서티 SEOTI · Archive — 갤러리</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css" />
+<style>
+:root{--bg:#fff;--ink:#161412;--sub:#8c8781;--faint:#bdb8b1;--line:#e7e4df;--paper:#f6f3ee;--accent:#e8503a}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Pretendard Variable',Pretendard,sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.55}
+img{display:block;max-width:100%}a{color:inherit;text-decoration:none}
+.wrap{max-width:1240px;margin:0 auto;padding:0 32px}
+.en{font-size:.7em;opacity:.45;margin-left:5px;font-weight:500;letter-spacing:.02em;text-transform:none;font-style:normal}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--sub)}
+
+/* SEOTI NAV */
+.seoti-nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.seoti-nav-wrap{max-width:1240px;margin:0 auto;padding:0 32px;display:flex;align-items:center;height:62px;gap:30px}
+.seoti-logo{font-size:20px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
+.seoti-nav-menu{display:flex;gap:26px;margin-left:auto;font-size:13.5px;font-weight:600}
+.seoti-nav-menu a{color:var(--sub);transition:.15s}
+.seoti-nav-menu a:hover{color:var(--ink)}
+.seoti-nav-menu a.on{color:var(--ink)}
+.seoti-nav-menu a.on::before{content:"·";color:var(--accent);margin-right:5px;font-weight:800}
+@media(max-width:760px){.seoti-nav-menu{gap:14px;font-size:12.5px}.seoti-logo{font-size:17px}}
+
+/* hero */
+.ph{padding:54px 0 30px;border-bottom:1px solid var(--line)}
+.ph-row{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap}
+.ph h1{font-size:48px;font-weight:800;letter-spacing:-.03em;line-height:1.05}
+.ph h1 em{font-style:normal;color:var(--accent)}
+.ph .sub{font-size:14px;color:var(--sub);max-width:340px;line-height:1.7;text-align:right}
+.ph .stats{display:flex;gap:24px;margin-top:14px;font-size:11.5px;color:var(--sub);justify-content:flex-end}
+.ph .stats b{color:var(--ink);font-size:16px;font-weight:800;display:block;letter-spacing:-.01em}
+
+/* filter */
+.filters{display:flex;gap:22px;padding:22px 0;border-bottom:1px solid var(--ink);font-size:13.5px;font-weight:600;align-items:center;flex-wrap:wrap}
+.filters a{color:var(--sub);cursor:pointer;display:flex;gap:5px;align-items:baseline}
+.filters a sup{font-size:10px;color:var(--faint)}
+.filters a.on{color:var(--ink)}
+.filters a.on::before{content:"";width:6px;height:6px;background:var(--accent);border-radius:50%;display:inline-block;margin-right:7px;vertical-align:middle}
+.view-toggle{margin-left:auto;display:flex;gap:4px;border:1px solid var(--line);padding:2px}
+.view-toggle button{background:none;border:none;font-family:inherit;font-size:12px;padding:6px 12px;cursor:pointer;color:var(--sub);font-weight:700}
+.view-toggle button.on{background:var(--ink);color:#fff}
+
+/* grid — Instagram feel */
+.gallery{padding:36px 0 70px}
+.grid.dense{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.grid.dense .item{aspect-ratio:1;background:var(--paper);overflow:hidden;cursor:pointer;position:relative}
+.grid.loose{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.grid.loose .item{background:var(--paper);overflow:hidden;cursor:pointer;position:relative}
+.grid.loose .item .ph-img{aspect-ratio:1;overflow:hidden}
+.grid.loose .item .ph-img img{width:100%;height:100%;object-fit:cover;transition:.4s}
+.grid.loose .item:hover img{transform:scale(1.04)}
+.grid.loose .item .meta{padding:10px 4px 0;font-size:11.5px;color:var(--sub);display:flex;justify-content:space-between}
+.grid.loose .item .meta .dt{font-weight:600}
+.grid.loose .item .meta .tag{font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--accent)}
+.grid.dense .item img{width:100%;height:100%;object-fit:cover;transition:.3s}
+.grid.dense .item:hover img{transform:scale(1.05)}
+.grid.dense .item.tall{grid-row:span 2}
+.grid.dense .item .hover{position:absolute;inset:0;background:rgba(22,20,18,.55);color:#fff;display:flex;align-items:flex-end;padding:14px;opacity:0;transition:.2s;font-size:12px;font-weight:600}
+.grid.dense .item:hover .hover{opacity:1}
+
+/* upload button (admin only — placeholder, looks like instagram add) */
+.upload-cta{margin-top:30px;background:var(--paper);border:2px dashed var(--line);padding:30px;text-align:center}
+.upload-cta b{font-size:14px;font-weight:800;display:block;margin-bottom:6px}
+.upload-cta p{font-size:12.5px;color:var(--sub)}
+
+/* lightbox */
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:100;display:none;align-items:center;justify-content:center;padding:30px;cursor:zoom-out}
+.lightbox.on{display:flex}
+.lightbox img{max-width:90vw;max-height:90vh;object-fit:contain}
+.lightbox .close{position:absolute;top:24px;right:30px;color:#fff;font-size:28px;cursor:pointer;font-weight:300}
+
+footer{padding:30px 0;font-size:12.5px;color:var(--sub);text-align:center;border-top:1px solid var(--line)}
+
+@media(max-width:760px){
+  .ph h1{font-size:32px}
+  .grid.dense{grid-template-columns:repeat(3,1fr)}
+  .grid.loose{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body data-page="archive">
+
+<nav class="seoti-nav">
+  <div class="seoti-nav-wrap">
+    <a class="seoti-logo" href="index.html">Seoti</a>
+    <div class="seoti-nav-menu">
+      <a href="notice-b.html">Notice</a>
+      <a href="mockup-b-minimal.html">Collection</a>
+      <a href="archive.html" class="on">Archive</a>
+      <a href="customer-bulk-order-c.html">Group Order</a>
+      <a href="customer-qna-b.html">QnA</a>
+      <a href="contact.html">Contact</a>
+    </div>
+  </div>
+</nav>
+
+<header class="ph wrap">
+  <div class="ph-row">
+    <div>
+      <span class="eyebrow">Archive<i class="en">갤러리</i></span>
+      <h1 style="margin-top:14px"><em>다꾸 샘플</em>과<br>작업 기록.</h1>
+    </div>
+    <div>
+      <p class="sub">서티가 직접 다꾸한 페이지, 작업 과정의 한 컷, 그날그날의 풍경. 자유롭게 모아두는 갤러리입니다.</p>
+      <div class="stats">
+        <div>전체<b>148</b></div>
+        <div>다꾸<b>62</b></div>
+        <div>작업과정<b>34</b></div>
+        <div>일상<b>52</b></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="filters">
+    <a class="on">전체 <sup>148</sup></a>
+    <a>다꾸 샘플 <sup>62</sup></a>
+    <a>작업 과정 <sup>34</sup></a>
+    <a>일상·풍경 <sup>52</sup></a>
+    <a>콜라보 <sup>8</sup></a>
+    <div class="view-toggle">
+      <button class="on" data-v="dense">밀집</button>
+      <button data-v="loose">여백</button>
+    </div>
+  </div>
+
+  <section class="gallery">
+    <div class="grid dense" id="grid">
+      <!-- generated -->
+    </div>
+
+    <div class="upload-cta">
+      <b>+ 새 사진 올리기</b>
+      <p>다꾸 샘플, 작업 사진, 일상 등 무엇이든 자유롭게 추가하세요. (관리자 전용)</p>
+    </div>
+  </section>
+</main>
+
+<div class="lightbox" id="lightbox">
+  <span class="close" id="lbClose">✕</span>
+  <img id="lbImg" alt="">
+</div>
+
+<footer>© 2026 SEOTI — Archive · 디자인 시안용 목업</footer>
+
+<script>
+// 갤러리 이미지 (실제 운영 시 작가가 직접 업로드)
+const photos = [
+ {img:"202602/a157d261092510f1542550274972a939",t:"다꾸",dt:"05.20"},
+ {img:"202602/3d92c3f2ae8a816bb0aaf8374372b46a",t:"다꾸",dt:"05.18",tall:true},
+ {img:"202602/8844055f11daba2bd37b69a6150cdac6",t:"작업",dt:"05.15"},
+ {img:"202508/d9342a7de8b65e19f073f6f99139560d",t:"다꾸",dt:"05.12"},
+ {img:"202602/655ded5da50146cf19dbaa537f0378da",t:"일상",dt:"05.10"},
+ {img:"202512/cb676b86854d5dc018ea0576b99c897a",t:"작업",dt:"05.08",tall:true},
+ {img:"202602/bc4816b7234830cacfd8e73dbc81ebcb",t:"다꾸",dt:"05.06"},
+ {img:"202410/e80feba7a57b4fcf1a3364e5cfbb40d6",t:"일상",dt:"05.04"},
+ {img:"202508/13260f931f04e15ddc8bb56a20dc0e90",t:"콜라보",dt:"05.01"},
+ {img:"202602/3dba9ab4bcc29cf34566d08a48284e13",t:"다꾸",dt:"04.28"},
+ {img:"202508/383bee900dbacb6369f996fc668c0f42",t:"작업",dt:"04.25",tall:true},
+ {img:"202512/6df4ff16a044b3cd8dde5d8b78447e35",t:"다꾸",dt:"04.22"},
+ {img:"202410/a20a1e98cd7574c0c8a6b6f025691a20",t:"일상",dt:"04.20"},
+ {img:"202503/58dafda9eee23c1a553c073971af033c",t:"작업",dt:"04.18"},
+ {img:"202503/92aeb5f0a0a640fb8c3b5ad9988d6c03",t:"다꾸",dt:"04.15"},
+ {img:"202503/4cc53b7e82b5b5224b04ba00a5d11a8c",t:"작업",dt:"04.12",tall:true},
+ {img:"202508/b09269ce7d3efc87ebf20224eced08ae",t:"일상",dt:"04.10"},
+ {img:"202410/844dbfbb79050905b13af490a5bafcf6",t:"다꾸",dt:"04.08"},
+ {img:"202503/534709a88d26c6894476dc80c17f47e8",t:"다꾸",dt:"04.05"},
+ {img:"202506/5887735028959c51e497a0b3024be03f",t:"콜라보",dt:"04.02"},
+ {img:"202506/9f390c9a8c0aa8bf9b006298da7a21c6",t:"작업",dt:"03.30",tall:true},
+ {img:"202506/3b1d4ad6e89848009f4698bcf828700b",t:"다꾸",dt:"03.28"},
+ {img:"202502/7bbbb2338a020dd97aea1812488f07c8",t:"일상",dt:"03.25"},
+ {img:"202503/68f042e99831f511d1f11dfd6a940bc0",t:"다꾸",dt:"03.22"},
+ {img:"202602/879c65563f5176d1a3592b11970a68db",t:"작업",dt:"03.20"},
+ {img:"202602/e8231ae71116a751019504392117bc90",t:"다꾸",dt:"03.18",tall:true},
+];
+const grid = document.getElementById('grid');
+let view = 'dense';
+
+function render() {
+  grid.className = 'grid ' + view;
+  grid.innerHTML = photos.map((p,i) => {
+    const tall = view === 'dense' && p.tall ? ' tall' : '';
+    if (view === 'dense') {
+      return `<div class="item${tall}" data-i="${i}">
+        <img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/${p.img}.png">
+        <div class="hover">${p.t} · ${p.dt}</div>
+      </div>`;
+    } else {
+      return `<div class="item" data-i="${i}">
+        <div class="ph-img"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/${p.img}.png"></div>
+        <div class="meta"><span class="dt">2026.${p.dt}</span><span class="tag">${p.t}</span></div>
+      </div>`;
+    }
+  }).join('');
+}
+render();
+
+document.querySelectorAll('.view-toggle button').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('.view-toggle button').forEach(x => x.classList.remove('on'));
+    b.classList.add('on');
+    view = b.dataset.v;
+    render();
+  });
+});
+
+// lightbox
+const lb = document.getElementById('lightbox');
+const lbImg = document.getElementById('lbImg');
+grid.addEventListener('click', e => {
+  const it = e.target.closest('[data-i]');
+  if (!it) return;
+  const p = photos[+it.dataset.i];
+  lbImg.src = `https://sosorowa.com/web/product/medium/${p.img}.png`;
+  lb.classList.add('on');
+});
+document.getElementById('lbClose').onclick = () => lb.classList.remove('on');
+lb.onclick = e => { if (e.target === lb) lb.classList.remove('on'); };
+</script>
+</body>
+</html>
