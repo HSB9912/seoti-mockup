@@ -174,21 +174,9 @@
   }
 </style>
 </head>
-<body>
+<body data-page="group">
 
-<nav>
-  <div class="wrap nav-in">
-    <a class="logo" href="index.html"><span class="dot"></span>seoti</a>
-    <div class="nav-r" style="font-size:13.5px;font-weight:600">
-      <a href="notice-b.html" style="color:var(--sub)">Notice</a>
-      <a href="mockup-b-minimal.html" style="color:var(--sub)">Collection</a>
-      <a href="archive.html" style="color:var(--sub)">Archive</a>
-      <a style="color:var(--ink)"><b style="color:var(--peach-deep)">·</b> Group Order</a>
-      <a href="customer-qna-b.html" style="color:var(--sub)">QnA</a>
-      <a href="contact.html" style="color:var(--sub)">Contact</a>
-    </div>
-  </div>
-</nav>
+<div id="seoti-nav"></div>
 
 <div style="background:var(--ink);color:#fff;padding:11px 24px;font-size:12.5px;font-weight:600;display:flex;justify-content:center;align-items:center;gap:14px;flex-wrap:wrap">
   <span>🔒 <b>Group Order는 회원 전용 페이지입니다</b> — 로그인 후 이용 가능 · 폰번호 없이 가입 가능 (해외 OK)</span>
@@ -389,5 +377,6 @@ document.addEventListener('click',e=>{
 document.getElementById('search').addEventListener('input',e=>{search=e.target.value.trim();render();});
 render();
 </script>
+<script src="assets/nav.js"></script>
 </body>
 </html>

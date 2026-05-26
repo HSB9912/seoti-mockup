@@ -132,13 +132,9 @@ footer{padding:30px 0;font-size:12.5px;color:var(--sub);text-align:center}
 @media(max-width:920px){.hero-card{grid-template-columns:1fr;text-align:center}.hero-card .right{justify-content:center}.dash{grid-template-columns:1fr 1fr}.row.r-2,.row.r-3-1{grid-template-columns:1fr}.wgrid{grid-template-columns:1fr 1fr}.coupon-grid,.rt-grid,.profile-grid{grid-template-columns:1fr}}
 </style>
 </head>
-<body>
+<body data-page="group">
 
-<nav class="wrap"><div class="nav-in">
-  <a class="logo" href="mockup-b-minimal.html">Seoti</a>
-  <div class="nav-m"><a href="mockup-b-minimal.html">스토어</a><a href="customer-bulk-order.html">Group Order</a><a href="customer-qna-a.html">Q&A</a></div>
-  <div class="nav-r"><a class="on">마이</a><a>🛒</a></div>
-</div></nav>
+<div id="seoti-nav"></div>
 
 <header class="hero wrap">
   <div class="hero-card">
@@ -313,5 +309,6 @@ document.addEventListener('click',e=>{
   window.scrollTo({top:200,behavior:'smooth'});
 });
 </script>
+<script src="assets/nav.js"></script>
 </body>
 </html>

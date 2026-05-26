@@ -149,21 +149,9 @@ footer{padding:30px 0;font-size:12.5px;color:var(--sub);text-align:center;border
 @media(max-width:880px){.pd{grid-template-columns:1fr;gap:30px}.gallery{position:static}.rel{grid-template-columns:repeat(2,1fr)}.r-sum{grid-template-columns:1fr}}
 </style>
 </head>
-<body>
+<body data-page="collection">
 
-<nav>
-  <div class="wrap nav-in">
-    <a class="logo" href="index.html">Seoti</a>
-    <div class="nav-m">
-      <a href="notice-b.html">Notice</a>
-      <a href="mockup-b-minimal.html" class="on" style="color:var(--ink)">Collection</a>
-      <a href="archive.html">Archive</a>
-      <a href="customer-bulk-order-c.html">Group Order</a>
-      <a href="customer-qna-b.html">QnA</a>
-      <a href="contact.html">Contact</a>
-    </div>
-  </div>
-</nav>
+<div id="seoti-nav"></div>
 
 <main class="wrap">
 
@@ -331,5 +319,6 @@ document.getElementById('writeBtn').addEventListener('click',()=>{
   document.getElementById('rForm').classList.toggle('on');
 });
 </script>
+<script src="assets/nav.js"></script>
 </body>
 </html>

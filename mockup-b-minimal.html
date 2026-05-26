@@ -146,23 +146,11 @@
   }
 </style>
 </head>
-<body>
+<body data-page="collection">
 
 <div class="top-bar">📦 해외·Group Order은 견적 신청 페이지에서 한번에 — <a href="customer-bulk-order.html">Group Order →</a></div>
 
-<nav>
-  <div class="wrap nav-in">
-    <a class="logo" href="index.html" style="color:inherit;text-decoration:none">Seoti</a>
-    <div class="menu">
-      <a href="notice-b.html">Notice</a>
-      <a href="mockup-b-minimal.html" class="on">Collection</a>
-      <a href="archive.html">Archive</a>
-      <a href="customer-bulk-order-c.html">Group Order</a>
-      <a href="customer-qna-b.html">QnA</a>
-      <a href="contact.html">Contact</a>
-    </div>
-  </div>
-</nav>
+<div id="seoti-nav"></div>
 
 <header class="hero wrap">
   <div class="hero-top">
@@ -277,5 +265,6 @@ document.getElementById('grid').innerHTML=products.map((x,i)=>`
    </div>
  </article>`).join('');
 </script>
+<script src="assets/nav.js"></script>
 </body>
 </html>
