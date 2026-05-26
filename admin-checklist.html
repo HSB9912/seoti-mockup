@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<script src="assets/admin-guard.js"></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>서티 SEOTI · Admin · DB 연동 전 체크리스트</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css" />
+<style>
+:root{--bg:#fefefc;--paper:#fff;--ink:#202020;--sub:#878680;--faint:#d4d2cd;
+  --line:#ededeb;--accent:#a06440;--hover:#f5f4f0;
+  --ok:#3a8a6a;--warn:#b07a2a;--bad:#b03a3a;--info:#3a82d6}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Pretendard Variable',Pretendard,sans-serif;background:var(--paper);
+  color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.55;font-size:13.5px}
+a{color:inherit;text-decoration:none}img{display:block;max-width:100%}
+.en{font-size:.7em;opacity:.42;margin-left:5px;font-weight:500;letter-spacing:.02em;text-transform:none;font-style:normal}
+.mono{font-family:'SF Mono',Menlo,monospace;font-variant-numeric:tabular-nums}
+
+.app{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+
+.sb{background:#f9f8f4;border-right:1px solid var(--line);font-size:13px;display:flex;flex-direction:column}
+.sb-h{padding:14px 14px 8px;display:flex;align-items:center;gap:8px}
+.sb-h .av{width:24px;height:24px;border-radius:5px;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:800;font-size:11px}
+.sb-h b{font-size:13.5px;font-weight:800}
+.sb-h small{font-size:11px;color:var(--sub);margin-left:auto}
+.sb-tree{flex:1;overflow-y:auto;padding:14px 6px}
+.grp{margin-bottom:4px}
+.gh{padding:5px 8px;color:var(--sub);font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.item{display:flex;align-items:center;gap:8px;padding:6px 8px 6px 22px;color:var(--sub);font-weight:600;margin:1px 0;font-size:13px;border-radius:4px;cursor:pointer}
+.item:hover{background:var(--hover);color:var(--ink)}
+.item.on{background:var(--ink);color:#fff}
+.item .ico{width:14px}
+
+.main{display:flex;flex-direction:column;min-width:0}
+.top{padding:14px 28px;display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--line)}
+.crumb{font-size:13px;color:var(--sub)}.crumb b{color:var(--ink);font-weight:700}
+.crumb .sep{color:var(--faint);margin:0 6px}
+.top .r{margin-left:auto;display:flex;gap:6px;font-size:12.5px}
+.top .r a{padding:6px 10px;border-radius:5px;cursor:pointer;color:var(--sub)}
+.top .r a:hover{background:var(--hover);color:var(--ink)}
+
+.content{padding:30px 36px 60px;flex:1;overflow-y:auto;max-width:980px;width:100%}
+
+.ph{margin-bottom:24px}
+.ph .ico{font-size:32px;display:block;margin-bottom:8px;color:var(--accent)}
+.ph h1{font-size:30px;font-weight:800;letter-spacing:-.02em;line-height:1.15;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.ph h1 small{font-size:12.5px;color:var(--sub);font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.ph .desc{font-size:13.5px;color:var(--sub);margin-top:8px;max-width:640px;line-height:1.7}
+
+/* progress bar */
+.progress{background:linear-gradient(180deg,#fff,#fafaf7);border:1px solid var(--line);border-radius:10px;padding:20px 24px;margin-bottom:24px;position:sticky;top:0;z-index:5}
+.progress .row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.progress .pct{font-size:32px;font-weight:800;letter-spacing:-.02em}
+.progress .bar{flex:1;height:8px;background:var(--hover);border-radius:99px;overflow:hidden;min-width:160px}
+.progress .bar div{height:100%;background:linear-gradient(90deg,var(--accent),var(--ok));border-radius:99px;transition:.3s}
+.progress .meta{font-size:13px;color:var(--sub)}
+.progress .meta b{color:var(--ink)}
+.progress .legend{display:flex;gap:14px;margin-top:10px;font-size:11.5px;color:var(--sub);flex-wrap:wrap}
+.progress .legend span{display:flex;align-items:center;gap:5px}
+.progress .legend i{width:9px;height:9px;border-radius:2px;display:inline-block;font-style:normal}
+
+/* section */
+.sect{margin-bottom:30px}
+.sect-h{display:flex;align-items:baseline;justify-content:space-between;padding-bottom:8px;border-bottom:2px solid var(--ink);margin-bottom:12px}
+.sect-h h2{font-size:17px;font-weight:800;letter-spacing:-.01em;display:flex;align-items:center;gap:8px}
+.sect-h .ic{font-size:20px}
+.sect-h .priority{font-size:10.5px;font-weight:800;letter-spacing:.1em;padding:3px 8px;border-radius:3px;text-transform:uppercase}
+.priority.crit{background:#fdebeb;color:var(--bad)}
+.priority.high{background:#fdf0eb;color:var(--warn)}
+.priority.med{background:#e6eff9;color:var(--info)}
+.priority.low{background:var(--hover);color:var(--sub)}
+.sect-h .count{font-size:12px;color:var(--sub);font-weight:600}
+
+.task{display:flex;gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:6px;margin-bottom:6px;cursor:pointer;transition:.12s;background:var(--paper)}
+.task:hover{border-color:var(--ink)}
+.task.done{background:#f5f9f3;border-color:#cfe3c8;opacity:.7}
+.task input[type=checkbox]{width:18px;height:18px;accent-color:var(--ok);flex:none;margin-top:1px;cursor:pointer}
+.task .body{flex:1}
+.task .body b{font-size:13.5px;font-weight:700;display:block}
+.task.done .body b{text-decoration:line-through;color:var(--sub)}
+.task .body p{font-size:12.5px;color:var(--sub);line-height:1.65;margin-top:3px}
+.task .body code{background:var(--hover);padding:1px 6px;border-radius:3px;font-size:11.5px;font-family:'SF Mono',Menlo,monospace}
+.task .body .why{margin-top:6px;padding:6px 10px;background:#fef5e7;border-left:3px solid #f0d9a0;font-size:11.5px;line-height:1.6;color:var(--sub)}
+.task .body .why b{color:var(--warn);font-weight:800;font-size:11px;display:block;margin-bottom:2px}
+.task .tag{font-size:10px;font-weight:800;padding:2px 7px;border-radius:3px;text-transform:uppercase;letter-spacing:.04em;flex:none;align-self:flex-start;margin-top:1px}
+.task .tag.law{background:#fdebeb;color:var(--bad)}
+.task .tag.sec{background:#fdf0eb;color:var(--warn)}
+.task .tag.data{background:#e6eff9;color:var(--info)}
+.task .tag.dev{background:var(--hover);color:var(--sub)}
+
+.footnote{margin-top:40px;padding:20px 24px;background:#f9f8f4;border-radius:10px;font-size:12.5px;color:var(--sub);line-height:1.8}
+.footnote b{color:var(--ink)}
+
+.actions-top{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+.btn{font-size:12.5px;font-weight:700;padding:8px 14px;border:1px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer;border-radius:5px;font-family:inherit}
+.btn:hover{background:var(--hover)}
+.btn-p{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+@media(max-width:920px){.app{grid-template-columns:1fr}.sb{display:none}}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="sb">
+    <div class="sb-h"><div class="av">서</div><b>SEOTI</b><small>Admin</small></div>
+    <div class="sb-tree">
+      <div class="grp">
+        <div class="gh">운영</div>
+        <a class="item" href="admin-c.html"><span class="ico">▦</span>대시보드</a>
+        <a class="item" href="admin-business.html"><span class="ico">📊</span>비즈니스</a>
+        <a class="item" href="admin-content.html"><span class="ico">📝</span>콘텐츠 편집</a>
+      </div>
+      <div class="grp">
+        <div class="gh">준비</div>
+        <a class="item on"><span class="ico">✅</span>DB 연동 전 체크리스트</a>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="top">
+      <div class="crumb"><span>준비</span><span class="sep">/</span><b>DB 연동 전 체크리스트</b></div>
+      <div class="r">
+        <a id="resetBtn">초기화</a>
+        <a id="exportBtn">📥 내보내기</a>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="ph">
+        <span class="ico">✅</span>
+        <h1>DB 연동 전 체크리스트 <small>Pre-Launch</small></h1>
+        <p class="desc">Supabase·Cloudflare 연동 전에 점검할 항목들. 시안 단계에서 미뤄둔 보안·법·데이터 구조 의사결정을 한 자리에 모았습니다. 체크 상태는 자동 저장돼요.</p>
+      </div>
+
+      <div class="actions-top">
+        <button class="btn" id="filterAll">전체</button>
+        <button class="btn" id="filterPending">미완료만</button>
+        <button class="btn btn-p" id="filterCrit">🔴 즉시 필요만</button>
+      </div>
+
+      <div class="progress">
+        <div class="row">
+          <span class="pct"><span id="pctVal">0</span>%</span>
+          <div class="bar"><div id="barFill" style="width:0%"></div></div>
+          <span class="meta"><b id="doneCount">0</b> / <span id="totalCount">0</span> 완료</span>
+        </div>
+        <div class="legend">
+          <span><i style="background:#fdebeb"></i>법·규제 (개인정보·통신판매)</span>
+          <span><i style="background:#fdf0eb"></i>보안·인증</span>
+          <span><i style="background:#e6eff9"></i>데이터 모델</span>
+          <span><i style="background:var(--hover)"></i>운영·DX</span>
+        </div>
+      </div>
+
+      <!-- ====================== 1. 법·규제 ====================== -->
+      <div class="sect">
+        <div class="sect-h">
+          <h2><span class="ic">⚖️</span>법·규제 (개인정보보호법 · 통신판매업)</h2>
+          <span class="priority crit">즉시 필요</span>
+        </div>
+
+        <div class="task" data-id="law-1" data-pri="crit">
+          <input type="checkbox">
+          <div class="body">
+            <b>입점처 실제 정보 → 더미 또는 비공개 처리</b>
+            <p>현재 admin-business.html에 9개 매장의 사업자번호·담당자·이메일·주소·정산금액이 공개 GitHub Pages에 노출 중. <code>개인정보보호법 위반 가능</code></p>
+            <div class="why"><b>WHY</b>제3자(입점처)의 개인정보를 동의 없이 공개 시 처벌 대상. 매장 정산액·수수료는 영업 비밀.</div>
+          </div>
+          <span class="tag law">법</span>
+        </div>
+
+        <div class="task" data-id="law-2" data-pri="crit">
+          <input type="checkbox">
+          <div class="body">
+            <b>개인정보 처리방침 작성·게시</b>
+            <p>회원가입 시 "동의" 텍스트만 있고 실제 문서 X. <code>개인정보보호법 30조</code>는 처리방침 공개를 의무화함.</p>
+            <div class="why"><b>WHY</b>수집 항목·이용 목적·보관 기간·파기 절차 명시 필수. 미이행 시 과태료 1,000만 원 이하.</div>
+          </div>
+          <span class="tag law">법</span>
+        </div>
+
+        <div class="task" data-id="law-3" data-pri="crit">
+          <input type="checkbox">
+          <div class="body">
+            <b>이용약관 작성·게시</b>
+            <p>전자상거래 운영 시 약관 게시 의무. 환불·배송·교환 정책 포함.</p>
+          </div>
+          <span class="tag law">법</span>
+        </div>
+
+        <div class="task" data-id="law-4" data-pri="crit">
+          <input type="checkbox">
+          <div class="body">
+            <b>통신판매업 신고</b>
+            <p>온라인 판매 시 관할 지자체에 신고 필수. 신고번호 사이트 푸터에 표시 의무.</p>
+            <div class="why"><b>WHY</b>「전자상거래법」 12조. 미신고 시 과태료 3,000만 원 이하.</div>
+          </div>
+          <span class="tag law">법</span>
+        </div>
+
+        <div class="task" data-id="law-5" data-pri="crit">
+          <input type="checkbox">
+          <div class="body">
+            <b>사업자 정보 사이트 푸터 표시</b>
+            <p>상호·대표자명·사업자등록번호·통신판매업번호·주소·연락처·이메일 명시.</p>
+          </div>
+          <span class="tag law">법</span>
+        </div>
+
+        <div class="task" data-id="law-6" data-pri="high">
+          <input type="checkbox">
+          <div class="body">
+            <b>만 14세 미만 회원가입 처리</b>
+            <p>법정대리인 동의 절차 필요. <code>개인정보보호법 22조의2</code>. 또는 14세 이상만 가입 가능하게 차단.</p>
+          </div>
+          <span class="tag law">법</span>
+        </div>
+
+        <div class="task" data-id="law-7" data-pri="high">
+          <input type="checkbox">
+          <div class="body">
+            <b>회원 동의 항목 분리 (필수/선택)</b>
+            <p>이용약관·개인정보처리방침은 필수, 마케팅 수신은 선택. 각각 개별 동의 체크박스로.</p>
+            <div class="why"><b>WHY</b>일괄 동의 금지. 「개인정보보호법」 22조.</div>
+          </div>
+          <span class="tag law">법</span>
+        </div>
+
+        <div class="task" data-id="law-8" data-pri="med">
+          <input type="checkbox">
+          <div class="body">
+            <b>환불·교환 정책 페이지</b>
+            <p>구매 후 7일 이내 청약철회 등 법정 권리 명시. QnA 페이지나 별도 페이지로.</p>
+          </div>
+          <span class="tag law">법</span>
+        </div>
+      </div>
+
+      <!-- ====================== 2. 보안·인증 ====================== -->
+      <div class="sect">
+        <div class="sect-h">
+          <h2><span class="ic">🔒</span>보안 · 인증</h2>
+          <span class="priority high">중요</span>
+        </div>
+
+        <div class="task" data-id="sec-1" data-pri="crit">
+          <input type="checkbox">
+          <div class="body">
+            <b>비밀번호 해싱 (bcrypt/Argon2)</b>
+            <p>Supabase Auth는 기본 제공. 직접 구현 시 평문 저장 절대 금지.</p>
+            <div class="why"><b>WHY</b>유출 시 평문 비밀번호 노출은 손해배상 폭발. 「개보법」 위반.</div>
+          </div>
+          <span class="tag sec">보안</span>
+        </div>
+
+        <div class="task" data-id="sec-2" data-pri="crit">
+          <input type="checkbox">
+          <div class="body">
+            <b>Supabase Row Level Security (RLS) 설정</b>
+            <p>모든 테이블에 RLS 활성화 + policy 작성. <code>auth.uid()</code>로 본인 데이터만 접근.</p>
+            <div class="why"><b>WHY</b>기본값은 anon key로 누구나 모든 데이터 읽기 가능. 반드시 RLS 켜야 함.</div>
+          </div>
+          <span class="tag sec">보안</span>
+        </div>
+
+        <div class="task" data-id="sec-3" data-pri="crit">
+          <input type="checkbox">
+          <div class="body">
+            <b>관리자 권한 분리 (admin role)</b>
+            <p>Supabase <code>auth.users</code>에 role 필드. admin 전용 테이블은 role=admin만 SELECT 가능하게 RLS.</p>
+            <p>현재 admin-guard.js는 JS 비밀번호라 누구나 우회 가능 — 반드시 교체.</p>
+          </div>
+          <span class="tag sec">보안</span>
+        </div>
+
+        <div class="task" data-id="sec-4" data-pri="high">
+          <input type="checkbox">
+          <div class="body">
+            <b>API 키 환경변수 분리 (.env)</b>
+            <p>Supabase URL/anon key는 환경변수로. Service role key는 절대 브라우저 노출 금지 (서버에서만).</p>
+            <div class="why"><b>WHY</b>service_role 키 노출 시 RLS 우회 가능 → DB 전체 탈취 위험.</div>
+          </div>
+          <span class="tag sec">보안</span>
+        </div>
+
+        <div class="task" data-id="sec-5" data-pri="high">
+          <input type="checkbox">
+          <div class="body">
+            <b>이메일 인증 활성화</b>
+            <p>Supabase Auth → Email confirmations ON. 가짜 이메일 가입 방지.</p>
+          </div>
+          <span class="tag sec">보안</span>
+        </div>
+
+        <div class="task" data-id="sec-6" data-pri="high">
+          <input type="checkbox">
+          <div class="body">
+            <b>로그인 시도 횟수 제한 (rate limit)</b>
+            <p>Supabase 기본 제공 + 추가로 IP별 제한 고려. 무차별 대입 공격(brute force) 방어.</p>
+          </div>
+          <span class="tag sec">보안</span>
+        </div>
+
+        <div class="task" data-id="sec-7" data-pri="med">
+          <input type="checkbox">
+          <div class="body">
+            <b>HTTPS 강제 (Cloudflare)</b>
+            <p>Cloudflare → SSL/TLS → Full(strict). HTTP 접근 시 자동 HTTPS 리다이렉트.</p>
+          </div>
+          <span class="tag sec">보안</span>
+        </div>
+
+        <div class="task" data-id="sec-8" data-pri="med">
+          <input type="checkbox">
+          <div class="body">
+            <b>CSRF·XSS 방어</b>
+            <p>Supabase JS 클라이언트는 기본 토큰 처리. 사용자 입력 출력 시 <code>textContent</code> 사용 (innerHTML X).</p>
+          </div>
+          <span class="tag sec">보안</span>
+        </div>
+
+        <div class="task" data-id="sec-9" data-pri="med">
+          <input type="checkbox">
+          <div class="body">
+            <b>이미지 업로드 검증 (Cloudflare Images)</b>
+            <p>파일 타입·크기 서버에서 재검증. 악성 파일(.exe 등 이미지 위장) 차단. EXIF 메타데이터 자동 제거.</p>
+          </div>
+          <span class="tag sec">보안</span>
+        </div>
+      </div>
+
+      <!-- ====================== 3. 데이터 모델 (Supabase) ====================== -->
+      <div class="sect">
+        <div class="sect-h">
+          <h2><span class="ic">🗂</span>데이터 모델 (Supabase 스키마)</h2>
+          <span class="priority high">중요</span>
+        </div>
+
+        <div class="task" data-id="data-1" data-pri="crit">
+          <input type="checkbox">
+          <div class="body">
+            <b>핵심 테이블 설계</b>
+            <p>필요한 테이블 (예시): <code>users · profiles · products · product_images · orders · order_items · cart_items · wishlists · qna · qna_replies · vendors · settlements · expenses · archive_photos · site_content · notices</code></p>
+          </div>
+          <span class="tag data">DB</span>
+        </div>
+
+        <div class="task" data-id="data-2" data-pri="crit">
+          <input type="checkbox">
+          <div class="body">
+            <b>상태값(enum) 정의</b>
+            <p>제품 상태: <code>in_stock · sold_out · discontinued</code><br>주문: <code>pending · paid · shipping · delivered · refunded</code><br>정산: <code>완료 · 확인필요 · 미입금</code></p>
+          </div>
+          <span class="tag data">DB</span>
+        </div>
+
+        <div class="task" data-id="data-3" data-pri="high">
+          <input type="checkbox">
+          <div class="body">
+            <b>인덱스 설계</b>
+            <p>자주 조회되는 컬럼에 index: <code>products(category, state)</code>, <code>orders(user_id, created_at desc)</code>, <code>qna(category, status)</code> 등</p>
+          </div>
+          <span class="tag data">DB</span>
+        </div>
+
+        <div class="task" data-id="data-4" data-pri="high">
+          <input type="checkbox">
+          <div class="body">
+            <b>외래키 관계 + ON DELETE 정책</b>
+            <p>주문자(user)가 탈퇴 시 주문은 어떻게? CASCADE? SET NULL? 보관 의무 5년 (전자상거래법).</p>
+          </div>
+          <span class="tag data">DB</span>
+        </div>
+
+        <div class="task" data-id="data-5" data-pri="med">
+          <input type="checkbox">
+          <div class="body">
+            <b>created_at·updated_at 자동 기록</b>
+            <p>모든 테이블에 타임스탬프. <code>updated_at</code>은 트리거로 자동 갱신.</p>
+          </div>
+          <span class="tag data">DB</span>
+        </div>
+
+        <div class="task" data-id="data-6" data-pri="med">
+          <input type="checkbox">
+          <div class="body">
+            <b>이미지 URL 저장 방식</b>
+            <p>Cloudflare image ID만 DB에 저장 (<code>cf_image_id</code>). delivery URL은 코드에서 생성. 변경 유연성 확보.</p>
+          </div>
+          <span class="tag data">DB</span>
+        </div>
+
+        <div class="task" data-id="data-7" data-pri="med">
+          <input type="checkbox">
+          <div class="body">
+            <b>가격 통화 단위 고정</b>
+            <p>원화 정수만 사용 (소수점 X). <code>price INTEGER NOT NULL</code></p>
+          </div>
+          <span class="tag data">DB</span>
+        </div>
+      </div>
+
+      <!-- ====================== 4. 운영 · DX ====================== -->
+      <div class="sect">
+        <div class="sect-h">
+          <h2><span class="ic">⚙️</span>운영 · 개발 환경</h2>
+          <span class="priority med">필요</span>
+        </div>
+
+        <div class="task" data-id="ops-1" data-pri="high">
+          <input type="checkbox">
+          <div class="body">
+            <b>스테이징 환경 분리</b>
+            <p>Supabase 프로젝트를 dev/prod 둘로. 실수로 운영 DB 망가지는 거 방지.</p>
+          </div>
+          <span class="tag dev">운영</span>
+        </div>
+
+        <div class="task" data-id="ops-2" data-pri="high">
+          <input type="checkbox">
+          <div class="body">
+            <b>백업 정책</b>
+            <p>Supabase Pro 플랜은 7일 자동 백업. Free는 수동. 정기적으로 SQL dump 받기.</p>
+            <div class="why"><b>WHY</b>실수로 삭제·해킹·과실로 데이터 잃으면 복구 불가.</div>
+          </div>
+          <span class="tag dev">운영</span>
+        </div>
+
+        <div class="task" data-id="ops-3" data-pri="med">
+          <input type="checkbox">
+          <div class="body">
+            <b>로그·모니터링</b>
+            <p>Supabase logs 정기 확인. 에러 발생 시 알림 받을 채널 (이메일·Discord) 설정.</p>
+          </div>
+          <span class="tag dev">운영</span>
+        </div>
+
+        <div class="task" data-id="ops-4" data-pri="med">
+          <input type="checkbox">
+          <div class="body">
+            <b>이메일 발송 설정</b>
+            <p>주문 확인·재입고 알림·QnA 답변 등. Supabase Auth는 기본 발송 가능, 추가 발송은 Resend·Mailgun 등 연동.</p>
+          </div>
+          <span class="tag dev">운영</span>
+        </div>
+
+        <div class="task" data-id="ops-5" data-pri="med">
+          <input type="checkbox">
+          <div class="body">
+            <b>도메인 연결</b>
+            <p>현재 <code>hsb9912.github.io/seoti-mockup</code>. 실제 운영 시 자체 도메인 (예: <code>seoti.studio</code>) → Cloudflare DNS → 호스팅 연결.</p>
+          </div>
+          <span class="tag dev">운영</span>
+        </div>
+
+        <div class="task" data-id="ops-6" data-pri="low">
+          <input type="checkbox">
+          <div class="body">
+            <b>분석 도구</b>
+            <p>Google Analytics 또는 Plausible/Umami. 어떤 페이지가 인기 있는지·이탈 지점 파악.</p>
+          </div>
+          <span class="tag dev">운영</span>
+        </div>
+
+        <div class="task" data-id="ops-7" data-pri="low">
+          <input type="checkbox">
+          <div class="body">
+            <b>SEO 메타 태그</b>
+            <p>각 페이지에 <code>&lt;meta description&gt;</code>, OG 태그 (카톡·트위터 공유 미리보기).</p>
+          </div>
+          <span class="tag dev">운영</span>
+        </div>
+      </div>
+
+      <!-- ====================== 5. 데이터 마이그레이션 ====================== -->
+      <div class="sect">
+        <div class="sect-h">
+          <h2><span class="ic">📦</span>기존 데이터 마이그레이션</h2>
+          <span class="priority high">중요</span>
+        </div>
+
+        <div class="task" data-id="mig-1" data-pri="high">
+          <input type="checkbox">
+          <div class="body">
+            <b>입점처 9개 → vendors 테이블</b>
+            <p>현재 admin-business.html에 JS 배열로 들어있는 VENDORS 9개를 CSV 또는 SQL insert로 옮기기.</p>
+          </div>
+          <span class="tag data">마이그</span>
+        </div>
+
+        <div class="task" data-id="mig-2" data-pri="high">
+          <input type="checkbox">
+          <div class="body">
+            <b>정산 데이터 33건 → settlements</b>
+            <p>월별·입점처별 정산. <code>settlement_date·paid_date</code> 등 날짜 컬럼 표준화.</p>
+          </div>
+          <span class="tag data">마이그</span>
+        </div>
+
+        <div class="task" data-id="mig-3" data-pri="med">
+          <input type="checkbox">
+          <div class="body">
+            <b>세금·관리비 → expenses</b>
+            <p>노션 페이지의 6건. 분류(사무실/세금) enum화.</p>
+          </div>
+          <span class="tag data">마이그</span>
+        </div>
+
+        <div class="task" data-id="mig-4" data-pri="high">
+          <input type="checkbox">
+          <div class="body">
+            <b>작가 컬렉션 43개 → products</b>
+            <p>현재 시안은 sosorowa CDN 핫링크. 모든 이미지를 Cloudflare Images에 업로드 후 image_id 저장.</p>
+          </div>
+          <span class="tag data">마이그</span>
+        </div>
+
+        <div class="task" data-id="mig-5" data-pri="med">
+          <input type="checkbox">
+          <div class="body">
+            <b>Archive 사진 → archive_photos</b>
+            <p>다꾸 샘플·작업 사진 기존 자료들을 일괄 업로드. 분류·날짜·메모 메타데이터 포함.</p>
+          </div>
+          <span class="tag data">마이그</span>
+        </div>
+      </div>
+
+      <!-- ====================== 6. 결제 ====================== -->
+      <div class="sect">
+        <div class="sect-h">
+          <h2><span class="ic">💳</span>결제 연동</h2>
+          <span class="priority high">중요</span>
+        </div>
+
+        <div class="task" data-id="pay-1" data-pri="high">
+          <input type="checkbox">
+          <div class="body">
+            <b>결제 PG사 선택·계약</b>
+            <p>토스페이먼츠 · 포트원(아임포트) · KG이니시스 등. 수수료·정산 주기·약관 비교.</p>
+          </div>
+          <span class="tag dev">결제</span>
+        </div>
+
+        <div class="task" data-id="pay-2" data-pri="high">
+          <input type="checkbox">
+          <div class="body">
+            <b>전자결제 표준 준수</b>
+            <p>본인인증·결제 도중 정보 보호·결제 결과 검증. PG사 SDK 가이드 따르기.</p>
+          </div>
+          <span class="tag sec">결제</span>
+        </div>
+
+        <div class="task" data-id="pay-3" data-pri="med">
+          <input type="checkbox">
+          <div class="body">
+            <b>무통장 입금 자동 매칭</b>
+            <p>입금자명에 주문번호 포함 안내. 은행 API 연동 시 자동 처리, 아니면 관리자 수동.</p>
+          </div>
+          <span class="tag dev">결제</span>
+        </div>
+      </div>
+
+      <!-- ====================== 7. 테스트 ====================== -->
+      <div class="sect">
+        <div class="sect-h">
+          <h2><span class="ic">🧪</span>출시 전 테스트</h2>
+          <span class="priority med">필요</span>
+        </div>
+
+        <div class="task" data-id="qa-1" data-pri="high">
+          <input type="checkbox">
+          <div class="body">
+            <b>가입 → 장바구니 → 결제 → 주문조회 E2E 테스트</b>
+            <p>최소 3명 외부 테스터에게 부탁. 모바일·PC 둘 다.</p>
+          </div>
+          <span class="tag dev">QA</span>
+        </div>
+
+        <div class="task" data-id="qa-2" data-pri="high">
+          <input type="checkbox">
+          <div class="body">
+            <b>Group Order 견적·입금·발송 흐름</b>
+            <p>관리자가 견적 보내고 입금 확인하는 전 과정 시뮬레이션.</p>
+          </div>
+          <span class="tag dev">QA</span>
+        </div>
+
+        <div class="task" data-id="qa-3" data-pri="med">
+          <input type="checkbox">
+          <div class="body">
+            <b>모바일 반응형 점검</b>
+            <p>iPhone Safari·Chrome Android에서 모든 페이지 직접 확인.</p>
+          </div>
+          <span class="tag dev">QA</span>
+        </div>
+
+        <div class="task" data-id="qa-4" data-pri="med">
+          <input type="checkbox">
+          <div class="body">
+            <b>이상 케이스 처리</b>
+            <p>품절 상품을 장바구니에 두고 결제 시도 / 이메일 중복 가입 / 비밀번호 재설정 / 네트워크 끊김 등.</p>
+          </div>
+          <span class="tag dev">QA</span>
+        </div>
+      </div>
+
+      <div class="footnote">
+        <b>📋 사용법</b><br>
+        체크박스 클릭 시 자동 저장. 새로고침해도 상태 유지. "내보내기"로 텍스트 복사 가능.<br>
+        <b>🚀 추천 순서</b> · ① 법·규제 (특히 입점처 데이터 즉시 처리) → ② Supabase 스키마 + RLS → ③ 인증 → ④ 결제 PG → ⑤ 마이그레이션 → ⑥ E2E 테스트 → ⑦ 런칭<br>
+        <b>💡 TODO</b> · 이 체크리스트도 Supabase 연동 시 DB에 저장하면 협업자(있다면)와 공유 가능
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="assets/app.js"></script>
+<script>
+(function(){
+  const STORAGE = 'seoti_checklist_v1';
+  let saved = {};
+  try { saved = JSON.parse(localStorage.getItem(STORAGE)) || {}; } catch(e){}
+
+  const tasks = document.querySelectorAll('.task');
+  const totalCount = document.getElementById('totalCount');
+  const doneCount = document.getElementById('doneCount');
+  const pctVal = document.getElementById('pctVal');
+  const barFill = document.getElementById('barFill');
+  totalCount.textContent = tasks.length;
+
+  // 초기값 적용
+  tasks.forEach(t => {
+    const cb = t.querySelector('input[type=checkbox]');
+    const id = t.dataset.id;
+    if (saved[id]) { cb.checked = true; t.classList.add('done'); }
+  });
+
+  function updateProgress(){
+    const done = document.querySelectorAll('.task.done').length;
+    const pct = Math.round(done / tasks.length * 100);
+    doneCount.textContent = done;
+    pctVal.textContent = pct;
+    barFill.style.width = pct + '%';
+  }
+  updateProgress();
+
+  // 체크 처리
+  tasks.forEach(t => {
+    t.addEventListener('click', e => {
+      if (e.target.tagName !== 'INPUT') {
+        t.querySelector('input').checked = !t.querySelector('input').checked;
+      }
+      const cb = t.querySelector('input');
+      const id = t.dataset.id;
+      t.classList.toggle('done', cb.checked);
+      saved[id] = cb.checked;
+      localStorage.setItem(STORAGE, JSON.stringify(saved));
+      updateProgress();
+    });
+  });
+
+  // 필터
+  function applyFilter(fn){
+    tasks.forEach(t => { t.style.display = fn(t) ? '' : 'none'; });
+  }
+  document.getElementById('filterAll').addEventListener('click', () => applyFilter(()=>true));
+  document.getElementById('filterPending').addEventListener('click', () => applyFilter(t => !t.classList.contains('done')));
+  document.getElementById('filterCrit').addEventListener('click', () => applyFilter(t => t.dataset.pri === 'crit' && !t.classList.contains('done')));
+
+  // 초기화
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    if (!confirm('모든 체크를 해제할까요?')) return;
+    saved = {};
+    localStorage.removeItem(STORAGE);
+    tasks.forEach(t => { t.querySelector('input').checked = false; t.classList.remove('done'); });
+    updateProgress();
+    SEOTI.toast('체크 상태 초기화됨', 'info');
+  });
+
+  // 내보내기
+  document.getElementById('exportBtn').addEventListener('click', () => {
+    let txt = `# SEOTI · DB 연동 전 체크리스트\n생성: ${new Date().toLocaleString('ko-KR')}\n\n`;
+    document.querySelectorAll('.sect').forEach(s => {
+      txt += `\n## ${s.querySelector('h2').textContent.trim()}\n`;
+      s.querySelectorAll('.task').forEach(t => {
+        const done = t.classList.contains('done');
+        const title = t.querySelector('b').textContent;
+        txt += `- [${done ? 'x' : ' '}] ${title}\n`;
+      });
+    });
+    const blob = new Blob([txt], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'seoti-checklist.txt';
+    a.click();
+    URL.revokeObjectURL(url);
+    SEOTI.toast('체크리스트 다운로드됨', 'success');
+  });
+})();
+</script>
+</body>
+</html>

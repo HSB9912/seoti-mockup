@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<script src="assets/admin-guard.js"></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>서티 SEOTI · Admin · 사이트 콘텐츠 편집</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css" />
+<style>
+:root{--bg:#fefefc;--paper:#fff;--ink:#202020;--sub:#878680;--faint:#d4d2cd;
+  --line:#ededeb;--line2:#dfddd6;--accent:#a06440;--hover:#f5f4f0;
+  --ok:#3a8a6a;--warn:#b07a2a;--bad:#b03a3a}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Pretendard Variable',Pretendard,sans-serif;background:var(--paper);
+  color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.5;font-size:13.5px}
+a{color:inherit;text-decoration:none}img{display:block;max-width:100%}
+button,input,select,textarea{font-family:inherit}
+.en{font-size:.7em;opacity:.42;margin-left:5px;font-weight:500;letter-spacing:.02em;text-transform:none;font-style:normal}
+
+.app{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+
+/* SIDEBAR */
+.sb{background:#f9f8f4;border-right:1px solid var(--line);font-size:13px;display:flex;flex-direction:column}
+.sb-h{padding:14px 14px 8px;display:flex;align-items:center;gap:8px}
+.sb-h .av{width:24px;height:24px;border-radius:5px;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:800;font-size:11px}
+.sb-h b{font-size:13.5px;font-weight:800}
+.sb-h small{font-size:11px;color:var(--sub);margin-left:auto}
+.sb-search{margin:8px 10px 14px;background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:7px 10px;font-size:12.5px;outline:none}
+.sb-tree{flex:1;overflow-y:auto;padding:0 6px 12px}
+.grp{margin-bottom:4px}
+.gh{display:flex;align-items:center;gap:5px;padding:5px 8px;cursor:pointer;color:var(--sub);font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.gh:hover{color:var(--ink)}
+.gh .chev{font-size:9px;width:10px;color:var(--faint);transform:rotate(90deg)}
+.item{display:flex;align-items:center;gap:8px;padding:5px 8px 5px 22px;cursor:pointer;border-radius:4px;color:var(--sub);font-weight:600;margin:1px 0;font-size:13px}
+.item:hover{background:var(--hover);color:var(--ink)}
+.item.on{background:var(--ink);color:#fff}
+.item .ico{width:14px;text-align:center;font-size:13px;flex:none}
+.sb-bot{padding:10px 14px;border-top:1px solid var(--line);display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--sub)}
+.sb-bot b{color:var(--ink);font-weight:700}
+
+/* MAIN */
+.main{display:flex;flex-direction:column;min-width:0}
+.top{padding:14px 28px;display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--line)}
+.crumb{font-size:13px;color:var(--sub)}.crumb b{color:var(--ink);font-weight:700}
+.crumb .sep{color:var(--faint);margin:0 6px}
+.top .r{margin-left:auto;display:flex;gap:6px;align-items:center;font-size:12.5px}
+.top .r a{padding:6px 10px;border-radius:5px;cursor:pointer;color:var(--sub)}
+.top .r a:hover{background:var(--hover);color:var(--ink)}
+
+.content{padding:30px 36px 60px;flex:1;overflow-y:auto;max-width:920px;width:100%}
+
+/* page header */
+.ph{margin-bottom:24px}
+.ph .ico{font-size:32px;display:block;line-height:1;margin-bottom:8px;color:var(--accent)}
+.ph h1{font-size:30px;font-weight:800;letter-spacing:-.02em;line-height:1.15;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.ph h1 small{font-size:12.5px;color:var(--sub);font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.ph .desc{font-size:13.5px;color:var(--sub);margin-top:8px;max-width:640px;line-height:1.7}
+
+.callout{display:flex;gap:14px;background:#fef5e7;border:1px solid #f0d9a0;border-radius:6px;padding:14px 18px;margin-bottom:24px}
+.callout .ic{font-size:18px;flex:none}
+.callout b{font-weight:700;display:block;margin-bottom:3px}
+.callout p{font-size:12.5px;color:var(--sub);line-height:1.6}
+.callout .actions{margin-left:auto;display:flex;gap:6px;align-items:center}
+
+.blk{margin-bottom:34px}
+.blk-h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.blk h2{font-size:17px;font-weight:800;letter-spacing:-.01em}
+.blk small{font-size:12px;color:var(--sub);font-weight:600}
+
+.fld{margin-bottom:16px}
+.fld label{display:block;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--sub);margin-bottom:6px}
+.fld label .key{margin-left:6px;font-family:'SF Mono',Menlo,monospace;font-size:10px;color:var(--faint);font-weight:600;letter-spacing:0}
+.fld input,.fld textarea{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:5px;font-size:14px;outline:none;font-family:inherit;background:#fff}
+.fld input:focus,.fld textarea:focus{border-color:var(--accent)}
+.fld textarea{min-height:90px;resize:vertical;line-height:1.6}
+.fld .hint{font-size:11.5px;color:var(--sub);margin-top:5px;line-height:1.5}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.frow.stat{grid-template-columns:2fr 1fr}
+
+/* preview card — shows result */
+.preview{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:30px 32px;margin-bottom:24px;background:linear-gradient(180deg,#fff,#fafaf7)}
+.preview .lbl{font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+.preview .pv-eyebrow{font-size:11px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--sub);margin-bottom:14px}
+.preview .pv-eyebrow .en{opacity:.5}
+.preview h3{font-size:36px;font-weight:800;letter-spacing:-.025em;line-height:1.1}
+.preview h3 em{font-style:normal;color:#e8503a}
+.preview .pv-sub{font-size:13.5px;color:var(--sub);margin-top:14px;max-width:520px;line-height:1.7}
+.preview .pv-stats{display:flex;gap:24px;margin-top:18px;font-size:11.5px;color:var(--sub)}
+.preview .pv-stats b{display:block;color:var(--ink);font-size:18px;font-weight:800;margin-top:2px}
+
+/* save bar */
+.savebar{position:sticky;bottom:0;background:var(--ink);color:#fff;padding:14px 22px;
+  display:flex;align-items:center;gap:14px;margin:24px -36px 0;border-radius:6px 6px 0 0;
+  box-shadow:0 -8px 20px -8px rgba(0,0,0,.2)}
+.savebar .info{font-size:13px;color:rgba(255,255,255,.7);flex:1}
+.savebar .info b{color:#fff;font-weight:800;display:block;font-size:14px;margin-bottom:2px}
+.savebar button{font-family:inherit;font-size:13px;font-weight:700;padding:10px 18px;border:none;border-radius:5px;cursor:pointer;letter-spacing:.02em}
+.savebar .btn-reset{background:rgba(255,255,255,.12);color:#fff}
+.savebar .btn-reset:hover{background:rgba(255,255,255,.2)}
+.savebar .btn-preview{background:rgba(255,255,255,.12);color:#fff}
+.savebar .btn-save{background:#fff;color:var(--ink);font-weight:800}
+.savebar .btn-save.dirty{background:#ffd23f}
+.savebar .btn-save:hover{transform:translateY(-1px)}
+
+@media(max-width:920px){.app{grid-template-columns:1fr}.sb{display:none}.frow,.frow.stat{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="sb">
+    <div class="sb-h"><div class="av">서</div><b>SEOTI</b><small>Admin</small></div>
+    <input class="sb-search" placeholder="Quick search... ⌘K">
+    <div class="sb-tree">
+      <div class="grp">
+        <div class="gh"><span class="chev">▸</span>운영<i class="en">Operations</i></div>
+        <a class="item" href="admin-c.html"><span class="ico">▦</span>대시보드</a>
+      </div>
+      <div class="grp">
+        <div class="gh"><span class="chev">▸</span>상품·재고<i class="en">Inventory</i></div>
+        <a class="item" href="admin-c.html"><span class="ico">🏷</span>상품 관리</a>
+        <a class="item" href="admin-c.html"><span class="ico">📦</span>재고 관리</a>
+      </div>
+      <div class="grp">
+        <div class="gh"><span class="chev">▸</span>비즈니스<i class="en">Business</i></div>
+        <a class="item" href="admin-business.html"><span class="ico">🏪</span>입점처·정산</a>
+        <a class="item" href="admin-business.html"><span class="ico">🧾</span>세금·관리비</a>
+      </div>
+      <div class="grp">
+        <div class="gh"><span class="chev">▸</span>사이트<i class="en">Site</i></div>
+        <a class="item on"><span class="ico">📝</span>콘텐츠 편집</a>
+        <a class="item" href="admin-extensions.html"><span class="ico">📢</span>공지·이벤트</a>
+        <a class="item" href="admin-c.html"><span class="ico">🎨</span>디자인</a>
+      </div>
+    </div>
+    <div class="sb-bot">
+      <span style="width:18px;height:18px;background:var(--accent);color:#fff;border-radius:3px;display:grid;place-items:center;font-size:10px;font-weight:800">서</span>
+      <span><b>서티</b> · 관리자</span>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="top">
+      <div class="crumb"><span>사이트</span><span class="sep">/</span><b>콘텐츠 편집</b></div>
+      <div class="r">
+        <a href="index.html" target="_blank">🌐 사이트 열기</a>
+        <a>⋯</a>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="ph">
+        <span class="ico">📝</span>
+        <h1>사이트 콘텐츠 편집 <small>CMS</small></h1>
+        <p class="desc">노션처럼 텍스트·숫자만 바꾸면 사이트에 즉시 반영돼요. 코드를 만질 필요 없습니다. (현재는 시안 단계라 이 브라우저에만 저장됨 — Supabase 연동 후 모든 기기에서 공유됨)</p>
+      </div>
+
+      <div class="callout">
+        <span class="ic">💡</span>
+        <div>
+          <b>실시간 미리보기</b>
+          <p>입력하면서 아래에 미리보기가 함께 바뀌어요. 저장 후 "사이트 열기"로 실제 페이지에서도 확인하세요.</p>
+        </div>
+      </div>
+
+      <!-- 미리보기 -->
+      <div class="preview">
+        <div class="lbl">⟶ 실시간 미리보기</div>
+        <div class="pv-eyebrow"><span id="pvEyeMain">SEOTI Studio</span> <i class="en"><span id="pvEyeSub">손그림 일러스트 아카이브</span></i></div>
+        <h3><span id="pvTitle1">다정한 종이 위의</span><br><em id="pvTitle2">작은 풍경들.</em></h3>
+        <p class="pv-sub" id="pvSub">2022년부터...</p>
+        <div class="pv-stats">
+          <div><span id="pvS1L">출시 컬렉션</span><b id="pvS1V">43</b></div>
+          <div><span id="pvS2L">활동 연차</span><b id="pvS2V">4년</b></div>
+          <div><span id="pvS3L">배송 국가</span><b id="pvS3V">28</b></div>
+        </div>
+      </div>
+
+      <!-- 메인 페이지 -->
+      <div class="blk">
+        <div class="blk-h"><h2>메인 페이지 (Hero)</h2><small>index.html 상단 영역</small></div>
+        <div class="frow">
+          <div class="fld">
+            <label>작은 라벨 (메인)<span class="key">home.eyebrow.main</span></label>
+            <input data-key="home.eyebrow.main">
+          </div>
+          <div class="fld">
+            <label>작은 라벨 (보조 영문)<span class="key">home.eyebrow.sub</span></label>
+            <input data-key="home.eyebrow.sub">
+          </div>
+        </div>
+        <div class="fld">
+          <label>큰 타이틀 — 첫 줄<span class="key">home.title.line1</span></label>
+          <input data-key="home.title.line1">
+        </div>
+        <div class="fld">
+          <label>큰 타이틀 — 두 번째 줄 (강조색)<span class="key">home.title.line2</span></label>
+          <input data-key="home.title.line2">
+          <p class="hint">두 줄로 나누어 표시됩니다. 마지막 줄이 빨강 강조색.</p>
+        </div>
+        <div class="fld">
+          <label>부제 (설명 문장)<span class="key">home.subtitle</span></label>
+          <textarea data-key="home.subtitle"></textarea>
+        </div>
+      </div>
+
+      <!-- 통계 -->
+      <div class="blk">
+        <div class="blk-h"><h2>통계 카드 3개</h2><small>홈 우측 작은 숫자 영역</small></div>
+        <div class="frow stat">
+          <div class="fld"><label>① 라벨<span class="key">home.stat1.label</span></label><input data-key="home.stat1.label"></div>
+          <div class="fld"><label>① 값<span class="key">home.stat1.value</span></label><input data-key="home.stat1.value"></div>
+        </div>
+        <div class="frow stat">
+          <div class="fld"><label>② 라벨<span class="key">home.stat2.label</span></label><input data-key="home.stat2.label"></div>
+          <div class="fld"><label>② 값<span class="key">home.stat2.value</span></label><input data-key="home.stat2.value"></div>
+        </div>
+        <div class="frow stat">
+          <div class="fld"><label>③ 라벨<span class="key">home.stat3.label</span></label><input data-key="home.stat3.label"></div>
+          <div class="fld"><label>③ 값<span class="key">home.stat3.value</span></label><input data-key="home.stat3.value"></div>
+        </div>
+      </div>
+
+      <!-- Contact -->
+      <div class="blk">
+        <div class="blk-h"><h2>Contact 정보</h2><small>contact.html, 푸터에 사용</small></div>
+        <div class="fld"><label>이메일<span class="key">contact.email</span></label><input type="email" data-key="contact.email"></div>
+        <div class="frow">
+          <div class="fld"><label>Instagram<span class="key">contact.instagram</span></label><input data-key="contact.instagram"></div>
+          <div class="fld"><label>Twitter / X<span class="key">contact.twitter</span></label><input data-key="contact.twitter"></div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="blk">
+        <div class="blk-h"><h2>푸터</h2><small>모든 페이지 하단</small></div>
+        <div class="fld"><label>저작권 텍스트<span class="key">footer.copyright</span></label><input data-key="footer.copyright"></div>
+      </div>
+
+      <!-- TODO 안내 -->
+      <div class="callout" style="background:#f4f1ec;border-color:#ddd6c6">
+        <span class="ic">🚧</span>
+        <div>
+          <b>다음 라운드 추가 예정</b>
+          <p>About 작가 소개 글 · Notice 공지 인라인 편집 · 이미지 교체 (Cloudflare 연동 후) · 다국어(KR/EN/JP)</p>
+        </div>
+      </div>
+
+      <!-- 저장 -->
+      <div class="savebar">
+        <div class="info">
+          <b id="saveStatus">변경 없음</b>
+          <span>저장 시 모든 페이지에 즉시 반영됩니다</span>
+        </div>
+        <button class="btn-reset" id="resetBtn">초기값으로</button>
+        <button class="btn-preview" id="previewBtn">🌐 사이트 열기</button>
+        <button class="btn-save" id="saveBtn">저장</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="assets/app.js"></script>
+<script>
+(function(){
+  const inputs = document.querySelectorAll('[data-key]');
+  let dirty = false;
+
+  // 기존 값 채우기
+  function fillInputs(){
+    inputs.forEach(inp => {
+      inp.value = SEOTI.content.get(inp.dataset.key, '');
+    });
+    dirty = false;
+    updateSaveUI();
+    refreshPreview();
+  }
+
+  function refreshPreview(){
+    const get = (k) => {
+      const inp = document.querySelector(`[data-key="${k}"]`);
+      return inp ? inp.value : SEOTI.content.get(k);
+    };
+    document.getElementById('pvEyeMain').textContent = get('home.eyebrow.main');
+    document.getElementById('pvEyeSub').textContent = get('home.eyebrow.sub');
+    document.getElementById('pvTitle1').textContent = get('home.title.line1');
+    document.getElementById('pvTitle2').textContent = get('home.title.line2');
+    document.getElementById('pvSub').textContent = get('home.subtitle');
+    document.getElementById('pvS1L').textContent = get('home.stat1.label');
+    document.getElementById('pvS1V').textContent = get('home.stat1.value');
+    document.getElementById('pvS2L').textContent = get('home.stat2.label');
+    document.getElementById('pvS2V').textContent = get('home.stat2.value');
+    document.getElementById('pvS3L').textContent = get('home.stat3.label');
+    document.getElementById('pvS3V').textContent = get('home.stat3.value');
+  }
+
+  function updateSaveUI(){
+    const btn = document.getElementById('saveBtn');
+    const st = document.getElementById('saveStatus');
+    if (dirty) {
+      btn.classList.add('dirty');
+      btn.textContent = '저장하기 ✨';
+      st.textContent = '저장하지 않은 변경사항 있음';
+    } else {
+      btn.classList.remove('dirty');
+      btn.textContent = '저장';
+      st.textContent = '저장됨 ✓';
+    }
+  }
+
+  inputs.forEach(inp => {
+    inp.addEventListener('input', () => {
+      dirty = true;
+      updateSaveUI();
+      refreshPreview();
+    });
+  });
+
+  document.getElementById('saveBtn').addEventListener('click', () => {
+    const data = {};
+    inputs.forEach(inp => { data[inp.dataset.key] = inp.value; });
+    SEOTI.content.setAll(data);
+    dirty = false;
+    updateSaveUI();
+    SEOTI.toast('사이트 콘텐츠가 저장되었어요. 페이지를 새로고침하면 반영됩니다.', 'success');
+  });
+
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    if (confirm('모든 항목을 기본값으로 되돌릴까요?')) {
+      SEOTI.content.reset();
+      fillInputs();
+      SEOTI.toast('초기값으로 복원되었어요', 'info');
+    }
+  });
+
+  document.getElementById('previewBtn').addEventListener('click', () => {
+    if (dirty) {
+      if (!confirm('저장하지 않은 변경사항이 있어요. 저장 없이 미리보러 갈까요?')) return;
+    }
+    window.open('index.html', '_blank');
+  });
+
+  // 떠나기 전 확인
+  window.addEventListener('beforeunload', e => {
+    if (dirty) {
+      e.preventDefault();
+      e.returnValue = '저장하지 않은 변경사항이 있어요.';
+    }
+  });
+
+  fillInputs();
+})();
+</script>
+</body>
+</html>

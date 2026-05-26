@@ -238,11 +238,81 @@
     refreshBadges();
   }
 
+  // ============ SITE CONTENT (CMS — 노션처럼 직접 편집) ============
+  // 작가가 어드민 페이지에서 텍스트·숫자 수정 → localStorage 저장 → 사이트에 즉시 반영
+  // Supabase 연동 시: content를 'site_content' 테이블로 옮기면 됨
+  const CONTENT_KEY = 'seoti_content_v1';
+
+  // 기본값 (관리자가 수정하기 전엔 이게 보임)
+  const CONTENT_DEFAULTS = {
+    'home.eyebrow.main': 'SEOTI Studio',
+    'home.eyebrow.sub':  '손그림 일러스트 아카이브',
+    'home.title.line1':  '다정한 종이 위의',
+    'home.title.line2':  '작은 풍경들.',
+    'home.subtitle':     '2022년부터 손으로 그린 다꾸 일러스트·스티커·마스킹테이프를 기록하는 아카이브입니다.',
+    'home.stat1.label':  '출시 컬렉션',
+    'home.stat1.value':  '43',
+    'home.stat2.label':  '활동 연차',
+    'home.stat2.value':  '4년',
+    'home.stat3.label':  '누적 판매',
+    'home.stat3.value':  '12,000+',
+    'contact.email':     'seoti.studio@gmail.com',
+    'contact.instagram': '@seoti.studio',
+    'contact.twitter':   '@seoti_studio',
+    'footer.copyright':  '© 2026 SEOTI'
+  };
+
+  function loadContent() {
+    try {
+      return Object.assign({}, CONTENT_DEFAULTS, JSON.parse(localStorage.getItem(CONTENT_KEY)) || {});
+    } catch (e) { return Object.assign({}, CONTENT_DEFAULTS); }
+  }
+  let siteContent = loadContent();
+
+  const content = {
+    get(key, fallback) {
+      return siteContent[key] !== undefined ? siteContent[key] : (fallback ?? '');
+    },
+    set(key, value) {
+      siteContent[key] = value;
+      localStorage.setItem(CONTENT_KEY, JSON.stringify(siteContent));
+      window.dispatchEvent(new CustomEvent('seoti-content-change'));
+    },
+    setAll(obj) {
+      Object.assign(siteContent, obj);
+      localStorage.setItem(CONTENT_KEY, JSON.stringify(siteContent));
+      window.dispatchEvent(new CustomEvent('seoti-content-change'));
+    },
+    all() { return Object.assign({}, siteContent); },
+    defaults() { return Object.assign({}, CONTENT_DEFAULTS); },
+    reset() {
+      localStorage.removeItem(CONTENT_KEY);
+      siteContent = loadContent();
+      window.dispatchEvent(new CustomEvent('seoti-content-change'));
+    }
+  };
+
+  // [data-content="key"] 요소를 자동으로 채워줌
+  function applyContent() {
+    document.querySelectorAll('[data-content]').forEach(el => {
+      const key = el.dataset.content;
+      const v = content.get(key, el.textContent);
+      el.textContent = v;
+    });
+  }
+  window.addEventListener('seoti-content-change', applyContent);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', applyContent);
+  } else {
+    applyContent();
+  }
+
   // ============ EXPOSE ============
   global.SEOTI = {
     api,
     img,
     toast,
+    content,
     state: () => state,
     // 디버그용
     _reset() { localStorage.removeItem(STORAGE_KEY); location.reload(); }

@@ -179,7 +179,7 @@
 <div id="seoti-nav"></div>
 
 <div id="loginGate" style="background:var(--ink);color:#fff;padding:11px 24px;font-size:12.5px;font-weight:600;display:flex;justify-content:center;align-items:center;gap:14px;flex-wrap:wrap">
-  <span>🔒 <b>Group Order는 회원 전용 페이지입니다</b> — 로그인 후 견적 신청 가능 · 폰번호 없이 가입 가능 (해외 OK)</span>
+  <span>🔒 <b>Group Order는 회원 전용 페이지입니다</b> — 로그인 후 견적 신청 가능 · 배송은 한국 내 주소만 (해외 분들은 구매대행 이용)</span>
   <a href="auth-b.html" id="gotoLogin" style="background:var(--peach);color:#fff;padding:5px 14px;border-radius:99px;font-weight:800;letter-spacing:.04em;text-decoration:none">로그인 / 가입 →</a>
 </div>
 <div id="welcomeBar" style="display:none;background:linear-gradient(90deg,#bfe3d2,#fff);color:var(--ink);padding:10px 24px;font-size:12.5px;font-weight:600;justify-content:center;align-items:center;gap:14px;flex-wrap:wrap">
@@ -217,7 +217,7 @@
       <div class="pi-row"><span class="k">은행<i class="en">Bank</i></span><span class="v">국민은행 KB</span></div>
       <div class="pi-row"><span class="k">예금주<i class="en">Holder</i></span><span class="v">서○티</span></div>
       <div class="pi-row"><span class="k">계좌번호<i class="en">Account</i></span><span class="v big">123-4567-89012-3</span></div>
-      <div class="pi-row"><span class="k">국제송금<i class="en">Intl.</i></span><span class="v">Wise · PayPal · seoti.studio@gmail.com</span></div>
+      <div class="pi-row"><span class="k">배송 범위<i class="en">Shipping</i></span><span class="v">한국 내 배송만 가능 · 해외는 구매대행 이용</span></div>
     </div>
     <div class="pi-help">
       <b>진행 순서 <i class="en">4-Step Flow</i></b>
@@ -271,7 +271,7 @@
       <div class="frow">
         <div class="fld"><label>이름<i class="en">Name</i></label><input placeholder="홍길동"></div>
         <div class="fld"><label>국가<i class="en">Country</i></label>
-          <select><option>🇰🇷 한국</option><option>🇯🇵 일본</option><option>🇺🇸 미국</option><option>기타</option></select></div>
+          <input value="🇰🇷 한국" readonly style="background:var(--paper);color:var(--sub);cursor:not-allowed" title="배송은 한국 내 주소만 가능"></div>
       </div>
       <div class="fld"><label>이메일<i class="en">Email</i></label><input type="email" placeholder="name@example.com"></div>
       <div class="frow">

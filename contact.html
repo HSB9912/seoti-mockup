@@ -64,9 +64,7 @@ img{display:block;max-width:100%}a{color:inherit;text-decoration:none}
 .hours .v small{font-weight:500;color:var(--sub);margin-left:6px}
 
 /* about-mini */
-.about-mini{display:grid;grid-template-columns:1fr 1.5fr;gap:40px;align-items:center;padding:50px 0;border-top:1px solid var(--line)}
-.about-mini .photo{aspect-ratio:1;background:var(--paper);overflow:hidden}
-.about-mini .photo img{width:100%;height:100%;object-fit:cover}
+.about-mini{padding:50px 0;border-top:1px solid var(--line);max-width:680px}
 .about-mini h2{font-size:24px;font-weight:800;letter-spacing:-.02em;margin-bottom:14px}
 .about-mini p{font-size:14px;color:var(--ink);line-height:1.9;margin-bottom:14px}
 .about-mini p.sub{color:var(--sub);font-size:13px}
@@ -79,7 +77,6 @@ footer{padding:30px 0;font-size:12.5px;color:var(--sub);text-align:center;border
   .ph h1{font-size:34px}
   .channels{grid-template-columns:1fr}
   .guide .topics{grid-template-columns:1fr}
-  .about-mini{grid-template-columns:1fr;gap:20px}
 }
 </style>
 </head>
@@ -154,16 +151,13 @@ footer{padding:30px 0;font-size:12.5px;color:var(--sub);text-align:center;border
     </div>
   </div>
 
-  <!-- about mini -->
+  <!-- about mini (이미지 제거 · 텍스트만) -->
   <section class="about-mini">
-    <div class="photo"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/202602/a157d261092510f1542550274972a939.png"></div>
-    <div>
-      <span class="eyebrow">About the Artist</span>
-      <h2 style="margin-top:12px">서티 (SEOTI)</h2>
-      <p>서울에서 활동하는 손그림 일러스트 작가. 다이어리·편지·노트 위 작은 풍경을 그립니다. 2022년부터 시작해 지금까지 43개의 컬렉션을 만들었어요.</p>
-      <p class="sub">"그림이 다른 사람의 하루를 잠시 멈추게 할 수 있다면, 그것만으로 충분하다고 생각해요."</p>
-      <a href="archive.html" class="read-more">Archive에서 작품 보기</a>
-    </div>
+    <span class="eyebrow">About the Artist</span>
+    <h2 style="margin-top:12px">서티 (SEOTI)</h2>
+    <p>서울에서 활동하는 손그림 일러스트 작가. 다이어리·편지·노트 위 작은 풍경을 그립니다. 2022년부터 시작해 지금까지 43개의 컬렉션을 만들었어요.</p>
+    <p class="sub">"그림이 다른 사람의 하루를 잠시 멈추게 할 수 있다면, 그것만으로 충분하다고 생각해요."</p>
+    <a href="archive.html" class="read-more">Archive에서 작품 보기</a>
   </section>
 </main>
 
