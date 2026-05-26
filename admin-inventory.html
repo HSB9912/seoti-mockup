@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<script src="assets/admin-guard.js"></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>서티 SEOTI · Admin · 재고·입고 관리</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css" />
+<style>
+:root{--bg:#fefefc;--paper:#fff;--ink:#202020;--sub:#878680;--faint:#d4d2cd;
+  --line:#ededeb;--accent:#a06440;--hover:#f5f4f0;
+  --ok:#3a8a6a;--warn:#b07a2a;--bad:#b03a3a;--info:#3a82d6}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Pretendard Variable',Pretendard,sans-serif;background:var(--paper);
+  color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.5;font-size:13.5px}
+a{color:inherit;text-decoration:none}img{display:block;max-width:100%}
+button,input,select,textarea{font-family:inherit}
+.en{font-size:.7em;opacity:.42;margin-left:5px;font-weight:500;text-transform:none;font-style:normal}
+.mono{font-family:'SF Mono',Menlo,monospace;font-variant-numeric:tabular-nums}
+
+.app{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+.sb{background:#f9f8f4;border-right:1px solid var(--line);font-size:13px;display:flex;flex-direction:column}
+.sb-h{padding:14px 14px 8px;display:flex;align-items:center;gap:8px}
+.sb-h .av{width:24px;height:24px;border-radius:5px;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:800;font-size:11px}
+.sb-h b{font-size:13.5px;font-weight:800}.sb-h small{font-size:11px;color:var(--sub);margin-left:auto}
+.sb-tree{flex:1;padding:14px 6px}
+.gh{padding:5px 8px;color:var(--sub);font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.item{display:flex;align-items:center;gap:8px;padding:6px 8px 6px 22px;color:var(--sub);font-weight:600;font-size:13px;border-radius:4px;cursor:pointer}
+.item:hover{background:var(--hover);color:var(--ink)}.item.on{background:var(--ink);color:#fff}
+.item .ico{width:14px}
+.item .badge{margin-left:auto;font-size:10.5px;color:var(--faint);font-weight:700}
+.item.on .badge{color:rgba(255,255,255,.6)}
+.item.alert .badge{color:var(--bad);font-weight:800}
+
+.main{display:flex;flex-direction:column;min-width:0}
+.top{padding:14px 28px;display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--line)}
+.crumb{font-size:13px;color:var(--sub)}.crumb b{color:var(--ink);font-weight:700}
+.crumb .sep{color:var(--faint);margin:0 6px}
+.top .r{margin-left:auto;display:flex;gap:6px;font-size:12.5px}
+.top .r a{padding:6px 10px;border-radius:5px;cursor:pointer;color:var(--sub)}
+.top .r a:hover{background:var(--hover);color:var(--ink)}
+
+.content{padding:30px 36px 60px;flex:1;overflow-y:auto;max-width:1320px;width:100%}
+
+.ph{margin-bottom:24px}
+.ph .ico{font-size:32px;display:block;margin-bottom:8px;color:var(--accent)}
+.ph h1{font-size:30px;font-weight:800;letter-spacing:-.02em;line-height:1.15;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.ph h1 small{font-size:12.5px;color:var(--sub);font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.ph .desc{font-size:13.5px;color:var(--sub);margin-top:8px;max-width:640px;line-height:1.7}
+
+/* KPI */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);border-radius:6px;overflow:hidden;margin-bottom:20px}
+.ki{padding:16px 20px;border-right:1px solid var(--line)}.ki:last-child{border-right:none}
+.ki .k{font-size:11.5px;color:var(--sub);font-weight:600}
+.ki .v{font-size:24px;font-weight:800;margin:5px 0 3px;letter-spacing:-.015em}
+.ki .d{font-size:11.5px;color:var(--ok);font-weight:700}
+.ki.alert{background:linear-gradient(180deg,#fff8ef,#fff)}.ki.alert .v{color:var(--accent)}
+.ki.bad{background:linear-gradient(180deg,#fff4f2,#fff)}.ki.bad .v{color:var(--bad)}
+
+/* tabs */
+.tabs{display:inline-flex;background:var(--paper);border:1px solid var(--line);padding:3px;border-radius:6px;margin-bottom:18px}
+.tabs a{padding:8px 16px;font-size:12.5px;font-weight:700;color:var(--sub);cursor:pointer;border-radius:4px}
+.tabs a.on{background:var(--ink);color:#fff}
+
+.sect{display:none}.sect.on{display:block}
+
+/* 빠른 입고 카드 */
+.quick-in{background:linear-gradient(135deg,#fff5e7,#fff);border:1.5px solid #f0d9a0;border-radius:10px;padding:22px 24px;margin-bottom:22px}
+.quick-in h2{font-size:16px;font-weight:800;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.quick-in .ic{font-size:20px}
+.quick-in p{font-size:12.5px;color:var(--sub);margin-bottom:14px}
+.quick-in .form{display:grid;grid-template-columns:2.5fr 1fr 1fr auto;gap:8px;align-items:end}
+.quick-in label{display:block;font-size:10.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--sub);margin-bottom:4px}
+.quick-in select,.quick-in input{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:5px;font-size:13px;outline:none;font-family:inherit;background:#fff}
+.quick-in select:focus,.quick-in input:focus{border-color:var(--accent)}
+.quick-in button{background:var(--ink);color:#fff;border:none;padding:10px 18px;font-weight:800;font-size:12.5px;cursor:pointer;border-radius:5px;letter-spacing:.04em;white-space:nowrap}
+.quick-in button:hover{background:var(--accent)}
+
+/* table */
+table.t{width:100%;border-collapse:collapse;font-size:13px}
+.t th{font-size:11px;font-weight:700;color:var(--sub);text-align:left;padding:9px 10px;border-bottom:1px solid var(--line)}
+.t td{padding:10px;border-bottom:1px solid var(--line);vertical-align:middle}
+.t tr:hover td{background:var(--hover)}
+.t .thumb{width:38px;height:38px;background:var(--hover);border-radius:5px;overflow:hidden;display:inline-block;vertical-align:middle;margin-right:10px}
+.t .thumb img{width:100%;height:100%;object-fit:cover}
+.t .nm{font-weight:700;display:inline-block;vertical-align:middle}
+.t .nm small{display:block;color:var(--sub);font-size:11px;font-weight:500;margin-top:1px}
+.t td.right{text-align:right;font-variant-numeric:tabular-nums}
+.t th.right{text-align:right}
+
+/* stock value inline editor */
+.stock-cell{display:inline-flex;align-items:center;gap:4px;background:var(--hover);border-radius:4px;padding:2px 4px}
+.stock-cell button{width:22px;height:22px;background:#fff;border:1px solid var(--line);font-size:13px;font-weight:800;cursor:pointer;border-radius:3px;font-family:inherit;color:var(--ink)}
+.stock-cell button:hover{background:var(--ink);color:#fff}
+.stock-cell button:disabled{color:var(--faint);cursor:not-allowed}
+.stock-cell .num{padding:0 6px;font-weight:800;min-width:32px;text-align:center;font-variant-numeric:tabular-nums}
+.stock-cell .num.low{color:var(--accent)}
+.stock-cell .num.out{color:var(--bad)}
+.stock-cell .num.disc{color:var(--faint);text-decoration:line-through}
+
+/* state tag */
+.tag{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:3px;background:var(--hover);color:var(--sub)}
+.tag.ok{background:#e7f4ec;color:var(--ok)}
+.tag.warn{background:#faf0d8;color:var(--warn)}
+.tag.bad{background:#f9e5e5;color:var(--bad)}
+.tag.disc{background:var(--hover);color:var(--sub);text-decoration:line-through}
+
+.controls{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
+.controls .seg{display:inline-flex;background:var(--paper);border:1px solid var(--line);padding:3px;border-radius:6px}
+.controls .seg a{padding:6px 12px;font-size:12px;font-weight:700;color:var(--sub);cursor:pointer;border-radius:4px}
+.controls .seg a.on{background:var(--ink);color:#fff}
+.controls input.search{background:var(--hover);border:1px solid var(--line);padding:7px 12px;font-size:12.5px;outline:none;border-radius:5px;width:240px;margin-left:auto}
+.btn{font-size:12.5px;font-weight:600;padding:7px 13px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;border-radius:5px}
+.btn:hover{background:var(--hover)}
+.btn-p{background:var(--ink);color:#fff;border-color:var(--ink)}
+.btn-p:hover{background:#3a3a3a}
+
+/* history row */
+.hi{display:flex;align-items:center;gap:14px;padding:10px 12px;border:1px solid var(--line);border-radius:5px;margin-bottom:5px;font-size:12.5px;background:#fff}
+.hi .when{color:var(--sub);font-size:11.5px;min-width:90px;font-variant-numeric:tabular-nums}
+.hi .what{flex:1}
+.hi .what b{font-weight:700}
+.hi .delta{font-weight:800;min-width:60px;text-align:right;font-variant-numeric:tabular-nums}
+.hi .delta.up{color:var(--ok)}.hi .delta.down{color:var(--bad)}
+.hi .note{color:var(--sub);font-size:11.5px;font-style:italic}
+
+/* alert callout */
+.alert-box{display:flex;gap:14px;background:#fdebeb;border:1px solid #f0b3b3;border-radius:6px;padding:14px 18px;margin-bottom:20px}
+.alert-box .ic{font-size:20px;flex:none}
+.alert-box b{font-weight:800;font-size:13.5px;display:block;color:var(--bad)}
+.alert-box p{font-size:12.5px;color:var(--sub);margin-top:3px}
+.alert-box .actions{margin-left:auto}
+
+/* edit modal */
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:100;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(6px)}
+.modal.on{display:flex}
+.modal-card{background:#fff;width:100%;max-width:480px;border-radius:8px;padding:28px 30px;font-family:inherit}
+.modal-card h3{font-size:18px;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.modal-card .fld{margin-bottom:12px}
+.modal-card label{display:block;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--sub);margin-bottom:5px}
+.modal-card input,.modal-card select,.modal-card textarea{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:5px;font-size:14px;outline:none;font-family:inherit}
+.modal-card textarea{min-height:60px;resize:vertical}
+.modal-card .ck{display:flex;gap:8px;padding:11px 14px;background:var(--hover);border-radius:5px;align-items:center;font-size:13px;margin-bottom:14px}
+.modal-card .row{display:flex;gap:8px;margin-top:18px}
+.modal-card .row button{flex:1;padding:13px;font-weight:800;font-size:13px;cursor:pointer;border-radius:5px}
+.modal-card .cancel{background:#fff;border:1px solid var(--line)}
+.modal-card .ok{background:var(--ink);color:#fff;border:none}
+
+@media(max-width:920px){.app{grid-template-columns:1fr}.sb{display:none}.kpis{grid-template-columns:1fr 1fr}.quick-in .form{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="sb">
+    <div class="sb-h"><div class="av">서</div><b>SEOTI</b><small>Admin</small></div>
+    <div class="sb-tree">
+      <div class="gh">운영</div>
+      <a class="item" href="admin-c.html"><span class="ico">▦</span>대시보드</a>
+      <a class="item" href="admin-business.html"><span class="ico">📊</span>비즈니스</a>
+      <div class="gh" style="margin-top:10px">상품·재고</div>
+      <a class="item" href="admin-c.html"><span class="ico">🏷</span>상품 관리</a>
+      <a class="item on alert"><span class="ico">📦</span>재고·입고 관리<span class="badge" id="lowBadge">0</span></a>
+      <div class="gh" style="margin-top:10px">사이트</div>
+      <a class="item" href="admin-content.html"><span class="ico">📝</span>콘텐츠 편집</a>
+      <a class="item" href="admin-checklist.html"><span class="ico">✅</span>체크리스트</a>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="top">
+      <div class="crumb"><span>상품·재고</span><span class="sep">/</span><b>재고·입고 관리</b></div>
+      <div class="r"><a id="exportBtn">📥 CSV 내보내기</a><a id="resetBtn">초기화</a></div>
+    </div>
+
+    <div class="content">
+      <div class="ph">
+        <span class="ico">📦</span>
+        <h1>재고·입고 관리 <small>Inventory</small></h1>
+        <p class="desc">현재 재고·안전재고·입출고를 한 자리에서. <b>+/-</b> 버튼으로 즉시 조정, "빠른 입고"로 한 번에 여러 개 추가 가능. 안전재고 미만 항목은 자동 알림.</p>
+      </div>
+
+      <div class="kpis">
+        <div class="ki"><div class="k">전체 상품</div><div class="v mono" id="kpiAll">0</div><div class="d">활성 컬렉션</div></div>
+        <div class="ki alert"><div class="k">재고 부족 ⚠</div><div class="v mono" id="kpiLow">0</div><div class="d down">안전재고 미만</div></div>
+        <div class="ki bad"><div class="k">일시품절</div><div class="v mono" id="kpiOut">0</div><div class="d down">재고 0</div></div>
+        <div class="ki"><div class="k">단종</div><div class="v mono" id="kpiDisc">0</div><div class="d">판매 종료</div></div>
+      </div>
+
+      <div class="alert-box" id="alertBox" style="display:none">
+        <span class="ic">⚠️</span>
+        <div>
+          <b id="alertTitle">재고 부족 / 품절 상품이 있어요</b>
+          <p id="alertDesc">아래 표에서 빨간 숫자 상품들을 우선 입고 처리해주세요.</p>
+        </div>
+        <div class="actions"><button class="btn btn-p" id="focusLow">부족 항목만 보기</button></div>
+      </div>
+
+      <!-- 빠른 입고 -->
+      <div class="quick-in">
+        <h2><span class="ic">＋</span>빠른 입고 처리</h2>
+        <p>제품 선택 → 추가할 수량 입력 → 메모 (선택) → 입고</p>
+        <div class="form">
+          <div>
+            <label>제품</label>
+            <select id="qiProduct"></select>
+          </div>
+          <div>
+            <label>입고 수량</label>
+            <input id="qiQty" type="number" min="1" value="10">
+          </div>
+          <div>
+            <label>메모 (선택)</label>
+            <input id="qiNote" placeholder="예: 1차 인쇄, 재인쇄 등">
+          </div>
+          <button id="qiSubmit">＋ 입고</button>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <a class="on" data-go="stock">📋 재고 현황</a>
+        <a data-go="history">📜 변동 이력</a>
+      </div>
+
+      <!-- 재고 현황 -->
+      <section class="sect on" data-s="stock">
+        <div class="controls">
+          <span class="seg" id="filterSeg">
+            <a class="on" data-f="all">전체</a>
+            <a data-f="low">부족 ⚠</a>
+            <a data-f="out">품절</a>
+            <a data-f="ok">정상</a>
+            <a data-f="disc">단종</a>
+          </span>
+          <input class="search" id="search" placeholder="🔍 제품명 검색">
+        </div>
+
+        <table class="t">
+          <thead>
+            <tr>
+              <th style="width:42px"></th>
+              <th>제품명</th>
+              <th>카테고리</th>
+              <th class="right">현재고</th>
+              <th class="right">안전재고</th>
+              <th>상태</th>
+              <th>최근 변동</th>
+              <th>액션</th>
+            </tr>
+          </thead>
+          <tbody id="stockRows"></tbody>
+        </table>
+      </section>
+
+      <!-- 변동 이력 -->
+      <section class="sect" data-s="history">
+        <div class="controls">
+          <span class="seg">
+            <a class="on" data-fh="all">전체</a>
+            <a data-fh="in">입고</a>
+            <a data-fh="out">출고/판매</a>
+          </span>
+          <input class="search" id="historySearch" placeholder="🔍 제품명 · 메모">
+        </div>
+        <div id="historyList"></div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<!-- Edit modal -->
+<div class="modal" id="editModal">
+  <div class="modal-card">
+    <h3 id="editTitle">재고 조정</h3>
+    <div class="fld"><label>현재고</label><input id="editStock" type="number" min="0"></div>
+    <div class="fld"><label>안전재고 (이하면 알림)</label><input id="editSafe" type="number" min="0"></div>
+    <div class="fld">
+      <label>상태</label>
+      <select id="editState">
+        <option value="auto">자동 (재고에 따라)</option>
+        <option value="disc">단종 처리</option>
+      </select>
+    </div>
+    <div class="fld"><label>메모 (이력에 기록됨)</label><textarea id="editNote" placeholder="조정 사유"></textarea></div>
+    <div class="row">
+      <button class="cancel" id="editCancel">취소</button>
+      <button class="ok" id="editOk">저장</button>
+    </div>
+  </div>
+</div>
+
+<script src="assets/app.js"></script>
+<script>
+(function(){
+  // 데이터 (Supabase 연동 시 from('products').select() 으로 교체)
+  const STORAGE_KEY = 'seoti_inventory_v1';
+
+  const SEED = [
+    {id:1, n:"롱 메모 스티커팩", c:"메모 스티커", stock:42, safe:10, state:"auto", img:"202602/bc4816b7234830cacfd8e73dbc81ebcb"},
+    {id:2, n:"스위티 메모 스티커팩", c:"메모 스티커", stock:18, safe:10, state:"auto", img:"202602/3d92c3f2ae8a816bb0aaf8374372b46a"},
+    {id:3, n:"설탕 눈마을 스티커", c:"메모 스티커", stock:6, safe:10, state:"auto", img:"202602/a157d261092510f1542550274972a939"},
+    {id:4, n:"학교괴담 스티커", c:"메모 스티커", stock:31, safe:10, state:"auto", img:"202602/8844055f11daba2bd37b69a6150cdac6"},
+    {id:5, n:"메모빈티지 스티커팩", c:"메모 스티커", stock:24, safe:10, state:"auto", img:"202602/3dba9ab4bcc29cf34566d08a48284e13"},
+    {id:6, n:"초록책장 스티커", c:"조각 스티커", stock:3, safe:10, state:"auto", img:"202512/6df4ff16a044b3cd8dde5d8b78447e35"},
+    {id:7, n:"다이어리 스티코", c:"메모 스티커", stock:55, safe:10, state:"auto", img:"202512/cb676b86854d5dc018ea0576b99c897a"},
+    {id:8, n:"선샤인데이 스티커", c:"메모 스티커", stock:9, safe:10, state:"auto", img:"202508/d9342a7de8b65e19f073f6f99139560d"},
+    {id:9, n:"키스컷 마스킹테이프 2", c:"마스킹테이프", stock:27, safe:10, state:"auto", img:"202508/13260f931f04e15ddc8bb56a20dc0e90"},
+    {id:10, n:"마스킹테이프 4type", c:"마스킹테이프", stock:36, safe:10, state:"auto", img:"202508/383bee900dbacb6369f996fc668c0f42"},
+    {id:11, n:"냠냠만두 투명 스티커", c:"투명스티커", stock:14, safe:10, state:"auto", img:"202410/e80feba7a57b4fcf1a3364e5cfbb40d6"},
+    {id:12, n:"크레페 말랑 키링", c:"키링·굿즈", stock:0, safe:5, state:"disc", img:"202503/58dafda9eee23c1a553c073971af033c"}
+  ];
+
+  function load(){
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch(e){}
+    return {products: JSON.parse(JSON.stringify(SEED)), history: []};
+  }
+  function save(data){ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+
+  let data = load();
+  let filter = 'all', search = '', historyFilter = 'all', historySearch = '';
+  let activeTab = 'stock';
+
+  function stateOf(p) {
+    if (p.state === 'disc') return 'disc';
+    if (p.stock === 0) return 'out';
+    if (p.stock <= p.safe) return 'low';
+    return 'ok';
+  }
+
+  function stateTag(p) {
+    const s = stateOf(p);
+    if (s === 'disc') return `<span class="tag disc">단종</span>`;
+    if (s === 'out')  return `<span class="tag bad">일시품절</span>`;
+    if (s === 'low')  return `<span class="tag warn">부족 ⚠</span>`;
+    return `<span class="tag ok">재고 있음</span>`;
+  }
+
+  function lastChange(pid) {
+    const h = data.history.filter(h => h.pid === pid).sort((a,b)=>b.t-a.t)[0];
+    if (!h) return '—';
+    const ago = Math.floor((Date.now() - h.t) / (1000*60*60*24));
+    const txt = ago === 0 ? '오늘' : ago + '일 전';
+    return `<small style="color:var(--sub)">${txt} ${h.delta>0?'+':''}${h.delta}</small>`;
+  }
+
+  function logChange(pid, delta, note) {
+    data.history.unshift({
+      id: Date.now(),
+      pid, delta,
+      note: note || '',
+      t: Date.now()
+    });
+    if (data.history.length > 200) data.history.length = 200;
+  }
+
+  function recompute(){
+    const all = data.products.length;
+    const low = data.products.filter(p => stateOf(p) === 'low').length;
+    const out = data.products.filter(p => stateOf(p) === 'out').length;
+    const disc = data.products.filter(p => stateOf(p) === 'disc').length;
+    document.getElementById('kpiAll').textContent = all;
+    document.getElementById('kpiLow').textContent = low;
+    document.getElementById('kpiOut').textContent = out;
+    document.getElementById('kpiDisc').textContent = disc;
+    document.getElementById('lowBadge').textContent = low + out;
+
+    const ab = document.getElementById('alertBox');
+    if (low + out > 0) {
+      ab.style.display = 'flex';
+      document.getElementById('alertTitle').textContent = `재고 부족 ${low}개 · 일시품절 ${out}개`;
+    } else {
+      ab.style.display = 'none';
+    }
+  }
+
+  function renderStockRows(){
+    let rows = data.products.filter(p => {
+      const s = stateOf(p);
+      if (filter === 'low' && s !== 'low') return false;
+      if (filter === 'out' && s !== 'out') return false;
+      if (filter === 'ok' && s !== 'ok') return false;
+      if (filter === 'disc' && s !== 'disc') return false;
+      if (search && !p.n.includes(search)) return false;
+      return true;
+    });
+
+    // Sort: low/out first, then by name
+    rows.sort((a,b) => {
+      const order = {out:0, low:1, ok:2, disc:3};
+      return order[stateOf(a)] - order[stateOf(b)];
+    });
+
+    document.getElementById('stockRows').innerHTML = rows.length ? rows.map(p => {
+      const s = stateOf(p);
+      const numClass = s === 'out' ? 'out' : s === 'low' ? 'low' : s === 'disc' ? 'disc' : '';
+      return `<tr data-id="${p.id}">
+        <td><span class="thumb"><img referrerpolicy="no-referrer" src="${SEOTI.img(p.img)}"></span></td>
+        <td><span class="nm">서티 ${p.n}<small>ID #${p.id}</small></span></td>
+        <td><small>${p.c}</small></td>
+        <td class="right">
+          <span class="stock-cell">
+            <button data-act="dec" data-id="${p.id}" ${p.stock <= 0 ? 'disabled' : ''}>−</button>
+            <span class="num ${numClass} mono">${p.stock}</span>
+            <button data-act="inc" data-id="${p.id}">＋</button>
+          </span>
+        </td>
+        <td class="right mono">${p.safe}</td>
+        <td>${stateTag(p)}</td>
+        <td>${lastChange(p.id)}</td>
+        <td>
+          <button class="btn" data-act="edit" data-id="${p.id}">⋯ 편집</button>
+        </td>
+      </tr>`;
+    }).join('') : `<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--sub)">해당 조건의 제품이 없어요.</td></tr>`;
+  }
+
+  function renderHistory(){
+    let rows = data.history.filter(h => {
+      if (historyFilter === 'in' && h.delta <= 0) return false;
+      if (historyFilter === 'out' && h.delta >= 0) return false;
+      if (historySearch) {
+        const p = data.products.find(x => x.id === h.pid);
+        const txt = (p ? p.n : '') + ' ' + (h.note || '');
+        if (!txt.includes(historySearch)) return false;
+      }
+      return true;
+    });
+
+    document.getElementById('historyList').innerHTML = rows.length ? rows.map(h => {
+      const p = data.products.find(x => x.id === h.pid);
+      const date = new Date(h.t);
+      const ago = Math.floor((Date.now() - h.t) / 60000);
+      const when = ago < 1 ? '방금 전' : ago < 60 ? `${ago}분 전` :
+                   ago < 1440 ? `${Math.floor(ago/60)}시간 전` :
+                   `${Math.floor(ago/1440)}일 전`;
+      return `<div class="hi">
+        <span class="when">${when}<br><small style="color:var(--faint)">${date.getMonth()+1}/${date.getDate()} ${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}</small></span>
+        <div class="what">
+          <b>서티 ${p ? p.n : '(삭제됨)'}</b>
+          ${h.note ? `<span class="note">— ${h.note}</span>` : ''}
+        </div>
+        <span class="delta ${h.delta>0?'up':'down'}">${h.delta>0?'+':''}${h.delta}개</span>
+      </div>`;
+    }).join('') : `<div style="text-align:center;padding:50px;color:var(--sub);font-size:13px">
+      변동 이력이 없어요. <b style="color:var(--ink)">+/-</b> 또는 "빠른 입고"로 재고를 조정해보세요.
+    </div>`;
+  }
+
+  function renderProductSelect(){
+    const sel = document.getElementById('qiProduct');
+    sel.innerHTML = data.products
+      .filter(p => stateOf(p) !== 'disc')
+      .map(p => `<option value="${p.id}">서티 ${p.n} (현재고 ${p.stock})</option>`).join('');
+  }
+
+  function renderAll(){
+    recompute();
+    renderStockRows();
+    renderHistory();
+    renderProductSelect();
+    save(data);
+  }
+
+  // Adjust stock (+/-1)
+  document.getElementById('stockRows').addEventListener('click', e => {
+    const btn = e.target.closest('[data-act]');
+    if (!btn) return;
+    const id = +btn.dataset.id;
+    const p = data.products.find(x => x.id === id);
+    if (!p) return;
+
+    if (btn.dataset.act === 'inc') {
+      p.stock++;
+      logChange(id, 1, '수동 +1');
+      renderAll();
+    } else if (btn.dataset.act === 'dec') {
+      if (p.stock <= 0) return;
+      p.stock--;
+      logChange(id, -1, '수동 -1');
+      renderAll();
+    } else if (btn.dataset.act === 'edit') {
+      openEdit(p);
+    }
+  });
+
+  // Filter
+  document.getElementById('filterSeg').addEventListener('click', e => {
+    const a = e.target.closest('[data-f]');
+    if (!a) return;
+    filter = a.dataset.f;
+    document.querySelectorAll('#filterSeg a').forEach(x => x.classList.toggle('on', x.dataset.f === filter));
+    renderStockRows();
+  });
+
+  // Focus low
+  document.getElementById('focusLow').addEventListener('click', () => {
+    filter = 'low';
+    document.querySelectorAll('#filterSeg a').forEach(x => x.classList.toggle('on', x.dataset.f === filter));
+    renderStockRows();
+  });
+
+  document.getElementById('search').addEventListener('input', e => {
+    search = e.target.value.trim();
+    renderStockRows();
+  });
+
+  // History filter
+  document.querySelectorAll('[data-fh]').forEach(a => a.addEventListener('click', () => {
+    historyFilter = a.dataset.fh;
+    document.querySelectorAll('[data-fh]').forEach(x => x.classList.toggle('on', x.dataset.fh === historyFilter));
+    renderHistory();
+  }));
+  document.getElementById('historySearch').addEventListener('input', e => {
+    historySearch = e.target.value.trim();
+    renderHistory();
+  });
+
+  // Tabs
+  document.querySelectorAll('.tabs [data-go]').forEach(a => a.addEventListener('click', () => {
+    activeTab = a.dataset.go;
+    document.querySelectorAll('.tabs a').forEach(x => x.classList.toggle('on', x.dataset.go === activeTab));
+    document.querySelectorAll('.sect').forEach(s => s.classList.toggle('on', s.dataset.s === activeTab));
+  }));
+
+  // Quick input
+  document.getElementById('qiSubmit').addEventListener('click', () => {
+    const pid = +document.getElementById('qiProduct').value;
+    const qty = parseInt(document.getElementById('qiQty').value) || 0;
+    const note = document.getElementById('qiNote').value.trim() || '빠른 입고';
+    if (!pid || qty <= 0) { SEOTI.toast('제품과 수량을 확인해주세요', 'warn'); return; }
+    const p = data.products.find(x => x.id === pid);
+    if (!p) return;
+    p.stock += qty;
+    if (stateOf(p) !== 'disc') p.state = 'auto';
+    logChange(pid, qty, note);
+    SEOTI.toast(`서티 ${p.n} +${qty}개 입고 완료 (현재 ${p.stock}개)`, 'success');
+    document.getElementById('qiNote').value = '';
+    renderAll();
+  });
+
+  // Edit modal
+  const modal = document.getElementById('editModal');
+  let editingId = null;
+
+  function openEdit(p){
+    editingId = p.id;
+    document.getElementById('editTitle').textContent = `서티 ${p.n} 재고 조정`;
+    document.getElementById('editStock').value = p.stock;
+    document.getElementById('editSafe').value = p.safe;
+    document.getElementById('editState').value = p.state || 'auto';
+    document.getElementById('editNote').value = '';
+    modal.classList.add('on');
+  }
+
+  document.getElementById('editCancel').addEventListener('click', () => modal.classList.remove('on'));
+  modal.addEventListener('click', e => { if (e.target === modal) modal.classList.remove('on'); });
+
+  document.getElementById('editOk').addEventListener('click', () => {
+    const p = data.products.find(x => x.id === editingId);
+    if (!p) return;
+    const newStock = parseInt(document.getElementById('editStock').value) || 0;
+    const newSafe = parseInt(document.getElementById('editSafe').value) || 0;
+    const newState = document.getElementById('editState').value;
+    const note = document.getElementById('editNote').value.trim();
+    const delta = newStock - p.stock;
+    p.stock = newStock;
+    p.safe = newSafe;
+    p.state = newState;
+    if (delta !== 0) logChange(p.id, delta, note || `수동 조정 (${p.stock}로 변경)`);
+    modal.classList.remove('on');
+    SEOTI.toast(`서티 ${p.n} 업데이트 완료`, 'success');
+    renderAll();
+  });
+
+  // Export CSV
+  document.getElementById('exportBtn').addEventListener('click', () => {
+    const header = 'ID,제품명,카테고리,현재고,안전재고,상태\n';
+    const rows = data.products.map(p =>
+      `${p.id},"서티 ${p.n}",${p.c},${p.stock},${p.safe},${stateOf(p)}`
+    ).join('\n');
+    const blob = new Blob([header + rows], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `seoti-inventory-${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+    SEOTI.toast('CSV 내보내기 완료', 'success');
+  });
+
+  // Reset
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    if (!confirm('모든 재고·이력을 시드 데이터로 되돌릴까요?')) return;
+    localStorage.removeItem(STORAGE_KEY);
+    data = load();
+    renderAll();
+    SEOTI.toast('초기화됨', 'info');
+  });
+
+  renderAll();
+})();
+</script>
+</body>
+</html>
