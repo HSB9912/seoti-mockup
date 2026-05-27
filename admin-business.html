@@ -101,6 +101,34 @@ button,input,select{font-family:inherit}
 .blk h2{font-size:17px;font-weight:800;letter-spacing:-.01em;display:flex;align-items:center;gap:8px}
 .blk h2 .h-cnt{font-size:12px;color:var(--sub);font-weight:600}
 
+/* money flow table */
+.flow-tbl{width:100%;border-collapse:collapse;background:var(--paper);border:1px solid var(--line);border-radius:6px;overflow:hidden;font-size:13px}
+.flow-tbl thead th{padding:11px 14px;font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--sub);text-align:left;background:var(--bg);border-bottom:1px solid var(--line)}
+.flow-tbl th.r, .flow-tbl td.r{text-align:right}
+.flow-tbl tbody tr{border-bottom:1px solid var(--line)}
+.flow-tbl tbody tr:last-child{border-bottom:none}
+.flow-tbl td{padding:9px 14px;vertical-align:middle}
+.flow-tbl .yr-row{background:var(--ink);color:#fff}
+.flow-tbl .yr-row td{padding:13px 14px;font-weight:800;font-size:14.5px;letter-spacing:-.01em}
+.flow-tbl .yr-row small{font-weight:600;font-size:11px;color:#878680;margin-left:6px;text-transform:none;letter-spacing:0}
+.flow-tbl .yr-row .in{color:#7fd296;font-weight:800}
+.flow-tbl .yr-row .out{color:#ff9b9b;font-weight:800}
+.flow-tbl .yr-row .net-pos{color:#fff;font-weight:800}
+.flow-tbl .yr-row .net-neg{color:#ff9b9b;font-weight:800}
+.flow-tbl .mo-row .mo{padding-left:28px;color:var(--sub);font-size:12.5px;font-weight:600}
+.flow-tbl .mo-row .mo .mn{color:var(--ink);font-weight:700;margin-right:4px}
+.flow-tbl .mo-row .cur-tag{color:var(--accent);font-weight:700;font-size:10.5px;margin-left:4px;background:#fff5e7;padding:1px 7px;border-radius:99px}
+.flow-tbl .mo-row.current{background:#fff8ef}
+.flow-tbl .mo-row.current .mo .mn{font-weight:800;color:var(--accent)}
+.flow-tbl .mo-row .in{color:var(--ok);font-weight:600}
+.flow-tbl .mo-row .out{color:var(--bad);font-weight:600}
+.flow-tbl .mo-row .net-pos{color:var(--ink);font-weight:800}
+.flow-tbl .mo-row .net-neg{color:var(--bad);font-weight:800}
+.flow-tbl .diff{font-size:11.5px;font-weight:700}
+.flow-tbl .diff.pos{color:var(--ok)}
+.flow-tbl .diff.neg{color:var(--bad)}
+.flow-tbl .diff.muted{color:var(--sub)}
+
 /* controls bar */
 .controls{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
 .controls .seg{display:inline-flex;background:var(--paper);border:1px solid var(--line);padding:3px;border-radius:6px}
@@ -219,34 +247,21 @@ table.t{width:100%;border-collapse:collapse;font-size:13px}
         </div>
 
         <div class="blk">
-          <h2>주요 지표 <span class="h-cnt">· 1~5월 누적</span></h2>
+          <h2>이번 달 한눈에 <span class="h-cnt">· <span id="kpiThisMonth">—</span></span></h2>
           <div class="kpis">
-            <div class="ki"><div class="k">총 정산 금액 (합계)</div><div class="v mono" id="kpiTotalSettlement">—</div><div class="d" id="kpiTotalCount">—</div></div>
-            <div class="ki"><div class="k">공급가 합계</div><div class="v mono" id="kpiTotalSupply">—</div><div class="d">VAT 별도</div></div>
-            <div class="ki"><div class="k">부가세 합계</div><div class="v mono" id="kpiTotalVat">—</div><div class="d">신고 기준</div></div>
-            <div class="ki bad"><div class="k">확인 필요 금액</div><div class="v mono" id="kpiPending">—</div><div class="d down" id="kpiPendingCount">—</div></div>
+            <div class="ki"><div class="k">💰 들어온 돈</div><div class="v mono" id="kpiTotalSettlement" style="color:var(--ok)">—</div><div class="d" id="kpiTotalCount">—</div></div>
+            <div class="ki bad"><div class="k">💸 나간 돈</div><div class="v mono" id="kpiThisOut">—</div><div class="d down" id="kpiThisOutBd">—</div></div>
+            <div class="ki"><div class="k">📊 순이익</div><div class="v mono" id="kpiThisNet">—</div><div class="d" id="kpiThisNetDiff">—</div></div>
+            <div class="ki alert"><div class="k">⚠ 확인 필요</div><div class="v mono" id="kpiPending">—</div><div class="d down" id="kpiPendingCount">—</div></div>
           </div>
         </div>
 
         <div class="blk">
-          <h2>입점처별 매출 <span class="h-cnt">· 누적 정산 기준</span></h2>
-          <div id="vendorBars"></div>
-        </div>
-
-        <div class="blk">
-          <h2>분류별 세금·관리비 <span class="h-cnt">· 1~5월 누적</span></h2>
-          <div class="vendor-grid" id="expenseSummary"></div>
-        </div>
-
-        <div class="upgrade">
-          <b>💡 노션에서 이렇게 달라졌어요</b>
-          <ul>
-            <li><b>자동 합산</b> — 입점처별·분류별 매출/세금이 페이지 새로고침 없이 즉시 계산됨</li>
-            <li><b>확인 필요 알림</b> — "완료" 외 상태는 자동으로 빨간 배지로 표시</li>
-            <li><b>한 곳에 통합</b> — 입점처/정산/세금이 따로 페이지 안 만들어도 사이드바에서 클릭만으로 이동</li>
-            <li><b>모바일 대응</b> — 노션과 달리 핸드폰에서도 동일하게 보임</li>
-            <li><b>CSV/PDF 내보내기</b> 한 번에 (계획)</li>
-          </ul>
+          <div class="blk-h">
+            <h2>달별 돈의 흐름 <span class="h-cnt" id="flowYearCount">· 전체 데이터</span></h2>
+            <small style="color:var(--sub);font-size:11.5px">들어온 돈 = 입점처 정산 · 나간 돈 = 발송·고정비·세금</small>
+          </div>
+          <div id="moneyFlow"></div>
         </div>
       </section>
 
@@ -564,70 +579,122 @@ function categoryTag(c){
 
 // ====================== OVERVIEW ======================
 function renderOverview(){
-  const totalSettlement = SETTLEMENTS.reduce((a,s) => a + s.total, 0);
-  const totalSupply = SETTLEMENTS.reduce((a,s) => a + s.supply, 0);
-  const totalVat = SETTLEMENTS.reduce((a,s) => a + s.vat, 0);
+  // === 헤더 메타 ===
   const pending = SETTLEMENTS.filter(s => s.status === "확인 필요");
   const pendingTotal = pending.reduce((a,s) => a + s.total, 0);
-  const totalTax = TAX.reduce((a,t) => a + t.amount, 0);
-  const totalOffice = TAX.filter(t => t.category === "사무실").reduce((a,t) => a + t.amount, 0);
-  const totalTaxOnly = TAX.filter(t => t.category === "세금").reduce((a,t) => a + t.amount, 0);
-
+  const totalTaxAll = TAX.reduce((a,t) => a + t.amount, 0);
   document.getElementById('ovVendors').textContent = VENDORS.length + "개";
   document.getElementById('ovSettlements').textContent = SETTLEMENTS.length + "건";
   document.getElementById('ovAlert').textContent = pending.length + "건";
-  document.getElementById('ovExpense').textContent = fmt(totalTax);
+  document.getElementById('ovExpense').textContent = fmt(totalTaxAll);
   document.getElementById('alertCount').textContent = pending.length;
 
-  document.getElementById('kpiTotalSettlement').textContent = fmt(totalSettlement);
-  document.getElementById('kpiTotalCount').textContent = SETTLEMENTS.length + "건 / 9개 입점처";
-  document.getElementById('kpiTotalSupply').textContent = fmt(totalSupply);
-  document.getElementById('kpiTotalVat').textContent = fmt(totalVat);
+  // === 월별 흐름 데이터 ===
+  function ym(d){ d=String(d||''); return d.length>=7 ? d.slice(0,7) : ''; }
+  const inMap = {}, outMap = {};
+  SETTLEMENTS_MONTHLY.forEach(s => { const k = ym(s.year_month); if(k) inMap[k]=(inMap[k]||0)+(+s.amount||0); });
+  SETTLEMENTS.forEach(s => { const k = ym(s.settled_at); if(k) inMap[k]=(inMap[k]||0)+(+s.total||0); });
+  SHIPMENTS.forEach(s => { const k = ym(s.shipped_on); if(k) outMap[k]=(outMap[k]||0)+(+s.amount||0); });
+  TAX.forEach(t => { const k = ym(t.paid_date); if(k) outMap[k]=(outMap[k]||0)+(+t.amount||0); });
+
+  const allKeys = Array.from(new Set([...Object.keys(inMap), ...Object.keys(outMap)])).sort();
+
+  // 빈 달 채우기
+  function fillMonths(start, end){
+    const out=[]; let [sy,sm]=start.split('-').map(Number), [ey,em]=end.split('-').map(Number);
+    while (sy<ey || (sy===ey && sm<=em)) {
+      out.push(sy+'-'+String(sm).padStart(2,'0'));
+      sm++; if(sm>12){sm=1;sy++;}
+    }
+    return out;
+  }
+  const months = allKeys.length>=2 ? fillMonths(allKeys[0], allKeys[allKeys.length-1]) : allKeys.slice();
+
+  // === KPI: 이번달 ===
+  const thisMonth = months[months.length-1] || '';
+  const prevMonth = months[months.length-2] || '';
+  const thisIn  = inMap[thisMonth]||0;
+  const thisOut = outMap[thisMonth]||0;
+  const thisNet = thisIn - thisOut;
+  const prevNet = prevMonth ? ((inMap[prevMonth]||0) - (outMap[prevMonth]||0)) : null;
+  const netDiff = prevNet!==null ? thisNet - prevNet : null;
+
+  const tmLabel = thisMonth ? `${thisMonth.split('-')[0]}년 ${parseInt(thisMonth.split('-')[1])}월` : '데이터 없음';
+  document.getElementById('kpiThisMonth').textContent = tmLabel;
+  document.getElementById('kpiTotalSettlement').textContent = fmt(thisIn);
+  document.getElementById('kpiTotalCount').textContent = SETTLEMENTS_MONTHLY.filter(s => s.year_month === thisMonth).length + "개 입점처 정산";
+  document.getElementById('kpiThisOut').textContent = fmt(thisOut);
+  const shipCnt = SHIPMENTS.filter(s => ym(s.shipped_on) === thisMonth).length;
+  const taxCnt  = TAX.filter(t => ym(t.paid_date) === thisMonth).length;
+  document.getElementById('kpiThisOutBd').textContent = `발송 ${shipCnt}건 · 고정·세금 ${taxCnt}건`;
+  const netEl = document.getElementById('kpiThisNet');
+  netEl.textContent = fmt(thisNet);
+  netEl.style.color = thisNet>=0 ? 'var(--ok)' : 'var(--bad)';
+  const diffEl = document.getElementById('kpiThisNetDiff');
+  if (netDiff === null) { diffEl.textContent = '전월 데이터 없음'; diffEl.style.color='var(--sub)'; }
+  else if (netDiff >= 0) { diffEl.textContent = '▲ ' + fmt(netDiff) + ' (전월 대비)'; diffEl.style.color='var(--ok)'; }
+  else { diffEl.textContent = '▼ ' + fmt(-netDiff) + ' (전월 대비)'; diffEl.style.color='var(--bad)'; }
   document.getElementById('kpiPending').textContent = fmt(pendingTotal);
   document.getElementById('kpiPendingCount').textContent = "▼ " + pending.length + "건 확인 필요";
 
-  // Vendor bars
-  const byVendor = {};
-  SETTLEMENTS.forEach(s => byVendor[s.vendor] = (byVendor[s.vendor] || 0) + s.total);
-  const sorted = Object.entries(byVendor).sort((a,b) => b[1] - a[1]);
-  const vendorBarsEl = document.getElementById('vendorBars');
-  if (vendorBarsEl) {
-    if (!sorted.length) {
-      vendorBarsEl.innerHTML = '<div style="padding:30px;text-align:center;color:var(--sub);font-size:13px">정산 데이터가 쌓이면 입점처별 매출 비교가 표시됩니다.</div>';
-    } else {
-      const max = sorted[0][1];
-      vendorBarsEl.innerHTML = sorted.map(([v, amt]) => `
-        <div class="bar-wrap">
-          <span class="name">${v}</span>
-          <div class="bar"><div style="width:${(amt/max*100).toFixed(0)}%"></div></div>
-          <span class="amt mono">${fmt(amt)}</span>
-          <span class="pct mono">${totalSettlement?(amt/totalSettlement*100).toFixed(0):0}%</span>
-        </div>`).join('');
-    }
+  // === 월별 흐름 표 (년도별 그룹) ===
+  const flowEl = document.getElementById('moneyFlow');
+  if (!flowEl) return;
+
+  if (!months.length) {
+    flowEl.innerHTML = '<div style="padding:50px;text-align:center;color:var(--sub);font-size:13px;border:1px solid var(--line);border-radius:6px;background:var(--paper)">정산·발송·세금 데이터가 들어오면 달별 흐름이 표시됩니다.</div>';
+    document.getElementById('flowYearCount').textContent = '· 데이터 없음';
+    return;
   }
 
-  // Expense summary (총합 0 일 때 div-by-zero 가드)
-  const expEl = document.getElementById('expenseSummary');
-  if (expEl) {
-    const officePct = totalTax ? (totalOffice/totalTax*100).toFixed(0) : 0;
-    const taxPct    = totalTax ? (totalTaxOnly/totalTax*100).toFixed(0) : 0;
-    expEl.innerHTML = `
-      <div class="vc">
-        <div class="vc-top"><h3>사무실</h3><span class="com">${officePct}%</span></div>
-        <div class="meta">
-          <b>전대료·관리비</b><span class="mono">${fmt(totalOffice)}</span>
-          <b>건수</b><span>${TAX.filter(t => t.category === "사무실").length}건</span>
-        </div>
-      </div>
-      <div class="vc">
-        <div class="vc-top"><h3>세금</h3><span class="com" style="background:#fdebeb;color:var(--bad)">${taxPct}%</span></div>
-        <div class="meta">
-          <b>종소세·지방세</b><span class="mono">${fmt(totalTaxOnly)}</span>
-          <b>건수</b><span>${TAX.filter(t => t.category === "세금").length}건</span>
-        </div>
-      </div>
-    `;
-  }
+  const byYear = {};
+  months.forEach(k => { const y = k.split('-')[0]; (byYear[y] = byYear[y] || []).push(k); });
+  const years = Object.keys(byYear).sort().reverse();
+  document.getElementById('flowYearCount').textContent = `· ${months[0]} ~ ${months[months.length-1]} (${months.length}개월)`;
+
+  let html = `<table class="flow-tbl"><thead><tr>
+    <th>달</th>
+    <th class="r">들어온 돈</th>
+    <th class="r">나간 돈</th>
+    <th class="r">순이익</th>
+    <th class="r">전월 대비</th>
+  </tr></thead><tbody>`;
+
+  years.forEach(y => {
+    const ms = byYear[y].slice().reverse();
+    const yIn = ms.reduce((s,k)=>s+(inMap[k]||0),0);
+    const yOut = ms.reduce((s,k)=>s+(outMap[k]||0),0);
+    const yNet = yIn - yOut;
+    html += `<tr class="yr-row">
+      <td><b>${y}년</b> <small>${ms.length}개월 합계</small></td>
+      <td class="r mono in">${fmt(yIn)}</td>
+      <td class="r mono out">${fmt(yOut)}</td>
+      <td class="r mono ${yNet>=0?'net-pos':'net-neg'}"><b>${fmt(yNet)}</b></td>
+      <td class="r"></td>
+    </tr>`;
+    ms.forEach((k, idx) => {
+      const i = inMap[k]||0, o = outMap[k]||0;
+      const net = i - o;
+      const monthsIdx = months.indexOf(k);
+      const prevK = monthsIdx>0 ? months[monthsIdx-1] : null;
+      const prevN = prevK ? ((inMap[prevK]||0) - (outMap[prevK]||0)) : null;
+      const dif = prevN!==null ? (net - prevN) : null;
+      const mo = parseInt(k.split('-')[1]);
+      const isCurrent = k === thisMonth;
+      const difStr = dif===null ? '—' : (dif>=0 ? '▲ '+fmt(dif) : '▼ '+fmt(-dif));
+      const difCls = dif===null ? 'muted' : (dif>=0 ? 'pos' : 'neg');
+      html += `<tr class="mo-row${isCurrent?' current':''}">
+        <td class="mo"><span class="mn">${mo}월</span>${isCurrent?'<small class="cur-tag">이번달</small>':''}</td>
+        <td class="r mono in">${fmt(i)}</td>
+        <td class="r mono out">${fmt(o)}</td>
+        <td class="r mono ${net>=0?'net-pos':'net-neg'}"><b>${fmt(net)}</b></td>
+        <td class="r mono diff ${difCls}">${difStr}</td>
+      </tr>`;
+    });
+  });
+
+  html += '</tbody></table>';
+  flowEl.innerHTML = html;
 }
 
 // ====================== VENDORS ======================
