@@ -70,9 +70,10 @@
       ${item('업데이트 내역', '📝', 'admin-changelog.html')}
 
       ${gh('비즈니스', 'Business')}
-      ${item('대시보드·정산', '📊', 'admin-business.html')}
-      ${item('입점처 관리',   '🏪', 'admin-business.html?go=vendors')}
-      ${item('세금·관리비',   '🧾', 'admin-business.html?go=tax')}
+      ${item('대시보드',     '📊', 'admin-business.html')}
+      ${item('입점처 관리', '🏪', 'admin-business.html?go=vendors')}
+      ${item('정산 관리',   '💰', 'admin-business.html?go=settlements')}
+      ${item('세금·관리비', '🧾', 'admin-business.html?go=tax')}
 
       ${gh('사이트 콘텐츠', 'Site')}
       ${item('콘텐츠 편집 (CMS)', '📝', 'admin-content.html')}
