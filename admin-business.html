@@ -259,7 +259,7 @@ table.t{width:100%;border-collapse:collapse;font-size:13px}
         <div class="blk">
           <div class="blk-h">
             <h2>달별 돈의 흐름 <span class="h-cnt" id="flowYearCount">· 전체 데이터</span></h2>
-            <small style="color:var(--sub);font-size:11.5px">들어온 돈 = 입점처 정산 · 나간 돈 = 발송·고정비·세금</small>
+            <small style="color:var(--sub);font-size:11.5px">들어온 돈 = 입점처 정산 입금 · 나간 돈 = 전대료·관리비·세금 (실제 현금 지출)</small>
           </div>
           <div id="moneyFlow"></div>
         </div>
@@ -659,9 +659,13 @@ function renderOverview(){
   // === 월별 흐름 데이터 ===
   function ym(d){ d=String(d||''); return d.length>=7 ? d.slice(0,7) : ''; }
   const inMap = {}, outMap = {};
+  // 들어온 돈: 입점처 정산 (월별 누적 + 개별 정산, 입금일 기준)
   SETTLEMENTS_MONTHLY.forEach(s => { const k = ym(s.year_month); if(k) inMap[k]=(inMap[k]||0)+(+s.amount||0); });
-  SETTLEMENTS.forEach(s => { const k = ym(s.settled_at); if(k) inMap[k]=(inMap[k]||0)+(+s.total||0); });
-  SHIPMENTS.forEach(s => { const k = ym(s.shipped_on); if(k) outMap[k]=(outMap[k]||0)+(+s.amount||0); });
+  SETTLEMENTS.forEach(s => {
+    const k = ym(s.paid_date || s.settlement_date);
+    if(k) inMap[k]=(inMap[k]||0)+(+s.total||0);
+  });
+  // 나간 돈: 실제 지출만 (전대료·관리비·세금). 발송(SHIPMENTS)은 재고 흐름이므로 제외.
   TAX.forEach(t => { const k = ym(t.date); if(k) outMap[k]=(outMap[k]||0)+(+t.amount||0); });
 
   const allKeys = Array.from(new Set([...Object.keys(inMap), ...Object.keys(outMap)])).sort();
@@ -691,9 +695,10 @@ function renderOverview(){
   document.getElementById('kpiTotalSettlement').textContent = fmt(thisIn);
   document.getElementById('kpiTotalCount').textContent = SETTLEMENTS_MONTHLY.filter(s => s.year_month === thisMonth).length + "개 입점처 정산";
   document.getElementById('kpiThisOut').textContent = fmt(thisOut);
-  const shipCnt = SHIPMENTS.filter(s => ym(s.shipped_on) === thisMonth).length;
   const taxCnt  = TAX.filter(t => ym(t.date) === thisMonth).length;
-  document.getElementById('kpiThisOutBd').textContent = `발송 ${shipCnt}건 · 고정·세금 ${taxCnt}건`;
+  const officeCnt = TAX.filter(t => ym(t.date) === thisMonth && t.category === '사무실').length;
+  const taxOnlyCnt = TAX.filter(t => ym(t.date) === thisMonth && t.category === '세금').length;
+  document.getElementById('kpiThisOutBd').textContent = `사무실 ${officeCnt}건 · 세금 ${taxOnlyCnt}건${taxCnt>(officeCnt+taxOnlyCnt)?` · 기타 ${taxCnt-officeCnt-taxOnlyCnt}건`:''}`;
   const netEl = document.getElementById('kpiThisNet');
   netEl.textContent = fmt(thisNet);
   netEl.style.color = thisNet>=0 ? 'var(--ok)' : 'var(--bad)';
