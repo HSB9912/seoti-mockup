@@ -48,8 +48,8 @@
     </div>
     <div class="sb-tree" style="flex:1;overflow-y:auto;padding:0 6px 12px">
       ${gh('운영', 'Operations')}
-      ${item('대시보드', '▦', 'admin-c.html')}
-      ${item('판매 실적', '📈', 'admin-c.html')}
+      ${item('대시보드',  '▦', 'admin-c.html?go=dash')}
+      ${item('판매 실적', '📈', 'admin-c.html?go=analytics')}
 
       ${gh('상품·재고', 'Inventory')}
       ${item('상품 관리',    '🏷', 'admin-c.html?go=products')}
@@ -57,31 +57,31 @@
       ${item('새 상품 등록', '＋', 'admin-c.html?go=add')}
 
       ${gh('주문', 'Orders')}
-      ${item('일반 주문', '🚚', 'admin-c.html')}
-      ${item('Group Order', '📋', 'admin-c.html')}
+      ${item('일반 주문',   '🚚', 'admin-c.html?go=orders')}
+      ${item('Group Order', '📋', 'admin-c.html?go=bulk')}
 
       ${gh('고객', 'Customer')}
-      ${item('Q&A 답변', '💬', 'admin-c.html')}
-      ${item('회원 관리', '👥', 'admin-extensions.html?go=members')}
+      ${item('Q&A 답변',    '💬', 'admin-c.html?go=qna')}
+      ${item('회원 관리',   '👥', 'admin-extensions.html?go=members')}
       ${item('관리자 권한', '👑', 'admin-extensions.html?go=admins')}
-      ${item('리뷰 관리', '⭐', 'admin-extensions.html?go=reviews')}
-
-      ${gh('작업', 'Workspace')}
-      ${item('요청 게시판', '📮', 'admin-feedback.html', { alert: true })}
-      ${item('업데이트 내역', '📝', 'admin-changelog.html')}
+      ${item('리뷰 관리',   '⭐', 'admin-extensions.html?go=reviews')}
 
       ${gh('비즈니스', 'Business')}
-      ${item('대시보드',     '📊', 'admin-business.html')}
+      ${item('대시보드',    '📊', 'admin-business.html?go=overview')}
       ${item('입점처 관리', '🏪', 'admin-business.html?go=vendors')}
       ${item('정산 관리',   '💰', 'admin-business.html?go=settlements')}
       ${item('세금·관리비', '🧾', 'admin-business.html?go=tax')}
 
       ${gh('사이트 콘텐츠', 'Site')}
-      ${item('콘텐츠 편집 (CMS)', '📝', 'admin-content.html')}
+      ${item('CMS 편집',         '📝', 'admin-content.html')}
       ${item('공지·이벤트 관리', '📢', 'admin-extensions.html?go=notices')}
 
+      ${gh('작업', 'Workspace')}
+      ${item('요청 게시판',   '📮', 'admin-feedback.html', { alert: true })}
+      ${item('업데이트 내역', '📜', 'admin-changelog.html')}
+
       ${gh('출시 준비', 'Pre-Launch')}
-      ${item('진행 로드맵', '🗺', 'admin-roadmap.html')}
+      ${item('진행 로드맵',     '🗺', 'admin-roadmap.html')}
       ${item('DB 연동 전 체크', '✅', 'admin-checklist.html')}
     </div>
     <div class="sb-bot" style="padding:10px 14px;border-top:1px solid #ededeb;display:flex;align-items:center;gap:8px;font-size:12.5px;color:#878680">
@@ -144,14 +144,14 @@
     sb.querySelectorAll('a.item').forEach(x => x.classList.remove('on'));
     a.classList.add('on');
     // 페이지의 탭 전환 함수 호출 (페이지별로 이름 다름)
-    if (typeof window.activateTab === 'function') window.activateTab(go || 'members');
+    if (typeof window.activateTab === 'function') window.activateTab(go || 'dash');
     else if (typeof window.activateBizTab === 'function') window.activateBizTab(go || 'overview');
   });
 
   // 브라우저 뒤로/앞으로 갈 때도 탭 동기화
   window.addEventListener('popstate', () => {
     const go = new URLSearchParams(location.search).get('go') || '';
-    if (typeof window.activateTab === 'function') window.activateTab(go || 'members');
+    if (typeof window.activateTab === 'function') window.activateTab(go || 'dash');
     else if (typeof window.activateBizTab === 'function') window.activateBizTab(go || 'overview');
     // 사이드바 .on 갱신
     sb.querySelectorAll('a.item').forEach(x => {
