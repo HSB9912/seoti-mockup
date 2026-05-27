@@ -10,9 +10,18 @@
 .seoti-nav *{box-sizing:border-box}
 .seoti-nav-wrap{max-width:1240px;margin:0 auto;padding:0 32px;
   display:flex;align-items:center;height:62px;gap:30px}
-.seoti-logo{font-size:20px;font-weight:800;letter-spacing:.16em;
-  text-transform:uppercase;color:#161412;text-decoration:none}
-.seoti-logo:hover{color:#161412}
+.seoti-logo{display:flex;align-items:center;gap:9px;font-size:21px;font-weight:900;
+  letter-spacing:.04em;color:#161412;text-decoration:none;
+  font-family:'Pretendard Variable',Pretendard,sans-serif}
+.seoti-logo:hover{color:#e8503a}
+.seoti-logo .mascot{width:34px;height:34px;border-radius:50%;background:#fef5e7;
+  display:grid;place-items:center;overflow:hidden;flex:none}
+.seoti-logo .mascot img{width:100%;height:100%;object-fit:cover}
+.seoti-logo .mascot .fallback{font-size:18px}
+.seoti-logo .brand{display:flex;align-items:center;gap:1px;letter-spacing:0}
+.seoti-logo .brand b{color:#f4a8cf;font-weight:900;font-size:24px;line-height:1}
+.seoti-logo .brand .gray{color:#5a5550;font-size:18px;line-height:1}
+.seoti-logo .brand sup{font-size:9px;color:#a8a3a0;font-weight:700;letter-spacing:.05em;margin-left:3px}
 .seoti-nav-menu{display:flex;gap:26px;margin-left:auto;
   font-size:13.5px;font-weight:600;align-items:center}
 .seoti-nav-menu a{color:#8c8781;transition:color .15s;
@@ -55,10 +64,22 @@
     .map(l => `<a href="${l.href}"${l.page === current ? ' class="on"' : ''}>${l.label}</a>`)
     .join('');
 
+  // 로고: 마스코트 이미지 + STTY 텍스트
+  // assets/logo/mascot.png 있으면 이미지, 없으면 이모지 fallback
   const navHTML = `
 <nav class="seoti-nav" role="navigation">
   <div class="seoti-nav-wrap">
-    <a class="seoti-logo" href="index.html">Seoti</a>
+    <a class="seoti-logo" href="index.html">
+      <span class="mascot">
+        <img src="assets/logo/mascot.png" alt="STTY"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+        <span class="fallback" style="display:none">🐕</span>
+      </span>
+      <span class="brand">
+        <span class="gray">s</span><b>TT</b><span class="gray">y</span>
+        <sup>STUDIO</sup>
+      </span>
+    </a>
     <button class="seoti-nav-mob" aria-label="menu" id="seoti-mob-btn">☰</button>
     <div class="seoti-nav-menu" id="seoti-menu">${menuHTML}</div>
   </div>
