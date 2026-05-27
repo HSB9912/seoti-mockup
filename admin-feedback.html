@@ -37,8 +37,14 @@ a{color:inherit;text-decoration:none}
 .ph h1 small{font-size:12.5px;color:var(--sub);font-weight:700;letter-spacing:.05em;text-transform:uppercase}
 .ph .desc{font-size:13.5px;color:var(--sub);margin-top:8px;max-width:680px;line-height:1.7}
 
-/* 새 요청 입력 카드 */
-.compose{background:linear-gradient(180deg,#fff,#fafaf7);border:1px solid var(--line);border-radius:10px;padding:20px 22px;margin-bottom:24px}
+/* 새 요청 토글 버튼 + 입력 카드 */
+.compose-toggle{display:inline-flex;align-items:center;gap:8px;background:var(--ink);color:#fff;border:none;
+  padding:11px 22px;font-size:13px;font-weight:800;letter-spacing:.04em;cursor:pointer;border-radius:99px;
+  font-family:inherit;margin-bottom:18px;transition:.15s}
+.compose-toggle:hover{background:var(--accent);transform:translateY(-1px)}
+.compose-toggle .ic{font-size:16px}
+.compose{display:none;background:linear-gradient(180deg,#fff,#fafaf7);border:1px solid var(--line);border-radius:10px;padding:20px 22px;margin-bottom:24px}
+.compose.open{display:block}
 .compose h3{font-size:15px;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:8px}
 .compose .row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px}
 .compose label{display:block;font-size:11.5px;color:var(--sub);font-weight:700;margin-bottom:4px;letter-spacing:.04em;text-transform:uppercase}
@@ -49,6 +55,35 @@ a{color:inherit;text-decoration:none}
 .compose .btn:hover{background:var(--accent)}
 .compose .btn:disabled{opacity:.5;cursor:not-allowed}
 .compose .hint{font-size:11.5px;color:var(--sub);margin-top:6px}
+
+/* 첨부파일 */
+.fattach{margin-top:10px;border:2px dashed var(--line);border-radius:6px;padding:14px;text-align:center;
+  font-size:12.5px;color:var(--sub);cursor:pointer;transition:.15s}
+.fattach:hover,.fattach.drag{border-color:var(--accent);color:var(--ink);background:#fef9f4}
+.fattach .ic{font-size:20px;display:block;margin-bottom:4px}
+.fattach input{display:none}
+.fattach-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.fattach-list .ti{position:relative;width:80px;height:80px;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--hover)}
+.fattach-list .ti img{width:100%;height:100%;object-fit:cover}
+.fattach-list .ti .fn{position:absolute;inset:auto 0 0 0;background:rgba(0,0,0,.5);color:#fff;font-size:10px;padding:2px 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fattach-list .ti .x{position:absolute;top:2px;right:2px;width:18px;height:18px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;font-size:11px;cursor:pointer;display:grid;place-items:center}
+.fattach-list .ti.uploading::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,.6) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23a06440' stroke-width='2'><circle cx='12' cy='12' r='10' stroke-dasharray='40' stroke-dashoffset='10'><animateTransform attributeName='transform' type='rotate' from='0 12 12' to='360 12 12' dur='1s' repeatCount='indefinite'/></circle></svg>") no-repeat center}
+
+/* 리스트 아이템 첨부 표시 */
+.list .item .at{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 0 24px}
+.list .item .at img{width:90px;height:90px;object-fit:cover;border-radius:5px;cursor:pointer;border:1px solid var(--line)}
+.list .item .at .file{display:inline-flex;align-items:center;gap:6px;background:var(--hover);padding:6px 10px;border-radius:5px;font-size:11.5px;color:var(--ink);text-decoration:none}
+.list .item .at .file:hover{background:var(--accent);color:#fff}
+
+/* 라이트박스 */
+.lb{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:99999;align-items:center;justify-content:center;cursor:zoom-out}
+.lb.on{display:flex}
+.lb img{max-width:92%;max-height:92%;object-fit:contain}
+.lb .x{position:absolute;top:18px;right:24px;color:#fff;font-size:28px;cursor:pointer;background:none;border:none}
+
+/* 카피 버튼 — Claude에게 복사 */
+.list .item .meta .copyc{font-size:11px;color:var(--info);cursor:pointer;font-weight:700;padding:2px 6px;border-radius:3px}
+.list .item .meta .copyc:hover{background:#e6eff9}
 
 /* 필터 바 */
 .filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
@@ -125,8 +160,10 @@ a{color:inherit;text-decoration:none}
 
       <div id="banner"></div>
 
+      <button class="compose-toggle" id="composeToggle"><span class="ic">＋</span><span id="composeLabel">새 요청 작성</span></button>
+
       <!-- 새 요청 입력 -->
-      <div class="compose">
+      <div class="compose" id="compose">
         <h3>✏️ 새 요청 남기기</h3>
         <div class="row">
           <div>
@@ -160,6 +197,14 @@ a{color:inherit;text-decoration:none}
           <label>설명 (선택)</label>
           <textarea id="fBody" placeholder="자세한 상황·재현 순서·원하는 모습 등 자유롭게"></textarea>
         </div>
+        <label for="fAttach" class="fattach" id="fAttachZone">
+          <span class="ic">📎</span>
+          <b>이미지·파일 끌어다 놓기 또는 클릭해서 선택</b>
+          <div style="font-size:11px;color:var(--faint);margin-top:3px">JPG·PNG·GIF·WEBP·PDF — 한 파일당 최대 10 MB</div>
+          <input id="fAttach" type="file" accept="image/*,.pdf,.gif,.webp" multiple>
+        </label>
+        <div class="fattach-list" id="fAttachList"></div>
+
         <button class="btn" id="fSubmit">요청 등록</button>
         <div class="hint">💡 작성자는 로그인된 닉네임으로 자동 기록돼요.</div>
       </div>
@@ -175,11 +220,14 @@ a{color:inherit;text-decoration:none}
       </div>
 
       <div class="list" id="list">
-        <div class="empty"><div class="ic">📮</div><b>아직 등록된 요청이 없어요</b><p>위 입력창에 첫 번째 요청을 남겨보세요.</p></div>
+        <div class="empty"><div class="ic">📮</div><b>아직 등록된 요청이 없어요</b><p>위 "새 요청 작성" 버튼을 눌러 첫 번째 요청을 남겨보세요.</p></div>
       </div>
     </div>
   </main>
 </div>
+
+<!-- 이미지 라이트박스 -->
+<div class="lb" id="lb"><button class="x" id="lbX">✕</button><img id="lbImg" alt=""></div>
 
 <script src="assets/admin-nav.js"></script>
 <script>
@@ -271,6 +319,11 @@ a{color:inherit;text-decoration:none}
     root.innerHTML=list.map(it=>{
       const isDone=it.status==='done'||it.status==='wontfix';
       const dt=new Date(it.created_at).toLocaleString('ko-KR',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+      const atts=Array.isArray(it.attachments)?it.attachments:[];
+      const attHtml=atts.length?`<div class="at">${atts.map(a=>{
+        if((a.type||'').startsWith('image/')) return `<img src="${escapeAttr(a.url)}" alt="${escapeAttr(a.name||'')}" data-zoom="${escapeAttr(a.url)}">`;
+        return `<a class="file" href="${escapeAttr(a.url)}" target="_blank">📎 ${escapeHtml(a.name||'file')}</a>`;
+      }).join('')}</div>`:'';
       return `<div class="item ${isDone?'done':''}" data-id="${it.id}">
         <div class="h">
           <span class="tag ${it.type}">${({bug:'🐞 BUG',feature:'✨ FEATURE',design:'🎨 DESIGN',content:'📝 CONTENT',idea:'💡 IDEA'})[it.type]||it.type}</span>
@@ -282,6 +335,7 @@ a{color:inherit;text-decoration:none}
           <b>${escapeHtml(it.title)}</b>
         </div>
         ${it.body?`<div class="body">${escapeHtml(it.body)}</div>`:''}
+        ${attHtml}
         <div class="meta">
           ${it.page_url?`<a href="${escapeAttr(it.page_url)}" target="_blank">📄 ${escapeHtml(it.page_url)}</a>`:''}
           <select data-act="status">
@@ -290,6 +344,7 @@ a{color:inherit;text-decoration:none}
             <option value="done"${it.status==='done'?' selected':''}>완료</option>
             <option value="wontfix"${it.status==='wontfix'?' selected':''}>보류</option>
           </select>
+          <span class="copyc" data-act="copy" title="Claude에게 보낼 형식으로 복사">📋 Claude에 복사</span>
           <span class="del" data-act="del">삭제</span>
         </div>
       </div>`;
@@ -309,6 +364,12 @@ a{color:inherit;text-decoration:none}
 
   // 리스트 액션
   $('#list').addEventListener('click',async e=>{
+    // 이미지 클릭 → 라이트박스
+    if(e.target.tagName==='IMG' && e.target.dataset.zoom){
+      $('#lbImg').src=e.target.dataset.zoom;
+      $('#lb').classList.add('on');
+      return;
+    }
     const item=e.target.closest('.item');if(!item)return;
     const id=item.dataset.id;
     const act=e.target.dataset.act;
@@ -319,8 +380,79 @@ a{color:inherit;text-decoration:none}
     }else if(act==='del'){
       if(!confirm('이 요청을 삭제할까요?'))return;
       await del(id);
+    }else if(act==='copy'){
+      const it=items.find(i=>String(i.id)===String(id));
+      if(!it)return;
+      const atts=Array.isArray(it.attachments)?it.attachments:[];
+      const txt=`[${(it.type||'').toUpperCase()} · ${(it.priority||'').toUpperCase()}] ${it.title}\n`+
+        (it.body?`${it.body}\n`:'')+
+        (it.page_url?`📄 페이지: ${it.page_url}\n`:'')+
+        (atts.length?`📎 첨부: ${atts.map(a=>a.url).join(' , ')}\n`:'')+
+        `\n(요청 게시판 #${it.id} · 상태: ${it.status})`;
+      try{await navigator.clipboard.writeText(txt);SEOTI.toast('Claude에게 보낼 텍스트가 복사됐어요 — 채팅에 붙여넣으세요','success');}
+      catch(err){SEOTI.toast('복사 실패 — 수동 선택','error');console.log(txt);}
     }
   });
+
+  // 라이트박스 닫기
+  $('#lbX').addEventListener('click',()=>$('#lb').classList.remove('on'));
+  $('#lb').addEventListener('click',e=>{if(e.target.id==='lb')$('#lb').classList.remove('on');});
+
+  // 컴포즈 토글
+  const composeEl=$('#compose');
+  $('#composeToggle').addEventListener('click',()=>{
+    composeEl.classList.toggle('open');
+    $('#composeLabel').textContent=composeEl.classList.contains('open')?'접기':'새 요청 작성';
+  });
+
+  // 첨부파일 — 펜딩 리스트 (등록 전엔 메모리에만)
+  let pendingFiles=[]; // {file, previewUrl, name, type, size}
+  const attachList=$('#fAttachList');
+  function renderPending(){
+    attachList.innerHTML=pendingFiles.map((p,i)=>{
+      const isImg=(p.type||'').startsWith('image/');
+      const thumb=isImg?`<img src="${p.previewUrl}" alt="">`:`<div style="display:grid;place-items:center;height:100%;font-size:24px">📄</div>`;
+      return `<div class="ti" data-idx="${i}">${thumb}<span class="fn">${escapeHtml(p.name)}</span><button class="x" data-act="rm" data-idx="${i}" type="button">✕</button></div>`;
+    }).join('');
+  }
+  function addFiles(files){
+    for(const f of files){
+      if(f.size>10*1024*1024){SEOTI.toast(`${f.name} — 10MB 초과 (스킵)`,'warn');continue;}
+      const previewUrl=f.type.startsWith('image/')?URL.createObjectURL(f):'';
+      pendingFiles.push({file:f,previewUrl,name:f.name,type:f.type,size:f.size});
+    }
+    renderPending();
+  }
+  $('#fAttach').addEventListener('change',e=>{addFiles(e.target.files);e.target.value='';});
+  const zone=$('#fAttachZone');
+  zone.addEventListener('dragover',e=>{e.preventDefault();zone.classList.add('drag');});
+  zone.addEventListener('dragleave',()=>zone.classList.remove('drag'));
+  zone.addEventListener('drop',e=>{e.preventDefault();zone.classList.remove('drag');addFiles(e.dataTransfer.files);});
+  attachList.addEventListener('click',e=>{
+    if(e.target.dataset.act!=='rm')return;
+    const idx=+e.target.dataset.idx;
+    const p=pendingFiles[idx];
+    if(p?.previewUrl)URL.revokeObjectURL(p.previewUrl);
+    pendingFiles.splice(idx,1);
+    renderPending();
+  });
+
+  // Storage 업로드 — pendingFiles 를 feedback-attachments 버킷에 PUT
+  async function uploadAttachments(){
+    if(!pendingFiles.length||usingLocal)return [];
+    const u=SEOTI.api.getUser();
+    if(!u)return [];
+    const uploaded=[];
+    for(const p of pendingFiles){
+      const ext=(p.name.split('.').pop()||'bin').toLowerCase();
+      const path=`${u.id}/${Date.now()}-${Math.random().toString(36).slice(2,8)}.${ext}`;
+      const {error}=await client.storage.from('feedback-attachments').upload(path,p.file,{contentType:p.type,upsert:false});
+      if(error){SEOTI.toast(`${p.name} 업로드 실패: ${error.message}`,'error');continue;}
+      const {data:pub}=client.storage.from('feedback-attachments').getPublicUrl(path);
+      uploaded.push({url:pub.publicUrl,name:p.name,type:p.type,size:p.size,path});
+    }
+    return uploaded;
+  }
   $('#list').addEventListener('change',async e=>{
     if(e.target.dataset.act!=='status')return;
     const item=e.target.closest('.item');
@@ -355,27 +487,41 @@ a{color:inherit;text-decoration:none}
       title,
       body:$('#fBody').value.trim()||null,
       page_url:$('#fPage').value.trim()||null,
-      status:'open'
+      status:'open',
+      attachments:[]
     };
     const u=SEOTI.api.getUser();
-    payload.author=u?.nickname||'서티';
+    payload.author=u?.nickname||'관리자';
 
     if(usingLocal){
+      // 로컬은 첨부 미지원 (Supabase 로그인 후 등록)
       payload.id='local-'+Date.now();payload.created_at=new Date().toISOString();
       items.unshift(payload);saveLocal(items);
       $('#fSubmit').disabled=true;setTimeout(()=>$('#fSubmit').disabled=false,400);
-      $('#fTitle').value='';$('#fBody').value='';$('#fPage').value='';
-      SEOTI.toast('임시 저장됨 (로컬)','warn');render();return;
+      resetForm();
+      SEOTI.toast('임시 저장됨 (로컬 · 첨부 제외)','warn');render();return;
     }
     $('#fSubmit').disabled=true;
+    $('#fSubmit').textContent=pendingFiles.length?'업로드 중…':'등록 중…';
+    // 1) 첨부 업로드
+    payload.attachments=await uploadAttachments();
+    // 2) 행 등록
     const {data,error}=await client.from('feedback').insert({...payload,user_id:u.id}).select().single();
     $('#fSubmit').disabled=false;
+    $('#fSubmit').textContent='요청 등록';
     if(error){SEOTI.toast('등록 실패: '+error.message,'error');return;}
     items.unshift(data);
-    $('#fTitle').value='';$('#fBody').value='';$('#fPage').value='';
-    SEOTI.toast('요청 등록됨 🎀','success');
+    resetForm();
+    SEOTI.toast(`요청 등록됨 🎀 ${data.attachments?.length?`(첨부 ${data.attachments.length}장 포함)`:''}`,'success');
     render();
   });
+  function resetForm(){
+    $('#fTitle').value='';$('#fBody').value='';$('#fPage').value='';
+    pendingFiles.forEach(p=>{if(p.previewUrl)URL.revokeObjectURL(p.previewUrl);});
+    pendingFiles=[];renderPending();
+    composeEl.classList.remove('open');
+    $('#composeLabel').textContent='새 요청 작성';
+  }
 
   // 자동 페이지 추천
   $('#fPage').setAttribute('list','pages-dl');

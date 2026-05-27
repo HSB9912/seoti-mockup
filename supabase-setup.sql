@@ -262,6 +262,37 @@ CREATE POLICY "feedback_admin_all" ON public.feedback
 CREATE INDEX IF NOT EXISTS feedback_status_idx ON public.feedback(status);
 CREATE INDEX IF NOT EXISTS feedback_created_idx ON public.feedback(created_at DESC);
 
+-- 첨부파일 (jsonb 배열: [{url, name, size, type, w?, h?}])
+ALTER TABLE public.feedback ADD COLUMN IF NOT EXISTS attachments jsonb DEFAULT '[]'::jsonb;
+
+-- ============================================================
+-- 10. STORAGE BUCKET · 요청 게시판 첨부파일
+-- ============================================================
+-- 'feedback-attachments' 버킷 (공개 읽기, 관리자만 쓰기)
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('feedback-attachments', 'feedback-attachments', true)
+ON CONFLICT (id) DO NOTHING;
+
+DROP POLICY IF EXISTS "feedback_attach_public_read" ON storage.objects;
+CREATE POLICY "feedback_attach_public_read" ON storage.objects
+  FOR SELECT USING (bucket_id = 'feedback-attachments');
+
+DROP POLICY IF EXISTS "feedback_attach_admin_write" ON storage.objects;
+CREATE POLICY "feedback_attach_admin_write" ON storage.objects
+  FOR INSERT TO authenticated
+  WITH CHECK (
+    bucket_id = 'feedback-attachments'
+    AND EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true)
+  );
+
+DROP POLICY IF EXISTS "feedback_attach_admin_delete" ON storage.objects;
+CREATE POLICY "feedback_attach_admin_delete" ON storage.objects
+  FOR DELETE TO authenticated
+  USING (
+    bucket_id = 'feedback-attachments'
+    AND EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true)
+  );
+
 -- ============================================================
 -- SEED DATA · 사이트 콘텐츠 기본값
 -- ============================================================
