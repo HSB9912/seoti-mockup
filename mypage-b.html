@@ -157,10 +157,10 @@ footer{padding:30px 0;font-size:12.5px;color:var(--sub);text-align:center}
 <section class="tabs-row wrap">
   <div class="pills">
     <a class="on" data-go="dash">▦ 대시보드</a>
-    <a data-go="orders">📦 주문 <span class="b">8</span></a>
-    <a data-go="wish">♡ 위시리스트 <span class="b">12</span></a>
-    <a data-go="reviews">⭐ 리뷰 <span class="b">2</span></a>
-    <a data-go="coupons">🎟 쿠폰 <span class="b">3</span></a>
+    <a data-go="orders">📦 주문</a>
+    <a data-go="wish">♡ 위시리스트 <span class="b" data-wishlist-count>0</span></a>
+    <a data-go="reviews">⭐ 리뷰</a>
+    <a data-go="coupons">🎟 쿠폰</a>
     <a data-go="profile">👤 회원정보</a>
   </div>
 </section>
@@ -173,32 +173,19 @@ footer{padding:30px 0;font-size:12.5px;color:var(--sub);text-align:center}
       <div class="dc"><div class="ic d">📦</div><div class="k">전체 주문</div><div class="v" id="dcOrders">0건</div><small id="dcOrdersSub">아직 주문 없음</small></div>
       <div class="dc"><div class="ic a">🛒</div><div class="k">장바구니</div><div class="v"><span data-cart-count>0</span>개</div><small>결제 대기</small></div>
       <div class="dc"><div class="ic c">♡</div><div class="k">위시리스트</div><div class="v"><span data-wishlist-count>0</span>개</div><small>마음에 담은 작품</small></div>
-      <div class="dc"><div class="ic b">🎟</div><div class="k">쿠폰</div><div class="v">3장</div><small>가장 빠른 만료 5/31</small></div>
+      <div class="dc"><div class="ic b">🎟</div><div class="k">쿠폰</div><div class="v">0장</div><small>—</small></div>
     </div>
     <div class="row r-3-1">
       <div class="card">
         <h3>최근 주문 <a data-go="orders">전체 보기 →</a></h3>
-        <div class="oi"><div class="tn"><img referrerpolicy="no-referrer" src="https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/202602/a157d261092510f1542550274972a939.png"></div>
-          <div><b>설탕 눈마을 ×2 외 3건</b><small>SEOTI-26-0521-0148 · 2026-05-21</small></div>
-          <span class="o-stat ink" style="margin-left:auto">배송중</span></div>
-        <div class="oi"><div class="tn"><img referrerpolicy="no-referrer" src="https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/202602/8844055f11daba2bd37b69a6150cdac6.png"></div>
-          <div><b>학교괴담 스티커</b><small>SEOTI-26-0519-0132 · 2026-05-19</small></div>
-          <span class="o-stat ok" style="margin-left:auto">완료</span></div>
-        <div class="oi"><div class="tn"><img referrerpolicy="no-referrer" src="https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/202508/d9342a7de8b65e19f073f6f99139560d.png"></div>
-          <div><b>선샤인데이 스티커</b><small>SEOTI-26-0515-0098 · 2026-05-15</small></div>
-          <span class="o-stat done" style="margin-left:auto">구매확정</span></div>
+        <div style="padding:40px 20px;text-align:center;color:var(--sub);font-size:13px">
+          아직 주문 내역이 없어요.
+        </div>
       </div>
       <div class="card">
         <h3>리뷰 작성 ✨</h3>
-        <div class="rt" style="padding:12px;border-radius:10px;margin-bottom:8px">
-          <div class="tn" style="width:48px;height:48px"><img referrerpolicy="no-referrer" src="https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/202602/8844055f11daba2bd37b69a6150cdac6.png"></div>
-          <div style="flex:1"><b>학교괴담</b><small>05.19 구매</small></div>
-          <button>작성</button>
-        </div>
-        <div class="rt" style="padding:12px;border-radius:10px">
-          <div class="tn" style="width:48px;height:48px"><img referrerpolicy="no-referrer" src="https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/202508/d9342a7de8b65e19f073f6f99139560d.png"></div>
-          <div style="flex:1"><b>선샤인데이</b><small>05.15 구매</small></div>
-          <button>작성</button>
+        <div style="padding:30px 20px;text-align:center;color:var(--sub);font-size:13px">
+          작성 가능한 리뷰가 없어요.
         </div>
       </div>
     </div>
@@ -206,62 +193,39 @@ footer{padding:30px 0;font-size:12.5px;color:var(--sub);text-align:center}
 
   <!-- 주문 -->
   <section class="sect" data-s="orders">
-    <div class="o-card">
-      <div class="o-head"><div class="meta">주문번호 <b>SEOTI-26-0521-0148</b> · 2026-05-21</div><span class="o-stat ink">배송중</span></div>
-      <div class="oi"><div class="tn"><img referrerpolicy="no-referrer" src="https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/202602/a157d261092510f1542550274972a939.png"></div><div><b>설탕 눈마을 스티커</b><small>단품 ×2</small></div><span class="pr">7,000원</span></div>
-      <div class="oi"><div class="tn"><img referrerpolicy="no-referrer" src="https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/202508/13260f931f04e15ddc8bb56a20dc0e90.png"></div><div><b>키스컷 마스킹테이프 2</b><small>단품 ×1</small></div><span class="pr">6,500원</span></div>
-      <div class="oi"><small style="color:var(--sub)">+ 외 2개 품목</small></div>
-      <div class="o-foot"><span>운송장 CJ대한통운 <b>123456789</b></span><span class="tot">21,900원</span>
-        <div class="actions"><button class="btn">배송조회</button><button class="btn">상세</button></div></div>
-    </div>
-    <div class="o-card">
-      <div class="o-head"><div class="meta">주문번호 <b>SEOTI-26-0519-0132</b> · 2026-05-19</div><span class="o-stat ok">배송완료</span></div>
-      <div class="oi"><div class="tn"><img referrerpolicy="no-referrer" src="https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/202602/8844055f11daba2bd37b69a6150cdac6.png"></div><div><b>학교괴담 스티커</b><small>단품 ×1</small></div><span class="pr">3,500원</span></div>
-      <div class="o-foot"><span style="color:var(--sub)">2026-05-21 수령</span><span class="tot">6,400원</span>
-        <div class="actions"><button class="btn">리뷰 작성</button><button class="btn btn-p">재구매</button></div></div>
-    </div>
-    <div class="o-card">
-      <div class="o-head"><div class="meta">주문번호 <b>SEOTI-26-0515-0098</b> · 2026-05-15</div><span class="o-stat done">구매확정</span></div>
-      <div class="oi"><div class="tn"><img referrerpolicy="no-referrer" src="https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/202508/d9342a7de8b65e19f073f6f99139560d.png"></div><div><b>선샤인데이 스티커</b><small>2개 세트 ×1</small></div><span class="pr">7,000원</span></div>
-      <div class="o-foot"><span style="color:var(--sub)">리뷰 ★★★★★</span><span class="tot">9,900원</span>
-        <div class="actions"><button class="btn">재구매</button></div></div>
+    <div class="o-card" style="text-align:center;padding:60px 30px">
+      <div style="font-size:42px;margin-bottom:14px;opacity:.5">📦</div>
+      <h3 style="font-size:18px;font-weight:800;margin-bottom:8px">아직 주문 내역이 없어요</h3>
+      <p style="color:var(--sub);font-size:13px;line-height:1.7">Collection에서 마음에 드는 작품을 골라보세요.</p>
+      <a href="mockup-b-minimal.html" style="display:inline-block;margin-top:18px;padding:11px 22px;background:var(--ink);color:#fff;font-weight:800;font-size:13px;text-decoration:none;border-radius:99px">Collection 보기 →</a>
     </div>
   </section>
 
   <!-- 위시리스트 -->
   <section class="sect" data-s="wish">
-    <div class="wgrid">
-      <a class="wi"><div class="ph"><img referrerpolicy="no-referrer" src="https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/202512/6df4ff16a044b3cd8dde5d8b78447e35.png"><span class="heart">♥</span></div><div class="b"><div class="ct">조각</div><h4>초록책장 스티커</h4><div class="foot"><span class="price">₩3,500</span><button class="btn">담기</button></div></div></a>
-      <a class="wi"><div class="ph"><img referrerpolicy="no-referrer" src="https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/202602/3d92c3f2ae8a816bb0aaf8374372b46a.png"><span class="heart">♥</span></div><div class="b"><div class="ct">메모</div><h4>스위티 메모팩</h4><div class="foot"><span class="price">₩3,500</span><button class="btn">담기</button></div></div></a>
-      <a class="wi"><div class="ph"><img referrerpolicy="no-referrer" src="https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/202503/58dafda9eee23c1a553c073971af033c.png"><span class="heart">♥</span></div><div class="b"><div class="ct">굿즈</div><h4>크레페 키링</h4><div class="foot"><span class="price">₩2,500</span><button class="btn" disabled style="opacity:.5">품절</button></div></div></a>
-      <a class="wi"><div class="ph"><img referrerpolicy="no-referrer" src="https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/202508/383bee900dbacb6369f996fc668c0f42.png"><span class="heart">♥</span></div><div class="b"><div class="ct">마테</div><h4>마스킹테이프 4type</h4><div class="foot"><span class="price">₩4,500</span><button class="btn">담기</button></div></div></a>
-      <a class="wi"><div class="ph"><img referrerpolicy="no-referrer" src="https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/202410/a20a1e98cd7574c0c8a6b6f025691a20.png"><span class="heart">♥</span></div><div class="b"><div class="ct">투명</div><h4>갓파갓파</h4><div class="foot"><span class="price">₩3,000</span><button class="btn">담기</button></div></div></a>
-      <a class="wi"><div class="ph"><img referrerpolicy="no-referrer" src="https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/202602/655ded5da50146cf19dbaa537f0378da.png"><span class="heart">♥</span></div><div class="b"><div class="ct">메모</div><h4>눈송이 여행</h4><div class="foot"><span class="price">₩3,500</span><button class="btn">담기</button></div></div></a>
+    <div id="wishGrid" class="wgrid"></div>
+    <div id="wishEmpty" style="display:none;background:var(--paper);padding:60px 30px;text-align:center;border-radius:14px">
+      <div style="font-size:42px;margin-bottom:14px;opacity:.5">♡</div>
+      <h3 style="font-size:18px;font-weight:800;margin-bottom:8px">위시리스트가 비어있어요</h3>
+      <p style="color:var(--sub);font-size:13px">상품 페이지에서 ♡ 버튼을 누르면 여기 담깁니다.</p>
     </div>
   </section>
 
   <!-- 리뷰 -->
   <section class="sect" data-s="reviews">
-    <div class="card" style="margin-bottom:14px"><h3>작성 가능 리뷰 2건</h3>
-      <div class="rt-grid">
-        <div class="rt"><div class="tn"><img referrerpolicy="no-referrer" src="https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/202602/8844055f11daba2bd37b69a6150cdac6.png"></div>
-          <div style="flex:1"><b>학교괴담 스티커</b><small>2026-05-19 구매</small></div><button>리뷰 작성</button></div>
-        <div class="rt"><div class="tn"><img referrerpolicy="no-referrer" src="https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/202508/d9342a7de8b65e19f073f6f99139560d.png"></div>
-          <div style="flex:1"><b>선샤인데이 스티커</b><small>2026-05-15 구매</small></div><button>리뷰 작성</button></div>
-      </div>
-    </div>
-    <div class="card"><h3>작성한 리뷰 14건</h3>
-      <p style="color:var(--sub);font-size:13px">작성하신 리뷰는 각 상품 페이지에서 확인할 수 있어요. 평균 평점 ★ 4.8</p>
+    <div class="card" style="text-align:center;padding:60px 30px">
+      <div style="font-size:42px;margin-bottom:14px;opacity:.5">⭐</div>
+      <h3 style="font-size:18px;font-weight:800;margin-bottom:8px">아직 작성한 리뷰가 없어요</h3>
+      <p style="color:var(--sub);font-size:13px;line-height:1.7">구매한 작품을 받은 뒤 리뷰를 남기실 수 있어요.</p>
     </div>
   </section>
 
   <!-- 쿠폰 -->
   <section class="sect" data-s="coupons">
-    <div class="coupon-grid">
-      <div class="cp"><div class="v">15%</div><div class="n">신상품 15% 할인</div><div class="d">최소 ₩5,000 · 1회 사용</div><div class="expire">⏰ ~ 2026-05-31 (10일 남음)</div><button>사용하기</button></div>
-      <div class="cp"><div class="v">₩2,000</div><div class="n">3만원 이상 할인</div><div class="d">최소 주문 ₩30,000</div><div class="expire">⏰ ~ 2026-06-30</div><button>사용하기</button></div>
-      <div class="cp"><div class="v">무료</div><div class="n">무료배송 쿠폰</div><div class="d">국내 일반택배</div><div class="expire">⏰ ~ 2026-07-15</div><button>사용하기</button></div>
-      <div class="cp used"><div class="v">10%</div><div class="n">생일 축하 10% 할인</div><div class="d" style="color:var(--sub)">2026-05-10 사용 완료</div></div>
+    <div class="card" style="text-align:center;padding:60px 30px">
+      <div style="font-size:42px;margin-bottom:14px;opacity:.5">🎟</div>
+      <h3 style="font-size:18px;font-weight:800;margin-bottom:8px">사용 가능한 쿠폰이 없어요</h3>
+      <p style="color:var(--sub);font-size:13px;line-height:1.7">이벤트·신규가입 등으로 쿠폰이 발급되면 여기에 표시됩니다.</p>
     </div>
   </section>
 
@@ -271,15 +235,15 @@ footer{padding:30px 0;font-size:12.5px;color:var(--sub);text-align:center}
       <h3>기본 정보 <a>저장하기 →</a></h3>
       <div class="profile-grid">
         <div><label style="font-size:11px;color:var(--sub);font-weight:800;letter-spacing:.1em;text-transform:uppercase">이메일</label>
-          <input value="seoti.fan@example.com" readonly style="width:100%;margin-top:6px;padding:11px 13px;border:1px solid var(--line);border-radius:8px;font-size:14px;background:var(--bg)"></div>
+          <input id="profEmail" data-user-email readonly style="width:100%;margin-top:6px;padding:11px 13px;border:1px solid var(--line);border-radius:8px;font-size:14px;background:var(--bg)"></div>
         <div><label style="font-size:11px;color:var(--sub);font-weight:800;letter-spacing:.1em;text-transform:uppercase">닉네임</label>
-          <input value="다꾸요정" style="width:100%;margin-top:6px;padding:11px 13px;border:1px solid var(--line);border-radius:8px;font-size:14px"></div>
+          <input id="profNick" data-user-nick style="width:100%;margin-top:6px;padding:11px 13px;border:1px solid var(--line);border-radius:8px;font-size:14px"></div>
         <div><label style="font-size:11px;color:var(--sub);font-weight:800;letter-spacing:.1em;text-transform:uppercase">이름</label>
-          <input value="홍길동" style="width:100%;margin-top:6px;padding:11px 13px;border:1px solid var(--line);border-radius:8px;font-size:14px"></div>
+          <input placeholder="이름" style="width:100%;margin-top:6px;padding:11px 13px;border:1px solid var(--line);border-radius:8px;font-size:14px"></div>
         <div><label style="font-size:11px;color:var(--sub);font-weight:800;letter-spacing:.1em;text-transform:uppercase">휴대폰</label>
-          <input value="010-1234-5678" style="width:100%;margin-top:6px;padding:11px 13px;border:1px solid var(--line);border-radius:8px;font-size:14px"></div>
+          <input placeholder="010-0000-0000 (선택)" style="width:100%;margin-top:6px;padding:11px 13px;border:1px solid var(--line);border-radius:8px;font-size:14px"></div>
         <div><label style="font-size:11px;color:var(--sub);font-weight:800;letter-spacing:.1em;text-transform:uppercase">생일</label>
-          <input value="04-12" style="width:100%;margin-top:6px;padding:11px 13px;border:1px solid var(--line);border-radius:8px;font-size:14px"></div>
+          <input placeholder="MM-DD (선택)" style="width:100%;margin-top:6px;padding:11px 13px;border:1px solid var(--line);border-radius:8px;font-size:14px"></div>
         <div><label style="font-size:11px;color:var(--sub);font-weight:800;letter-spacing:.1em;text-transform:uppercase">비밀번호 변경</label>
           <input type="password" placeholder="새 비밀번호" style="width:100%;margin-top:6px;padding:11px 13px;border:1px solid var(--line);border-radius:8px;font-size:14px"></div>
       </div>

@@ -214,9 +214,9 @@
   <div class="pay-info">
     <div>
       <h3>입금 안내<span class="en">Payment Info</span></h3>
-      <div class="pi-row"><span class="k">은행<i class="en">Bank</i></span><span class="v">국민은행 KB</span></div>
-      <div class="pi-row"><span class="k">예금주<i class="en">Holder</i></span><span class="v">서○티</span></div>
-      <div class="pi-row"><span class="k">계좌번호<i class="en">Account</i></span><span class="v big">123-4567-89012-3</span></div>
+      <div class="pi-row"><span class="k">은행<i class="en">Bank</i></span><span class="v" data-content="payment.bank">—</span></div>
+      <div class="pi-row"><span class="k">예금주<i class="en">Holder</i></span><span class="v" data-content="payment.holder">—</span></div>
+      <div class="pi-row"><span class="k">계좌번호<i class="en">Account</i></span><span class="v big" data-content="payment.account">—</span></div>
       <div class="pi-row"><span class="k">배송 범위<i class="en">Shipping</i></span><span class="v">한국 내 배송만 가능 · 해외는 구매대행 이용</span></div>
     </div>
     <div class="pi-help">
@@ -297,27 +297,17 @@
 <footer>© 2026 SEOTI · 디자인 시안용 목업</footer>
 
 <script>
-const products=[
- {c:"메모 스티커",n:"롱 메모 스티커팩",p:3500,s:42,img:"202602/bc4816b7234830cacfd8e73dbc81ebcb"},
- {c:"메모 스티커",n:"스위티 메모 스티커팩",p:3500,s:18,img:"202602/3d92c3f2ae8a816bb0aaf8374372b46a"},
- {c:"메모 스티커",n:"설탕 눈마을 스티커",p:3500,s:6,img:"202602/a157d261092510f1542550274972a939"},
- {c:"메모 스티커",n:"학교괴담 스티커",p:3500,s:31,img:"202602/8844055f11daba2bd37b69a6150cdac6"},
- {c:"메모 스티커",n:"메모빈티지 스티커팩",p:2500,s:24,img:"202602/3dba9ab4bcc29cf34566d08a48284e13"},
- {c:"조각 스티커",n:"초록책장 스티커",p:3500,s:3,img:"202512/6df4ff16a044b3cd8dde5d8b78447e35"},
- {c:"메모 스티커",n:"다이어리 스티코",p:3500,s:55,img:"202512/cb676b86854d5dc018ea0576b99c897a"},
- {c:"메모 스티커",n:"선샤인데이 스티커",p:3500,s:9,img:"202508/d9342a7de8b65e19f073f6f99139560d"},
- {c:"마스킹테이프",n:"키스컷 마스킹테이프 2",p:6500,s:27,img:"202508/13260f931f04e15ddc8bb56a20dc0e90"},
- {c:"투명스티커",n:"냠냠만두 투명 스티커",p:3000,s:14,img:"202410/e80feba7a57b4fcf1a3364e5cfbb40d6"},
- {c:"투명스티커",n:"갓파갓파 투명스티커",p:3000,s:11,img:"202410/a20a1e98cd7574c0c8a6b6f025691a20"},
- {c:"키링·굿즈",n:"크레페 말랑 키링",p:2500,s:0,img:"202503/58dafda9eee23c1a553c073971af033c"},
- {c:"메모 스티커",n:"눈송이 여행 스티커",p:3500,s:21,img:"202602/655ded5da50146cf19dbaa537f0378da"},
- {c:"메모 스티커",n:"뉴데이 다이어리 스티커",p:3500,s:48,img:"202602/879c65563f5176d1a3592b11970a68db"},
-];
+// 제품 데이터는 어드민에서 추가하면 Supabase products 테이블에서 로드 예정
+const products = [];
 const cart={};let filter="",search="";
 function stk(s){if(s===0)return `<span class="stk out">SOLD OUT</span>`;
   if(s<=5)return `<span class="stk low">재고 ${s}</span>`;return "";}
 function render(){
   const list=products.filter(p=>(!filter||p.c===filter)&&(!search||p.n.includes(search)));
+  if(!list.length){
+    document.getElementById('grid').innerHTML='<div style="grid-column:1/-1;background:var(--paper);padding:80px 30px;text-align:center;border-radius:14px"><div style="font-size:42px;margin-bottom:14px;opacity:.5">📦</div><h2 style="font-size:20px;font-weight:800;margin-bottom:8px">아직 등록된 제품이 없어요</h2><p style="font-size:13.5px;color:var(--sub);line-height:1.7">어드민 → 상품 관리에서 추가하면 여기에 카드로 표시됩니다.</p></div>';
+    updateCart();return;
+  }
   document.getElementById('grid').innerHTML=list.map(p=>{
     const i=products.indexOf(p),q=cart[i]||0;
     return `<article class="card ${q?'sel':''} ${p.s===0?'out':''}">

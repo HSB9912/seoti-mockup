@@ -93,34 +93,47 @@ footer{padding:30px 0;font-size:12.5px;color:var(--sub);text-align:center;border
 <main class="wrap">
   <!-- channels -->
   <section class="channels">
-    <a class="ch primary" href="mailto:seoti.studio@gmail.com">
+    <a class="ch primary" id="emailCh">
       <div>
         <div class="icon">✉️</div>
         <h3>Email</h3>
-        <div class="at">seoti.studio@gmail.com</div>
-        <p class="desc">콜라보·도매·라이선스 등 공식 문의는 이메일로 부탁드려요. 영업일 기준 1~2일 내 회신.</p>
+        <div class="at" data-content="contact.email">—</div>
+        <p class="desc">콜라보·도매·라이선스 등 공식 문의. 영업일 기준 1~2일 내 회신.</p>
       </div>
       <span class="copy">메일 보내기</span>
     </a>
-    <a class="ch" href="https://instagram.com/seoti.studio" target="_blank">
+    <a class="ch" id="igCh" target="_blank">
       <div>
         <div class="icon">📷</div>
         <h3>Instagram</h3>
-        <div class="at">@seoti.studio</div>
-        <p class="desc">매일 한 컷의 그림 일기. 새 작품·통판·이벤트 소식이 가장 빠르게 올라옵니다.</p>
+        <div class="at" data-content="contact.instagram">—</div>
+        <p class="desc">새 작품·통판·이벤트 소식.</p>
       </div>
       <span class="copy">팔로우하기</span>
     </a>
-    <a class="ch" href="https://twitter.com/seoti_studio" target="_blank">
+    <a class="ch" id="twCh" target="_blank">
       <div>
         <div class="icon">𝕏</div>
         <h3>Twitter / X</h3>
-        <div class="at">@seoti_studio</div>
-        <p class="desc">통판·재입고 알림은 트위터에서도 진행해요. 짧은 작업 노트도 종종 올립니다.</p>
+        <div class="at" data-content="contact.twitter">—</div>
+        <p class="desc">통판·재입고 알림. 짧은 작업 노트.</p>
       </div>
       <span class="copy">트위터 가기</span>
     </a>
   </section>
+  <script>
+  // 연락처는 CMS에서 가져와 링크 연결
+  document.addEventListener('DOMContentLoaded',()=>{
+    const c = (window.SEOTI && SEOTI.content) || null;
+    if (!c) return;
+    const email = c.get('contact.email','');
+    if (email && email!=='—') document.getElementById('emailCh').href = 'mailto:'+email;
+    const ig = (c.get('contact.instagram','')||'').replace('@','');
+    if (ig) document.getElementById('igCh').href = 'https://instagram.com/'+ig;
+    const tw = (c.get('contact.twitter','')||'').replace('@','');
+    if (tw) document.getElementById('twCh').href = 'https://twitter.com/'+tw;
+  });
+  </script>
 
   <!-- topic guide -->
   <section class="guide">
@@ -151,12 +164,11 @@ footer{padding:30px 0;font-size:12.5px;color:var(--sub);text-align:center;border
     </div>
   </div>
 
-  <!-- about mini (이미지 제거 · 텍스트만) -->
+  <!-- about mini -->
   <section class="about-mini">
     <span class="eyebrow">About the Artist</span>
-    <h2 style="margin-top:12px">서티 (SEOTI)</h2>
-    <p>서울에서 활동하는 손그림 일러스트 작가. 다이어리·편지·노트 위 작은 풍경을 그립니다. 2022년부터 시작해 지금까지 43개의 컬렉션을 만들었어요.</p>
-    <p class="sub">"그림이 다른 사람의 하루를 잠시 멈추게 할 수 있다면, 그것만으로 충분하다고 생각해요."</p>
+    <h2 style="margin-top:12px" data-content="about.title">STTY</h2>
+    <p data-content="about.body1">손그림 일러스트 작가. 다이어리·편지·노트 위 작은 풍경을 그립니다.</p>
     <a href="archive.html" class="read-more">Archive에서 작품 보기</a>
   </section>
 </main>

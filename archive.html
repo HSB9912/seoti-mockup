@@ -93,12 +93,12 @@ footer{padding:30px 0;font-size:12.5px;color:var(--sub);text-align:center;border
       <h1 style="margin-top:14px"><em>다꾸 샘플</em>과<br>작업 기록.</h1>
     </div>
     <div>
-      <p class="sub">서티가 직접 다꾸한 페이지, 작업 과정의 한 컷, 그날그날의 풍경. 자유롭게 모아두는 갤러리입니다.</p>
+      <p class="sub">직접 다꾸한 페이지, 작업 과정의 한 컷, 그날그날의 풍경. 자유롭게 모아두는 갤러리입니다.</p>
       <div class="stats">
-        <div>전체<b>148</b></div>
-        <div>다꾸<b>62</b></div>
-        <div>작업과정<b>34</b></div>
-        <div>일상<b>52</b></div>
+        <div>전체<b>—</b></div>
+        <div>다꾸<b>—</b></div>
+        <div>작업과정<b>—</b></div>
+        <div>일상<b>—</b></div>
       </div>
     </div>
   </div>
@@ -106,11 +106,11 @@ footer{padding:30px 0;font-size:12.5px;color:var(--sub);text-align:center;border
 
 <main class="wrap">
   <div class="filters">
-    <a class="on">전체 <sup>148</sup></a>
-    <a>다꾸 샘플 <sup>62</sup></a>
-    <a>작업 과정 <sup>34</sup></a>
-    <a>일상·풍경 <sup>52</sup></a>
-    <a>콜라보 <sup>8</sup></a>
+    <a class="on">전체</a>
+    <a>다꾸 샘플</a>
+    <a>작업 과정</a>
+    <a>일상·풍경</a>
+    <a>콜라보</a>
     <div class="view-toggle">
       <button class="on" data-v="dense">밀집</button>
       <button data-v="loose">여백</button>
@@ -185,40 +185,17 @@ footer{padding:30px 0;font-size:12.5px;color:var(--sub);text-align:center;border
 <footer>© 2026 SEOTI — Archive · 디자인 시안용 목업</footer>
 
 <script>
-// 갤러리 이미지 (실제 운영 시 작가가 직접 업로드)
-const photos = [
- {img:"202602/a157d261092510f1542550274972a939",t:"다꾸",dt:"05.20"},
- {img:"202602/3d92c3f2ae8a816bb0aaf8374372b46a",t:"다꾸",dt:"05.18",tall:true},
- {img:"202602/8844055f11daba2bd37b69a6150cdac6",t:"작업",dt:"05.15"},
- {img:"202508/d9342a7de8b65e19f073f6f99139560d",t:"다꾸",dt:"05.12"},
- {img:"202602/655ded5da50146cf19dbaa537f0378da",t:"일상",dt:"05.10"},
- {img:"202512/cb676b86854d5dc018ea0576b99c897a",t:"작업",dt:"05.08",tall:true},
- {img:"202602/bc4816b7234830cacfd8e73dbc81ebcb",t:"다꾸",dt:"05.06"},
- {img:"202410/e80feba7a57b4fcf1a3364e5cfbb40d6",t:"일상",dt:"05.04"},
- {img:"202508/13260f931f04e15ddc8bb56a20dc0e90",t:"콜라보",dt:"05.01"},
- {img:"202602/3dba9ab4bcc29cf34566d08a48284e13",t:"다꾸",dt:"04.28"},
- {img:"202508/383bee900dbacb6369f996fc668c0f42",t:"작업",dt:"04.25",tall:true},
- {img:"202512/6df4ff16a044b3cd8dde5d8b78447e35",t:"다꾸",dt:"04.22"},
- {img:"202410/a20a1e98cd7574c0c8a6b6f025691a20",t:"일상",dt:"04.20"},
- {img:"202503/58dafda9eee23c1a553c073971af033c",t:"작업",dt:"04.18"},
- {img:"202503/92aeb5f0a0a640fb8c3b5ad9988d6c03",t:"다꾸",dt:"04.15"},
- {img:"202503/4cc53b7e82b5b5224b04ba00a5d11a8c",t:"작업",dt:"04.12",tall:true},
- {img:"202508/b09269ce7d3efc87ebf20224eced08ae",t:"일상",dt:"04.10"},
- {img:"202410/844dbfbb79050905b13af490a5bafcf6",t:"다꾸",dt:"04.08"},
- {img:"202503/534709a88d26c6894476dc80c17f47e8",t:"다꾸",dt:"04.05"},
- {img:"202506/5887735028959c51e497a0b3024be03f",t:"콜라보",dt:"04.02"},
- {img:"202506/9f390c9a8c0aa8bf9b006298da7a21c6",t:"작업",dt:"03.30",tall:true},
- {img:"202506/3b1d4ad6e89848009f4698bcf828700b",t:"다꾸",dt:"03.28"},
- {img:"202502/7bbbb2338a020dd97aea1812488f07c8",t:"일상",dt:"03.25"},
- {img:"202503/68f042e99831f511d1f11dfd6a940bc0",t:"다꾸",dt:"03.22"},
- {img:"202602/879c65563f5176d1a3592b11970a68db",t:"작업",dt:"03.20"},
- {img:"202602/e8231ae71116a751019504392117bc90",t:"다꾸",dt:"03.18",tall:true},
-];
+// 사진 데이터는 어드민에서 업로드하면 Supabase archive_photos 테이블에서 로드 예정
+const photos = [];
 const grid = document.getElementById('grid');
 let view = 'dense';
 
 function render() {
   grid.className = 'grid ' + view;
+  if (!photos.length) {
+    grid.innerHTML = '<div style="grid-column:1/-1;background:#fafaf7;padding:80px 30px;text-align:center;border:1px solid #e7e4df"><div style="font-size:42px;margin-bottom:14px;opacity:.5">🖼</div><h2 style="font-size:20px;font-weight:800;margin-bottom:8px">아직 등록된 사진이 없어요</h2><p style="font-size:13.5px;color:#8c8781;line-height:1.7">아래 <b>＋ 새 사진 올리기</b>로 첫 사진을 추가해 보세요. (관리자 전용)</p></div>';
+    return;
+  }
   grid.innerHTML = photos.map((p,i) => {
     const tall = view === 'dense' && p.tall ? ' tall' : '';
     if (view === 'dense') {

@@ -135,10 +135,10 @@
       <h1>고객 문의 <small>Customer Q&A</small></h1>
     </div>
     <div class="stats">
-      <div>전체 문의<b>247</b></div>
-      <div>답변 완료<b>239</b></div>
-      <div>답변 대기<b>8</b></div>
-      <div>평균 답변<b>0.8일</b></div>
+      <div>전체 문의<b>—</b></div>
+      <div>답변 완료<b>—</b></div>
+      <div>답변 대기<b>—</b></div>
+      <div>평균 답변<b>—</b></div>
     </div>
   </div>
 </header>
@@ -150,26 +150,19 @@
       <a class="ask-mini">+ 새 문의 작성<i class="en">Ask</i></a>
       <div class="sb-blk">
         <h4>카테고리<i class="en">Category</i></h4>
-        <a class="on">전체 <span class="cnt">247</span></a>
-        <a>배송 <span class="cnt">98</span></a>
-        <a>제품 <span class="cnt">72</span></a>
-        <a>결제 · 환불 <span class="cnt">41</span></a>
-        <a>교환 · A/S <span class="cnt">22</span></a>
-        <a>해외주문 <span class="cnt">9</span></a>
-        <a>기타 <span class="cnt">5</span></a>
+        <a class="on">전체</a>
+        <a>배송</a>
+        <a>제품</a>
+        <a>결제 · 환불</a>
+        <a>교환 · A/S</a>
+        <a>기타</a>
       </div>
       <div class="sb-blk">
         <h4>상태<i class="en">Status</i></h4>
-        <a>전체 보기 <span class="cnt">247</span></a>
-        <a>답변 완료 <span class="cnt">239</span></a>
-        <a>답변 대기 <span class="cnt">8</span></a>
-        <a>내 문의 <span class="cnt">·</span></a>
-      </div>
-      <div class="sb-blk">
-        <h4>도움이 된 답변 TOP<i class="en">Best</i></h4>
-        <div class="top-ans"><b>배송</b>해외배송은 어떻게 신청하나요?</div>
-        <div class="top-ans"><b>제품</b>마스킹테이프 사용법 알려주세요</div>
-        <div class="top-ans"><b>결제</b>입금자명 잘못 적었을 때</div>
+        <a>전체 보기</a>
+        <a>답변 완료</a>
+        <a>답변 대기</a>
+        <a>내 문의</a>
       </div>
     </aside>
 
@@ -189,14 +182,6 @@
         <div id="rows"></div>
       </div>
 
-      <div class="board" style="margin-top:16px">
-        <div class="page">
-          <span class="page-info">전체 247건 · 1~8 표시</span>
-          <div class="page-nums">
-            <a>‹</a><a class="on">1</a><a>2</a><a>3</a><a>4</a><a>5</a><a>›</a>
-          </div>
-        </div>
-      </div>
     </section>
   </div>
 </main>
@@ -204,32 +189,14 @@
 <footer>© 2026 SEOTI — 디자인 시안용 목업 · Q&A 게시판형</footer>
 
 <script>
-const qa=[
- {no:247,c:"제품",t:"설탕 눈마을 스티커 재입고 언제 되나요?",by:"송이*",d:"05-20",s:"answered",
-  q:"5월 첫 주에 봤을 때 품절이라 알림 신청만 해뒀어요. 곧 재입고 되나요? 다이어리 꾸미려고 기다리고 있어요!",
-  ans:"안녕하세요! 설탕 눈마을 스티커는 5월 30일에 재입고 예정이에요. 알림 신청해주시면 입고 즉시 메일로 안내드릴게요 🙇‍♀️",resp:"서티"},
- {no:246,c:"배송",t:"해외배송 가능한가요? 미국으로 받고 싶어서요",by:"jenn*",d:"05-19",s:"answered",
-  q:"Hi! Can you ship to the US? I'd like to buy ~30 pieces of various stickers.",
-  ans:"네! 미국 포함 전 세계로 배송 가능합니다. 30개 이상 구매하실 경우 [Group Order 페이지]에서 신청해 주시면 견적과 함께 배송비 안내드려요.",resp:"서티"},
- {no:245,c:"교환",t:"받은 제품에 미세한 흠집이 있어요",by:"minji*",d:"05-18",s:"answered",lock:true,
-  q:"오늘 받았는데 모서리가 살짝 눌렸어요. 사진 첨부합니다.",
-  ans:"불편드려 죄송합니다 ㅠㅠ 새 제품으로 교환해드릴게요. 반송비도 저희가 부담합니다.",resp:"서티"},
- {no:244,c:"결제",t:"무통장입금 입금자명을 잘못 적었어요",by:"jihye*",d:"05-17",s:"wait",
-  q:"주문번호 #2026-0517-021 인데 입금자명을 회사명으로 적어버렸어요. 어떻게 해야 하나요?",ans:"",resp:""},
- {no:243,c:"제품",t:"마스킹테이프 자유롭게 자를 수 있나요?",by:"하늘*",d:"05-16",s:"answered",
-  q:"키스컷과 일반 마테 차이가 궁금해요!",
-  ans:"키스컷은 캐릭터 모양대로 떼어 쓰실 수 있고, 일반 마테는 자유롭게 잘라 쓰는 형식이에요. 둘다 다꾸에 좋아요!",resp:"서티"},
- {no:242,c:"배송",t:"주문 후 며칠이면 받을 수 있나요?",by:"수민*",d:"05-15",s:"answered",
-  q:"이번 주 안에 받을 수 있을까요?",
-  ans:"평일 오후 2시 이전 결제 건은 당일 출고됩니다. 일반택배 기준 1~3일 정도 소요돼요!",resp:"서티"},
- {no:241,c:"해외",t:"콜라보 문의는 어디로 드리면 되나요?",by:"agency*",d:"05-14",s:"wait",lock:true,q:"비공개 문의입니다.",ans:"",resp:""},
- {no:240,c:"제품",t:"학교괴담 스티커 사이즈가 어떻게 되나요?",by:"가을*",d:"05-13",s:"answered",
-  q:"다이어리 사이즈에 맞는지 알고 싶어요.",
-  ans:"135 × 105mm 사이즈예요. A6 다이어리 한 페이지에 잘 맞아요!",resp:"서티"},
-];
+// 문의 데이터는 어드민에서 답변하면 Supabase qna 테이블에서 로드 예정
+const qa = [];
 const cls={answered:["","답변완료"],wait:["wait","답변대기"]};
-const cl={"제품":"제품","배송":"배송","교환":"교환","결제":"결제","해외":"해외","기타":"기타"};
-document.getElementById('rows').innerHTML=qa.map((q,i)=>`
+if (!qa.length) {
+  document.getElementById('rows').innerHTML =
+    '<div style="padding:80px 30px;text-align:center"><div style="font-size:42px;margin-bottom:14px;opacity:.5">💬</div><h2 style="font-size:20px;font-weight:800;margin-bottom:8px">아직 등록된 문의가 없어요</h2><p style="font-size:13.5px;color:#8c8781;line-height:1.7">위 <b>+ 문의 작성</b> 버튼으로 첫 문의를 남겨보세요.</p></div>';
+}
+document.getElementById('rows').innerHTML += qa.map((q,i)=>`
  <div class="row" data-i="${i}">
    <span class="no">${q.no}</span>
    <span class="cat">${q.c}</span>

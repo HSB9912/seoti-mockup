@@ -156,57 +156,24 @@
   <div class="hero-top">
     <h1>다꾸,<br>가장 <em>나다운</em><br>한 페이지.</h1>
     <div class="hero-meta">
-      <span class="eyebrow">Illustrator — Seoti</span>
-      <p>손으로 그린 일러스트를 스티커와 마스킹테이프로. 서티 작가의 2026 컬렉션을 소개합니다.</p>
+      <span class="eyebrow">Illustrator — STTY</span>
+      <p>손으로 그린 일러스트를 스티커와 마스킹테이프로. STTY 작가의 컬렉션 페이지.</p>
     </div>
   </div>
-  <div class="hero-img">
-    <div><img referrerpolicy="no-referrer" src="https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/202508/d9342a7de8b65e19f073f6f99139560d.png" alt=""></div>
-    <div><img referrerpolicy="no-referrer" src="https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/202602/8844055f11daba2bd37b69a6150cdac6.png" alt=""></div>
-    <div><img referrerpolicy="no-referrer" src="https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/202602/655ded5da50146cf19dbaa537f0378da.png" alt=""></div>
+  <div class="hero-img" style="opacity:.35;background:var(--paper);padding:40px 0;text-align:center;color:var(--sub);font-size:13px;font-weight:600;grid-template-columns:1fr">
+    <div style="aspect-ratio:auto;background:transparent;display:flex;align-items:center;justify-content:center">대표 작품 이미지 자리 — 어드민에서 추가</div>
   </div>
 </header>
 
 <section class="cat wrap">
   <div class="cat-head">
-    <h2>2026 Collection</h2>
-    <span class="count">전체 43개 제품</span>
+    <h2>Collection</h2>
+    <span class="count">아직 제품 없음</span>
   </div>
-  <div class="filters">
-    <a class="on">All <sup>43</sup></a>
-    <a>메모 스티커 <sup>16</sup></a>
-    <a>마스킹테이프 <sup>9</sup></a>
-    <a>투명스티커 <sup>7</sup></a>
-    <a>키링·굿즈 <sup>6</sup></a>
-    <a>조각 스티커 <sup>5</sup></a>
-    <a class="sort">정렬 · 신상품순 ↕</a>
-  </div>
-  <div class="grid" id="grid"></div>
-</section>
-
-<section class="detail">
-  <div class="wrap">
-    <span class="eyebrow">Product — 상세 페이지 레이아웃</span>
-    <div class="d-in">
-      <div class="d-left">
-        <div class="d-thumbs">
-          <div class="on"><img referrerpolicy="no-referrer" src="https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/202602/a157d261092510f1542550274972a939.png"></div>
-          <div><img referrerpolicy="no-referrer" src="https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/202602/bc4816b7234830cacfd8e73dbc81ebcb.png"></div>
-          <div><img referrerpolicy="no-referrer" src="https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/202512/6df4ff16a044b3cd8dde5d8b78447e35.png"></div>
-          <div><img referrerpolicy="no-referrer" src="https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/202602/3dba9ab4bcc29cf34566d08a48284e13.png"></div>
-        </div>
-        <div class="d-hero"><img referrerpolicy="no-referrer" src="https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/202602/a157d261092510f1542550274972a939.png" alt=""></div>
-      </div>
-      <div class="d-right">
-        <div class="ct">메모 스티커 · No.03</div>
-        <h3>서티 설탕 눈마을 스티커</h3>
-        <p class="desc">눈 내리는 작은 마을을 담은 다이컷 메모 스티커. 다이어리 한 켠, 편지 봉투 어디에 붙여도 잘 어울립니다.</p>
-        <div class="spec"><span class="k">사이즈</span><span>135 × 105 mm</span></div>
-        <div class="spec"><span class="k">소재</span><span>아트지 다이컷 / 유광 코팅</span></div>
-        <div class="spec"><span class="k">발매</span><span>2026.02</span></div>
-        <div class="spec"><span class="k">상태</span><span style="display:inline-flex;align-items:center;gap:7px"><span style="width:7px;height:7px;border-radius:50%;background:#7fd296;display:inline-block"></span>재고 있음</span></div>
-      </div>
-    </div>
+  <div style="background:var(--paper);padding:80px 30px;text-align:center;border:1px solid var(--line);margin-top:20px">
+    <div style="font-size:42px;margin-bottom:14px;opacity:.5">🎨</div>
+    <h2 style="font-size:20px;font-weight:800;letter-spacing:-.015em;margin-bottom:8px">아직 등록된 작품이 없어요</h2>
+    <p style="font-size:13.5px;color:var(--sub);line-height:1.7">어드민 → 상품 관리에서 작품을 추가하면<br>여기에 카드 그리드로 표시됩니다.</p>
   </div>
 </section>
 
@@ -226,21 +193,8 @@
 </footer>
 
 <script>
-// 재고 상태(state): in=재고 있음 / out=일시품절 / disc=단종
-const products=[
- {c:"메모 스티커",n:"롱 메모 스티커팩",t:"new",state:"in",img:"202602/bc4816b7234830cacfd8e73dbc81ebcb"},
- {c:"메모 스티커",n:"스위티 메모 스티커팩",t:"new",state:"in",img:"202602/3d92c3f2ae8a816bb0aaf8374372b46a"},
- {c:"메모 스티커",n:"설탕 눈마을 스티커",t:"best",state:"in",img:"202602/a157d261092510f1542550274972a939"},
- {c:"메모 스티커",n:"학교괴담 스티커",t:"new",state:"in",img:"202602/8844055f11daba2bd37b69a6150cdac6"},
- {c:"메모 스티커",n:"메모빈티지 스티커팩",t:"",state:"out",img:"202602/3dba9ab4bcc29cf34566d08a48284e13"},
- {c:"조각 스티커",n:"초록책장 스티커",t:"best",state:"in",img:"202512/6df4ff16a044b3cd8dde5d8b78447e35"},
- {c:"메모 스티커",n:"다이어리 스티코",t:"",state:"in",img:"202512/cb676b86854d5dc018ea0576b99c897a"},
- {c:"메모 스티커",n:"선샤인데이 스티커",t:"best",state:"in",img:"202508/d9342a7de8b65e19f073f6f99139560d"},
- {c:"마스킹테이프",n:"키스컷 마스킹테이프 2",t:"new",state:"in",img:"202508/13260f931f04e15ddc8bb56a20dc0e90"},
- {c:"투명스티커",n:"냠냠만두 투명 스티커",t:"",state:"in",img:"202410/e80feba7a57b4fcf1a3364e5cfbb40d6"},
- {c:"키링·굿즈",n:"크레페 말랑 키링",t:"",state:"disc",img:"202503/58dafda9eee23c1a553c073971af033c"},
- {c:"메모 스티커",n:"눈송이 여행 스티커",t:"new",state:"in",img:"202602/655ded5da50146cf19dbaa537f0378da"},
-];
+// 제품 데이터는 어드민에서 추가하면 Supabase products 테이블에서 로드 예정
+const products = [];
 const stateMap={
   in:  {cls:"in",  label:"재고 있음", note:""},
   out: {cls:"out", label:"일시품절", note:"재입고 예정"},
