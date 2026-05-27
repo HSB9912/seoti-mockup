@@ -10,10 +10,18 @@
   if (!sb) return;
 
   const current = (location.pathname.split('/').pop() || '').toLowerCase();
+  const currentGo = new URLSearchParams(location.search).get('go') || '';
 
   function item(label, icon, href, opts) {
     opts = opts || {};
-    const isCurrent = (opts.match || href).toLowerCase() === current;
+    // active 판정: 파일명 일치 + ?go 도 일치 (href 에 ?go 있으면)
+    const hrefFile = (opts.match || href.split('?')[0]).toLowerCase();
+    const hrefGo = new URLSearchParams(href.split('?')[1] || '').get('go') || '';
+    const fileMatches = hrefFile === current;
+    const goMatches = hrefGo
+      ? hrefGo === currentGo                       // href 에 ?go=X 있으면 정확히 X 와만 일치
+      : !currentGo;                                // href 에 ?go 없으면 ?go 없는 URL 에서만 active
+    const isCurrent = fileMatches && goMatches;
     const cls = 'item' + (isCurrent ? ' on' : '') + (opts.alert ? ' alert' : '');
     const badge = opts.badge
       ? `<span class="badge">${opts.badge}</span>`
@@ -63,7 +71,8 @@
 
       ${gh('비즈니스', 'Business')}
       ${item('대시보드·정산', '📊', 'admin-business.html')}
-      ${item('입점처·세금·관리비', '🧾', 'admin-business.html')}
+      ${item('입점처 관리',   '🏪', 'admin-business.html?go=vendors')}
+      ${item('세금·관리비',   '🧾', 'admin-business.html?go=tax')}
 
       ${gh('사이트 콘텐츠', 'Site')}
       ${item('콘텐츠 편집 (CMS)', '📝', 'admin-content.html')}

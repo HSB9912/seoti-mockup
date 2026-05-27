@@ -628,6 +628,19 @@ function renderTax(){
 // ====================== ROUTING & EVENTS ======================
 const labels = {overview:"대시보드", vendors:"입점처 관리", settlements:"정산 관리", tax:"세금·관리비"};
 
+// URL ?go=X 로 탭 자동 전환
+function activateBizTab(k){
+  if(!k) return;
+  document.querySelectorAll('.sect').forEach(s => s.classList.toggle('on', s.dataset.s === k));
+  document.querySelectorAll('.item[data-go]').forEach(a => a.classList.toggle('on', a.dataset.go === k));
+  const crumb = document.getElementById('crumbNow');
+  if (crumb && labels[k]) crumb.textContent = labels[k];
+}
+(function(){
+  const p = new URLSearchParams(location.search).get('go');
+  if (p) setTimeout(() => activateBizTab(p), 50);
+})();
+
 document.addEventListener('click', e => {
   const gh = e.target.closest('.gh');
   if (gh) { gh.parentElement.classList.toggle('open'); return; }
@@ -635,9 +648,7 @@ document.addEventListener('click', e => {
   const go = e.target.closest('[data-go]');
   if (go) {
     const k = go.dataset.go;
-    document.querySelectorAll('.sect').forEach(s => s.classList.toggle('on', s.dataset.s === k));
-    document.querySelectorAll('.item[data-go]').forEach(a => a.classList.toggle('on', a.dataset.go === k));
-    document.getElementById('crumbNow').textContent = labels[k] || "";
+    activateBizTab(k);
     document.querySelector('.content')?.scrollTo?.({top:0});
     return;
   }

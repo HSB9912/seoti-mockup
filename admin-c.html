@@ -325,11 +325,11 @@
       <section class="sect" data-s="products">
         <div class="ph">
           <span class="ico">🏷</span>
-          <h1>전체 상품 <small>43개 · 판매중 39</small></h1>
-          <p class="desc">표 형태로 빠르게 훑고, 셀을 클릭해 인라인 편집할 수 있습니다.</p>
+          <h1>전체 상품 <small id="prodSummary">불러오는 중…</small></h1>
+          <p class="desc">표 형태로 빠르게 훑고, 우상단 "＋ 새 상품"으로 추가하세요. Supabase products 테이블에서 실시간 로드.</p>
           <div class="meta">
-            <div><b>판매중</b><span>39</span></div><div><b>품절</b><span>1</span></div>
-            <div><b>비공개</b><span>3</span></div><div><b>이번 달 신상</b><span>5</span></div>
+            <div><b>판매중</b><span id="prodInCount">—</span></div><div><b>품절</b><span id="prodOutCount">—</span></div>
+            <div><b>단종</b><span id="prodDiscCount">—</span></div><div><b>이번 달 신상</b><span id="prodNewCount">—</span></div>
           </div>
         </div>
         <div class="blk">
@@ -360,33 +360,32 @@
         <div class="ph">
           <span class="ico">＋</span>
           <h1>새 상품 추가</h1>
-          <p class="desc">정보를 입력하면 자동 저장됩니다. <b style="color:var(--ink)">⌘ S</b>로 등록 완료.</p>
+          <p class="desc">대표 이미지를 끌어다놓고 정보 입력 후 <b style="color:var(--ink)">＋ 등록</b>. R2 에 즉시 업로드되고 Supabase products 테이블에 저장돼요.</p>
         </div>
+        <div id="addErr" style="display:none;background:#fdebeb;border:1px solid #f0b3b3;color:var(--bad);padding:10px 14px;border-radius:6px;font-size:13px;margin-bottom:14px"></div>
         <div style="display:grid;grid-template-columns:240px 1fr;gap:24px;align-items:flex-start">
           <div>
-            <div class="img-up">📷<br>대표 이미지<br><small style="color:var(--faint)">1000×1000 권장</small></div>
-            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:6px">
-              <div class="img-up" style="aspect-ratio:1;padding:6px;font-size:11px">＋</div>
-              <div class="img-up" style="aspect-ratio:1;padding:6px;font-size:11px">＋</div>
-              <div class="img-up" style="aspect-ratio:1;padding:6px;font-size:11px">＋</div>
-            </div>
+            <label class="img-up" id="addImgZone" style="cursor:pointer;display:block">
+              <div id="addImgPreview" style="display:none"><img id="addImgImg" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:4px"></div>
+              <div id="addImgPrompt">📷<br>대표 이미지<br><small style="color:var(--faint)">JPG·PNG · 끌어놓기·클릭</small></div>
+              <input id="addImgFile" type="file" accept="image/*" style="display:none">
+            </label>
           </div>
           <div>
-            <div class="nb"><label>상품명</label><input placeholder="예: 서티 설탕 눈마을 스티커"></div>
+            <div class="nb"><label>상품명 *</label><input id="addName" placeholder="예: 설탕 눈마을 스티커"></div>
             <div class="frow">
-              <div class="nb"><label>카테고리</label><select><option>메모 스티커</option><option>마스킹테이프</option><option>투명스티커</option><option>키링·굿즈</option><option>조각 스티커</option></select></div>
-              <div class="nb"><label>가격 (₩)</label><input type="number" placeholder="3500"></div>
+              <div class="nb"><label>카테고리</label><select id="addCat"><option>메모 스티커</option><option>마스킹테이프</option><option>투명스티커</option><option>키링·굿즈</option><option>조각 스티커</option></select></div>
+              <div class="nb"><label>가격 (₩)</label><input id="addPrice" type="number" placeholder="3500"></div>
             </div>
             <div class="frow">
-              <div class="nb"><label>초기 재고</label><input type="number" placeholder="50"></div>
-              <div class="nb"><label>안전재고</label><input type="number" placeholder="10"></div>
+              <div class="nb"><label>초기 재고</label><input id="addStock" type="number" placeholder="50" value="0"></div>
+              <div class="nb"><label>안전재고</label><input id="addSafe" type="number" placeholder="10" value="10"></div>
             </div>
-            <div class="nb"><label>상세 설명</label><textarea placeholder="고객에게 보일 설명..."></textarea></div>
-            <div class="nb"><label>태그</label><input placeholder="다꾸, 메모, 신상"></div>
+            <div class="nb"><label>상세 설명</label><textarea id="addDesc" placeholder="고객에게 보일 설명..."></textarea></div>
+            <div class="nb"><label>태그 (콤마 구분)</label><input id="addTags" placeholder="다꾸, 메모, 신상"></div>
             <div class="actions" style="margin-top:14px;justify-content:flex-end">
               <button class="btn" data-go="products">취소</button>
-              <button class="btn">임시 저장</button>
-              <button class="btn btn-p">＋ 등록</button>
+              <button class="btn btn-p" id="addSubmit">＋ 등록</button>
             </div>
           </div>
         </div>
@@ -396,15 +395,15 @@
       <section class="sect" data-s="bulk">
         <div class="ph">
           <span class="ico">📋</span>
-          <h1>Group Order 견적 <small>5건 대기 · 평균 회신 18h</small></h1>
+          <h1>Group Order 견적 <small id="bulkSummary">아직 견적 요청 없음</small></h1>
           <p class="desc">고객이 보낸 견적 요청을 한 줄씩 확인하고, 클릭해서 금액·배송정보를 입력 후 회신할 수 있어요.</p>
         </div>
-        <div class="blk">
-          <div class="bo-row" style="background:var(--hover)"><span class="ref mono">A4K9</span><div class="who"><b>jenn*</b><small>🇺🇸 US · 인스타 DM · 5월 21 14:23</small></div><div class="it">12품목 · 84개<br><small style="color:var(--sub)">설탕 눈마을 ×10 · 스위티 ×8 · 외 10건</small></div><div><span class="tag warn">견적 대기</span></div><div class="actions"><button class="btn">상세</button><button class="btn btn-p">📧 견적</button></div></div>
-          <div class="bo-row"><span class="ref mono">B8M2</span><div class="who"><b>송*이</b><small>🇰🇷 KR · 카톡 · 5월 21 11:08</small></div><div class="it">5품목 · 40개<br><small style="color:var(--sub)">예상 ₩140,000</small></div><div><span class="tag ink">입금대기</span></div><div class="actions"><button class="btn">상세</button><button class="btn">✓ 입금확인</button></div></div>
-          <div class="bo-row"><span class="ref mono">C3R7</span><div class="who"><b>yui*</b><small>🇯🇵 JP · 이메일 · 5월 21 09:32</small></div><div class="it">8품목 · 56개</div><div><span class="tag warn">견적 대기</span></div><div class="actions"><button class="btn">상세</button><button class="btn btn-p">📧 견적</button></div></div>
-          <div class="bo-row"><span class="ref mono">D1L4</span><div class="who"><b>지혜*</b><small>🇰🇷 KR · 이메일</small></div><div class="it">3품목 · 25개</div><div><span class="tag ok">발송중</span></div><div class="actions"><button class="btn">운송장</button></div></div>
-          <div class="bo-row"><span class="ref mono">E7N0</span><div class="who"><b>mary*</b><small>🇪🇺 EU · 이메일</small></div><div class="it">10품목 · 70개</div><div><span class="tag warn">견적 대기</span></div><div class="actions"><button class="btn">상세</button><button class="btn btn-p">📧 견적</button></div></div>
+        <div class="blk" id="bulkList">
+          <div style="padding:60px 30px;text-align:center;color:var(--sub);background:var(--paper);border:1px solid var(--line);border-radius:8px">
+            <div style="font-size:42px;margin-bottom:14px;opacity:.5">📋</div>
+            <b>아직 도착한 견적 요청이 없어요</b>
+            <p style="font-size:13px;margin-top:6px">고객이 손님 사이트 Group Order에서 견적을 보내면 여기에 표시됩니다.</p>
+          </div>
         </div>
       </section>
 
@@ -412,27 +411,14 @@
       <section class="sect" data-s="qna">
         <div class="ph">
           <span class="ico">💬</span>
-          <h1>Q&A 답변 <small>미답변 8건</small></h1>
-          <p class="desc">평일 기준 1~2일 내 답변을 목표로 운영중이에요. 자주쓰는 답변을 등록해두면 클릭으로 삽입 가능합니다.</p>
+          <h1>Q&A 답변 <small id="qnaSummary">아직 문의 없음</small></h1>
+          <p class="desc">평일 기준 1~2일 내 답변을 목표로 운영. 자주쓰는 답변 등록해두면 클릭으로 삽입 가능합니다.</p>
         </div>
-        <div class="blk">
-          <div class="qn">
-            <div class="h"><span class="tag warn">대기 5일</span><span class="tag">결제</span><h4>무통장입금 입금자명을 잘못 적었어요</h4><span class="m">jihye* · 2026-05-17</span></div>
-            <p>주문번호 #2026-0517-021 인데 입금자명을 회사명으로 적어버렸어요. 어떻게 해야 하나요?</p>
-            <textarea placeholder="답변을 작성하세요... (⌘+J: 자주쓰는 답변)"></textarea>
-            <div class="ra"><button class="btn">초안</button><button class="btn btn-p">답변 등록</button></div>
-          </div>
-          <div class="qn">
-            <div class="h"><span class="tag warn">대기 7일</span><span class="tag">해외</span><span class="tag bad">🔒</span><h4>콜라보 문의는 어디로 드리면 되나요?</h4><span class="m">agency* · 2026-05-14</span></div>
-            <p>안녕하세요. 캐릭터 콜라보 관련 미팅 요청드리고 싶은데, 담당자 메일을 알려주실 수 있을까요?</p>
-            <textarea placeholder="답변을 작성하세요..."></textarea>
-            <div class="ra"><button class="btn">초안</button><button class="btn btn-p">답변 등록</button></div>
-          </div>
-          <div class="qn">
-            <div class="h"><span class="tag warn">대기 2일</span><span class="tag">배송</span><h4>주문한 게 아직 도착을 안했어요</h4><span class="m">유빈* · 2026-05-19</span></div>
-            <p>#2026-0518-014 주문건인데 운송장 조회가 안돼요...</p>
-            <textarea placeholder="답변을 작성하세요..."></textarea>
-            <div class="ra"><button class="btn">초안</button><button class="btn btn-p">답변 등록</button></div>
+        <div class="blk" id="qnaList">
+          <div style="padding:60px 30px;text-align:center;color:var(--sub);background:var(--paper);border:1px solid var(--line);border-radius:8px">
+            <div style="font-size:42px;margin-bottom:14px;opacity:.5">💬</div>
+            <b>아직 문의가 없어요</b>
+            <p style="font-size:13px;margin-top:6px">고객이 QnA에 글을 남기면 여기에서 답변할 수 있습니다.</p>
           </div>
         </div>
       </section>
@@ -441,39 +427,27 @@
       <section class="sect" data-s="analytics">
         <div class="ph">
           <span class="ico">📈</span>
-          <h1>판매 실적 <small>이번 달 — May 2026</small></h1>
-          <p class="desc">매출은 전월 대비 18.4% 증가. 신상 5종이 메인 견인. 자세한 항목은 표를 클릭해 드릴다운하세요.</p>
+          <h1>판매 실적 <small id="analyticsRange">아직 데이터 없음</small></h1>
+          <p class="desc">주문이 들어오면 매출·국가·카테고리·재방문율 등이 자동 집계됩니다. orders 테이블 연동 후 활성화됩니다.</p>
         </div>
         <div class="blk">
           <h2>요약</h2>
           <div class="kpi-list">
-            <div class="ki"><div class="k">총 매출</div><div class="v mono">₩7,234,500</div><div class="d">▲ 18.4%</div></div>
-            <div class="ki"><div class="k">주문 건수</div><div class="v mono">587</div><div class="d">▲ 22.1%</div></div>
-            <div class="ki"><div class="k">평균 객단가</div><div class="v mono">₩12,260</div><div class="d">▲ ₩340</div></div>
-            <div class="ki"><div class="k">재방문율</div><div class="v mono">42%</div><div class="d">▲ 3.1%p</div></div>
+            <div class="ki"><div class="k">총 매출</div><div class="v mono">—</div><div class="d">—</div></div>
+            <div class="ki"><div class="k">주문 건수</div><div class="v mono">—</div><div class="d">—</div></div>
+            <div class="ki"><div class="k">평균 객단가</div><div class="v mono">—</div><div class="d">—</div></div>
+            <div class="ki"><div class="k">재방문율</div><div class="v mono">—</div><div class="d">—</div></div>
           </div>
         </div>
         <div class="blk">
           <h2>카테고리별 매출 비중</h2>
-          <div style="font-size:13px">
-            <div class="pgs" style="padding:7px 0"><span style="width:96px;color:var(--sub)">메모 스티커</span><div class="pbar"><div style="width:52%"></div></div><b class="mono">52%</b><span style="color:var(--sub)" class="mono">₩3.7M</span></div>
-            <div class="pgs" style="padding:7px 0"><span style="width:96px;color:var(--sub)">마스킹테이프</span><div class="pbar"><div style="width:24%"></div></div><b class="mono">24%</b><span style="color:var(--sub)" class="mono">₩1.7M</span></div>
-            <div class="pgs" style="padding:7px 0"><span style="width:96px;color:var(--sub)">조각 스티커</span><div class="pbar"><div style="width:14%"></div></div><b class="mono">14%</b><span style="color:var(--sub)" class="mono">₩1.0M</span></div>
-            <div class="pgs" style="padding:7px 0"><span style="width:96px;color:var(--sub)">투명스티커</span><div class="pbar"><div style="width:6%"></div></div><b class="mono">6%</b><span style="color:var(--sub)" class="mono">₩432k</span></div>
-            <div class="pgs" style="padding:7px 0"><span style="width:96px;color:var(--sub)">키링·굿즈</span><div class="pbar"><div style="width:4%"></div></div><b class="mono">4%</b><span style="color:var(--sub)" class="mono">₩293k</span></div>
-          </div>
+          <div style="padding:30px;text-align:center;color:var(--sub);font-size:13px">판매 데이터가 쌓이면 여기에 카테고리별 비중이 표시됩니다.</div>
         </div>
         <div class="blk">
           <h2>국가별 분포</h2>
           <table class="t">
             <thead><tr><th>국가</th><th>주문</th><th>매출</th><th>비중</th><th>전월 대비</th></tr></thead>
-            <tbody>
-              <tr><td>🇰🇷 한국</td><td class="mono">432</td><td class="mono">₩5,309,800</td><td class="mono">74%</td><td><span class="tag ok">▲ 14%</span></td></tr>
-              <tr><td>🇯🇵 일본</td><td class="mono">71</td><td class="mono">₩864,400</td><td class="mono">12%</td><td><span class="tag ok">▲ 31%</span></td></tr>
-              <tr><td>🇺🇸 미국</td><td class="mono">44</td><td class="mono">₩648,200</td><td class="mono">9%</td><td><span class="tag ok">▲ 8%</span></td></tr>
-              <tr><td>🇪🇺 유럽</td><td class="mono">22</td><td class="mono">₩324,100</td><td class="mono">4%</td><td><span class="tag ok">▲ 5%</span></td></tr>
-              <tr><td>기타</td><td class="mono">18</td><td class="mono">₩88,000</td><td class="mono">1%</td><td><span>—</span></td></tr>
-            </tbody>
+            <tbody><tr><td colspan="5" style="padding:30px;text-align:center;color:var(--sub)">한국 내 배송이 시작되면 여기에 표시됩니다.</td></tr></tbody>
           </table>
         </div>
       </section>
@@ -482,53 +456,217 @@
   </div>
 </div>
 
+<script src="assets/uploader.js"></script>
 <script>
-const products=[
- {n:"롱 메모 스티커팩",c:"메모 스티커",p:3500,s:42,safe:10,img:"202602/bc4816b7234830cacfd8e73dbc81ebcb"},
- {n:"스위티 메모 스티커팩",c:"메모 스티커",p:3500,s:18,safe:10,img:"202602/3d92c3f2ae8a816bb0aaf8374372b46a"},
- {n:"설탕 눈마을 스티커",c:"메모 스티커",p:3500,s:6,safe:10,img:"202602/a157d261092510f1542550274972a939"},
- {n:"학교괴담 스티커",c:"메모 스티커",p:3500,s:31,safe:10,img:"202602/8844055f11daba2bd37b69a6150cdac6"},
- {n:"메모빈티지 스티커팩",c:"메모 스티커",p:2500,s:24,safe:10,img:"202602/3dba9ab4bcc29cf34566d08a48284e13"},
- {n:"초록책장 스티커",c:"조각 스티커",p:3500,s:3,safe:10,img:"202512/6df4ff16a044b3cd8dde5d8b78447e35"},
- {n:"다이어리 스티코",c:"메모 스티커",p:3500,s:55,safe:10,img:"202512/cb676b86854d5dc018ea0576b99c897a"},
- {n:"선샤인데이 스티커",c:"메모 스티커",p:3500,s:9,safe:10,img:"202508/d9342a7de8b65e19f073f6f99139560d"},
- {n:"키스컷 마테 2",c:"마스킹테이프",p:6500,s:27,safe:10,img:"202508/13260f931f04e15ddc8bb56a20dc0e90"},
- {n:"마스킹테이프 4type",c:"마스킹테이프",p:4500,s:36,safe:10,img:"202508/383bee900dbacb6369f996fc668c0f42"},
- {n:"냠냠만두 투명 스티커",c:"투명스티커",p:3000,s:14,safe:10,img:"202410/e80feba7a57b4fcf1a3364e5cfbb40d6"},
- {n:"크레페 말랑 키링",c:"키링·굿즈",p:2500,s:0,safe:5,img:"202503/58dafda9eee23c1a553c073971af033c"},
-];
+// ===== Supabase client (lib lazy-loaded by uploader.js, then reused) =====
+let products = [];
+async function getSb(){
+  if (window.__sttySb) return window.__sttySb;
+  if (!window.supabase) {
+    await new Promise((res, rej) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
+      s.onload = res; s.onerror = () => rej(new Error('Supabase lib load failed'));
+      document.head.appendChild(s);
+    });
+  }
+  window.__sttySb = window.supabase.createClient(
+    'https://wzmtcomawebufylojffx.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6bXRjb21hd2VidWZ5bG9qZmZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NTg5MjcsImV4cCI6MjA5NTQzNDkyN30.6P0ZSLTU7XPudr9Ove2S0Nc5XO7pdb87LUVDdVJKmEM',
+    { auth: { persistSession: true, autoRefreshToken: true, storageKey: 'sb-wzmtcomawebufylojffx-auth-token' } }
+  );
+  return window.__sttySb;
+}
+
+async function loadProducts(){
+  try {
+    const sb = await getSb();
+    const { data, error } = await sb.from('products')
+      .select('id,name,category,price,image_url,image_id,state,stock,safe_stock,created_at')
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    products = (data || []).map(p => ({
+      id: p.id, n: p.name, c: p.category, p: p.price,
+      img: p.image_url || p.image_id || '',
+      s: p.stock || 0, safe: p.safe_stock || 10,
+      state: p.state, createdAt: p.created_at,
+    }));
+  } catch(e) {
+    console.error('상품 로드 실패', e);
+    products = [];
+  }
+  renderProductTables();
+  updateProductSummary();
+}
+
+function updateProductSummary(){
+  const total = products.length;
+  const inStock = products.filter(p => p.state !== 'disc' && p.s > 0).length;
+  const outStock = products.filter(p => p.state !== 'disc' && p.s === 0).length;
+  const disc = products.filter(p => p.state === 'disc').length;
+  const now = new Date(); now.setDate(1);
+  const newThisMonth = products.filter(p => p.createdAt && new Date(p.createdAt) >= now).length;
+  document.getElementById('prodSummary').textContent = `${total}개 · 판매중 ${inStock}`;
+  document.getElementById('prodInCount').textContent = inStock;
+  document.getElementById('prodOutCount').textContent = outStock;
+  document.getElementById('prodDiscCount').textContent = disc;
+  document.getElementById('prodNewCount').textContent = newThisMonth;
+}
 function statTag(s,safe){
   if(s===0)return `<span class="tag bad">품절</span>`;
   if(s<=5)return `<span class="tag warn">⚠ 임박</span>`;
   if(s<=safe)return `<span class="tag warn">부족</span>`;
   return `<span class="tag ok">판매중</span>`;
 }
-const trows=h=>`<thead>${h}</thead>`;
-document.getElementById('prodT').innerHTML=`
- <thead><tr><th></th><th>상품명</th><th>카테고리</th><th>가격</th><th>재고</th><th>판매</th><th>액션</th></tr></thead>
- <tbody>${products.map(p=>`<tr>
-   <td style="width:32px"><span class="thumb"><img referrerpolicy="no-referrer" src="https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/${p.img}.png"></span></td>
-   <td><span class="nm">${p.n}</span></td>
-   <td>${p.c}</td>
-   <td class="mono">₩${p.p.toLocaleString()}</td>
-   <td class="mono">${p.s}</td>
-   <td>${statTag(p.s,p.safe)}</td>
-   <td><span style="color:var(--sub);font-size:11px">편집 · 복제 · 숨김</span></td>
- </tr>`).join('')}</tbody>`;
-document.getElementById('stockT').innerHTML=`
- <thead><tr><th></th><th>상품명</th><th>현재고 / 안전</th><th>게이지</th><th>상태</th><th>최근 변동</th><th></th></tr></thead>
- <tbody>${products.map(p=>{
-   const pct=Math.min(100,p.s/p.safe*50);
-   const cls=p.s===0?'out':p.s<=p.safe?'low':'';
-   return `<tr>
-   <td style="width:32px"><span class="thumb"><img referrerpolicy="no-referrer" src="https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/${p.img}.png"></span></td>
-   <td><span class="nm">${p.n}</span></td>
-   <td class="mono"><b>${p.s}</b> <span style="color:var(--sub)">/ ${p.safe}</span></td>
-   <td><div class="pgs"><div class="pbar ${cls}" style="max-width:120px"><div style="width:${pct}%"></div></div></div></td>
-   <td>${statTag(p.s,p.safe)}</td>
-   <td><small class="mono" style="color:var(--sub)">${p.s===0?'-2 · 5/18':'-1 · 5/20'}</small></td>
-   <td><button class="btn">＋</button> <button class="btn">−</button></td>
- </tr>`;}).join('')}</tbody>`;
+function imgUrl(img){
+  if (!img) return '';
+  if (img.startsWith('http')) return img;
+  // 기존 image_id 형식 (folder/uuid) 이면 r2.dev URL 조립
+  return `https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/${img}`;
+}
+function renderProductTables(){
+  const empty = !products.length;
+  document.getElementById('prodT').innerHTML=`
+   <thead><tr><th></th><th>상품명</th><th>카테고리</th><th>가격</th><th>재고</th><th>판매</th><th>액션</th></tr></thead>
+   <tbody>${empty ? `<tr><td colspan="7" style="padding:40px;text-align:center;color:var(--sub)">아직 등록된 상품이 없어요. <b style="color:var(--accent);cursor:pointer" onclick="document.querySelector('[data-go=add]').click()">＋ 새 상품</b></td></tr>` : products.map(p=>`<tr>
+     <td style="width:32px"><span class="thumb">${p.img?`<img referrerpolicy="no-referrer" src="${imgUrl(p.img)}">`:''}</span></td>
+     <td><span class="nm">${p.n}</span></td>
+     <td>${p.c||'—'}</td>
+     <td class="mono">₩${(p.p||0).toLocaleString()}</td>
+     <td class="mono">${p.s}</td>
+     <td>${statTag(p.s,p.safe)}</td>
+     <td><span style="color:var(--sub);font-size:11px">편집 · 복제 · 숨김</span></td>
+   </tr>`).join('')}</tbody>`;
+  document.getElementById('stockT').innerHTML=`
+   <thead><tr><th></th><th>상품명</th><th>현재고 / 안전</th><th>게이지</th><th>상태</th><th></th></tr></thead>
+   <tbody>${empty ? `<tr><td colspan="6" style="padding:40px;text-align:center;color:var(--sub)">상품을 등록하면 여기에 표시됩니다.</td></tr>` : products.map(p=>{
+     const pct=Math.min(100,p.s/p.safe*50);
+     const cls=p.s===0?'out':p.s<=p.safe?'low':'';
+     return `<tr>
+     <td style="width:32px"><span class="thumb">${p.img?`<img referrerpolicy="no-referrer" src="${imgUrl(p.img)}">`:''}</span></td>
+     <td><span class="nm">${p.n}</span></td>
+     <td class="mono"><b>${p.s}</b> <span style="color:var(--sub)">/ ${p.safe}</span></td>
+     <td><div class="pgs"><div class="pbar ${cls}" style="max-width:120px"><div style="width:${pct}%"></div></div></div></td>
+     <td>${statTag(p.s,p.safe)}</td>
+     <td><button class="btn" data-stock-id="${p.id}" data-d="1">＋</button> <button class="btn" data-stock-id="${p.id}" data-d="-1">−</button></td>
+   </tr>`;}).join('')}</tbody>`;
+}
+renderProductTables();
+loadProducts();
+
+// ===== 새 상품 추가 폼 =====
+(function(){
+  let pendingImage = null; // File
+  let pendingPreviewUrl = null;
+  const zone = document.getElementById('addImgZone');
+  const fileInput = document.getElementById('addImgFile');
+  const preview = document.getElementById('addImgPreview');
+  const prompt = document.getElementById('addImgPrompt');
+  const previewImg = document.getElementById('addImgImg');
+
+  function setFile(f){
+    if (pendingPreviewUrl) URL.revokeObjectURL(pendingPreviewUrl);
+    pendingImage = f;
+    pendingPreviewUrl = URL.createObjectURL(f);
+    previewImg.src = pendingPreviewUrl;
+    preview.style.display = 'block';
+    prompt.style.display = 'none';
+  }
+  fileInput.addEventListener('change', e => { if (e.target.files[0]) setFile(e.target.files[0]); });
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.style.borderColor = 'var(--accent)'; });
+  zone.addEventListener('dragleave', () => { zone.style.borderColor = ''; });
+  zone.addEventListener('drop', e => {
+    e.preventDefault(); zone.style.borderColor = '';
+    if (e.dataTransfer.files[0]) setFile(e.dataTransfer.files[0]);
+  });
+
+  function showErr(msg){
+    const el = document.getElementById('addErr');
+    el.textContent = msg;
+    el.style.display = 'block';
+    setTimeout(() => el.style.display = 'none', 6000);
+  }
+  function slugify(s){
+    return s.toLowerCase().replace(/[^a-z0-9가-힣\s-]/g, '').replace(/\s+/g, '-').slice(0, 60) || `p-${Date.now()}`;
+  }
+
+  document.getElementById('addSubmit').addEventListener('click', async () => {
+    const name = document.getElementById('addName').value.trim();
+    const cat = document.getElementById('addCat').value;
+    const price = parseInt(document.getElementById('addPrice').value, 10) || 0;
+    const stock = parseInt(document.getElementById('addStock').value, 10) || 0;
+    const safe = parseInt(document.getElementById('addSafe').value, 10) || 10;
+    const desc = document.getElementById('addDesc').value.trim() || null;
+    const tags = document.getElementById('addTags').value.split(',').map(t => t.trim()).filter(Boolean);
+
+    if (!name) { showErr('상품명은 필수예요'); return; }
+
+    const btn = document.getElementById('addSubmit');
+    btn.disabled = true; btn.textContent = '등록 중…';
+    try {
+      let imageUrl = null, imageKey = null;
+      if (pendingImage) {
+        btn.textContent = '이미지 업로드 중…';
+        const r = await STTY.upload(pendingImage, { folder: 'products' });
+        imageUrl = r.publicUrl; imageKey = r.key;
+      }
+      btn.textContent = '저장 중…';
+      const sb = await getSb();
+      // unique slug — name + random 4 chars
+      const slug = slugify(name) + '-' + Math.random().toString(36).slice(2, 6);
+      const { error } = await sb.from('products').insert({
+        slug, name, category: cat, price,
+        stock, safe_stock: safe,
+        state: stock > 0 ? 'in' : 'out',
+        image_url: imageUrl, image_id: imageKey,
+        description: desc,
+        tags: tags.length ? tags : null,
+      });
+      if (error) throw error;
+      // reset form
+      ['addName','addPrice','addStock','addSafe','addDesc','addTags'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = id === 'addSafe' ? '10' : (id === 'addStock' ? '0' : '');
+      });
+      if (pendingPreviewUrl) URL.revokeObjectURL(pendingPreviewUrl);
+      pendingImage = null; pendingPreviewUrl = null;
+      preview.style.display = 'none'; prompt.style.display = 'block';
+      fileInput.value = '';
+      // refresh list + jump back to product tab
+      await loadProducts();
+      document.querySelector('[data-go="products"]').click();
+    } catch(e) {
+      console.error(e);
+      showErr('등록 실패 — ' + (e.message || e));
+    } finally {
+      btn.disabled = false; btn.textContent = '＋ 등록';
+    }
+  });
+
+  // 재고 +/- 버튼 (위임)
+  document.getElementById('stockT').addEventListener('click', async e => {
+    const btn = e.target.closest('[data-stock-id]');
+    if (!btn) return;
+    const id = +btn.dataset.stockId;
+    const delta = +btn.dataset.d;
+    const p = products.find(x => x.id === id);
+    if (!p) return;
+    const newStock = Math.max(0, p.s + delta);
+    btn.disabled = true;
+    try {
+      const sb = await getSb();
+      await sb.from('products').update({ stock: newStock, state: newStock === 0 ? 'out' : 'in' }).eq('id', id);
+      p.s = newStock;
+      renderProductTables();
+      updateProductSummary();
+    } catch(err) {
+      console.error(err);
+      alert('재고 변경 실패: ' + err.message);
+    } finally {
+      btn.disabled = false;
+    }
+  });
+})();
 
 const labels={dash:"대시보드",products:"상품",stock:"재고 관리",add:"새 상품 등록",
   bulk:"Group Order",qna:"Q&A",analytics:"판매 실적"};
