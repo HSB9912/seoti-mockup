@@ -31,8 +31,8 @@
 
   const html = `
     <div class="sb-h" style="padding:14px 14px 8px;display:flex;align-items:center;gap:8px">
-      <div class="av" style="width:24px;height:24px;border-radius:5px;background:#a06440;color:#fff;display:grid;place-items:center;font-weight:800;font-size:11px">서</div>
-      <b style="font-size:13.5px;font-weight:800">SEOTI</b>
+      <div class="av" style="width:24px;height:24px;border-radius:5px;background:#a06440;color:#fff;display:grid;place-items:center;font-weight:800;font-size:11px">S</div>
+      <b style="font-size:13.5px;font-weight:800">STTY</b>
       <small style="font-size:11px;color:#878680;margin-left:auto;font-weight:700">Admin</small>
     </div>
     <div style="margin:8px 10px 14px">
@@ -71,8 +71,8 @@
       ${item('DB 연동 전 체크', '✅', 'admin-checklist.html', { badge: '42', alert: true })}
     </div>
     <div class="sb-bot" style="padding:10px 14px;border-top:1px solid #ededeb;display:flex;align-items:center;gap:8px;font-size:12.5px;color:#878680">
-      <span style="width:18px;height:18px;background:#a06440;color:#fff;border-radius:3px;display:grid;place-items:center;font-size:10px;font-weight:800">서</span>
-      <span><b style="color:#202020;font-weight:700">서티</b> · 관리자</span>
+      <span style="width:18px;height:18px;background:#a06440;color:#fff;border-radius:3px;display:grid;place-items:center;font-size:10px;font-weight:800">S</span>
+      <span><b style="color:#202020;font-weight:700">STTY</b> · 관리자</span>
       <a id="adminLogout" style="margin-left:auto;cursor:pointer;font-size:11.5px;font-weight:600">잠그기</a>
     </div>
   `;

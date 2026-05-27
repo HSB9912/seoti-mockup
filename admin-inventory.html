@@ -5,7 +5,7 @@
 <script src="assets/admin-guard.js"></script>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>서티 SEOTI · Admin · 재고·입고 관리</title>
+<title>STTY · Admin · 재고·입고 관리</title>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css" />
 <style>
 :root{--bg:#fefefc;--paper:#fff;--ink:#202020;--sub:#878680;--faint:#d4d2cd;
@@ -154,7 +154,7 @@ table.t{width:100%;border-collapse:collapse;font-size:13px}
 
 <div class="app">
   <aside class="sb">
-    <div class="sb-h"><div class="av">서</div><b>SEOTI</b><small>Admin</small></div>
+    <div class="sb-h"><div class="av">S</div><b>STTY</b><small>Admin</small></div>
     <div class="sb-tree">
       <div class="gh">운영</div>
       <a class="item" href="admin-c.html"><span class="ico">▦</span>대시보드</a>
@@ -389,7 +389,7 @@ table.t{width:100%;border-collapse:collapse;font-size:13px}
       const numClass = s === 'out' ? 'out' : s === 'low' ? 'low' : s === 'disc' ? 'disc' : '';
       return `<tr data-id="${p.id}">
         <td><span class="thumb"><img referrerpolicy="no-referrer" src="${SEOTI.img(p.img)}"></span></td>
-        <td><span class="nm">서티 ${p.n}<small>ID #${p.id}</small></span></td>
+        <td><span class="nm">${p.n}<small>ID #${p.id}</small></span></td>
         <td><small>${p.c}</small></td>
         <td class="right">
           <span class="stock-cell">
@@ -430,7 +430,7 @@ table.t{width:100%;border-collapse:collapse;font-size:13px}
       return `<div class="hi">
         <span class="when">${when}<br><small style="color:var(--faint)">${date.getMonth()+1}/${date.getDate()} ${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}</small></span>
         <div class="what">
-          <b>서티 ${p ? p.n : '(삭제됨)'}</b>
+          <b>${p ? p.n : '(삭제됨)'}</b>
           ${h.note ? `<span class="note">— ${h.note}</span>` : ''}
         </div>
         <span class="delta ${h.delta>0?'up':'down'}">${h.delta>0?'+':''}${h.delta}개</span>
@@ -444,7 +444,7 @@ table.t{width:100%;border-collapse:collapse;font-size:13px}
     const sel = document.getElementById('qiProduct');
     sel.innerHTML = data.products
       .filter(p => stateOf(p) !== 'disc')
-      .map(p => `<option value="${p.id}">서티 ${p.n} (현재고 ${p.stock})</option>`).join('');
+      .map(p => `<option value="${p.id}">${p.n} (현재고 ${p.stock})</option>`).join('');
   }
 
   function renderAll(){
@@ -527,7 +527,7 @@ table.t{width:100%;border-collapse:collapse;font-size:13px}
     p.stock += qty;
     if (stateOf(p) !== 'disc') p.state = 'auto';
     logChange(pid, qty, note);
-    SEOTI.toast(`서티 ${p.n} +${qty}개 입고 완료 (현재 ${p.stock}개)`, 'success');
+    SEOTI.toast(`${p.n} +${qty}개 입고 완료 (현재 ${p.stock}개)`, 'success');
     document.getElementById('qiNote').value = '';
     renderAll();
   });
@@ -538,7 +538,7 @@ table.t{width:100%;border-collapse:collapse;font-size:13px}
 
   function openEdit(p){
     editingId = p.id;
-    document.getElementById('editTitle').textContent = `서티 ${p.n} 재고 조정`;
+    document.getElementById('editTitle').textContent = `${p.n} 재고 조정`;
     document.getElementById('editStock').value = p.stock;
     document.getElementById('editSafe').value = p.safe;
     document.getElementById('editState').value = p.state || 'auto';
@@ -562,7 +562,7 @@ table.t{width:100%;border-collapse:collapse;font-size:13px}
     p.state = newState;
     if (delta !== 0) logChange(p.id, delta, note || `수동 조정 (${p.stock}로 변경)`);
     modal.classList.remove('on');
-    SEOTI.toast(`서티 ${p.n} 업데이트 완료`, 'success');
+    SEOTI.toast(`${p.n} 업데이트 완료`, 'success');
     renderAll();
   });
 
@@ -570,7 +570,7 @@ table.t{width:100%;border-collapse:collapse;font-size:13px}
   document.getElementById('exportBtn').addEventListener('click', () => {
     const header = 'ID,제품명,카테고리,현재고,안전재고,상태\n';
     const rows = data.products.map(p =>
-      `${p.id},"서티 ${p.n}",${p.c},${p.stock},${p.safe},${stateOf(p)}`
+      `${p.id},"${p.n}",${p.c},${p.stock},${p.safe},${stateOf(p)}`
     ).join('\n');
     const blob = new Blob([header + rows], { type: 'text/csv;charset=utf-8' });
     const url = URL.createObjectURL(blob);

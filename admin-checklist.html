@@ -5,7 +5,7 @@
 <script src="assets/admin-guard.js"></script>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>서티 SEOTI · Admin · DB 연동 전 체크리스트</title>
+<title>STTY · Admin · DB 연동 전 체크리스트</title>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css" />
 <style>
 :root{--bg:#fefefc;--paper:#fff;--ink:#202020;--sub:#878680;--faint:#d4d2cd;
@@ -105,7 +105,7 @@ a{color:inherit;text-decoration:none}img{display:block;max-width:100%}
 
 <div class="app">
   <aside class="sb">
-    <div class="sb-h"><div class="av">서</div><b>SEOTI</b><small>Admin</small></div>
+    <div class="sb-h"><div class="av">S</div><b>STTY</b><small>Admin</small></div>
     <div class="sb-tree">
       <div class="grp">
         <div class="gh">운영</div>
@@ -133,7 +133,7 @@ a{color:inherit;text-decoration:none}img{display:block;max-width:100%}
       <div class="ph">
         <span class="ico">✅</span>
         <h1>DB 연동 전 체크리스트 <small>Pre-Launch</small></h1>
-        <p class="desc">Supabase·Cloudflare 연동 전에 점검할 항목들. 시안 단계에서 미뤄둔 보안·법·데이터 구조 의사결정을 한 자리에 모았습니다. 체크 상태는 자동 저장돼요.</p>
+        <p class="desc">정식 런칭 전 점검할 보안·법·데이터 구조 항목 모음. 체크 상태는 자동 저장돼요.</p>
       </div>
 
       <div class="actions-top">
@@ -513,8 +513,8 @@ a{color:inherit;text-decoration:none}img{display:block;max-width:100%}
         <div class="task" data-id="mig-4" data-pri="high">
           <input type="checkbox">
           <div class="body">
-            <b>작가 컬렉션 43개 → products</b>
-            <p>현재 시안은 sosorowa CDN 핫링크. 모든 이미지를 Cloudflare Images에 업로드 후 image_id 저장.</p>
+            <b>작가 컬렉션 → products 테이블 등록</b>
+            <p>모든 이미지를 Cloudflare R2 (stty-images) 에 업로드 후 image_id 저장.</p>
           </div>
           <span class="tag data">마이그</span>
         </div>

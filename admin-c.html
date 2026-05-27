@@ -5,7 +5,7 @@
 <script src="assets/admin-guard.js"></script>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>서티 SEOTI · 관리자 변형 C — 노션형 트리</title>
+<title>STTY · 관리자 변형 C — 노션형 트리</title>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css" />
 <style>
   :root{
@@ -188,7 +188,7 @@
   <aside class="sb">
     <div class="sb-h">
       <div class="av">서</div>
-      <b>SEOTI</b>
+      <b>STTY</b>
       <small>Admin</small>
     </div>
     <input class="sb-search" placeholder="Quick search... ⌘K">
@@ -259,7 +259,7 @@
     </div>
     <div class="sb-bot">
       <span style="width:18px;height:18px;background:var(--accent);color:#fff;border-radius:3px;display:grid;place-items:center;font-size:10px;font-weight:800">서</span>
-      <span><b>서티</b> · 관리자</span>
+      <span><b>STTY</b> · 관리자</span>
     </div>
   </aside>
 
@@ -518,7 +518,7 @@ document.getElementById('prodT').innerHTML=`
  <thead><tr><th></th><th>상품명</th><th>카테고리</th><th>가격</th><th>재고</th><th>판매</th><th>액션</th></tr></thead>
  <tbody>${products.map(p=>`<tr>
    <td style="width:32px"><span class="thumb"><img referrerpolicy="no-referrer" src="https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/${p.img}.png"></span></td>
-   <td><span class="nm">서티 ${p.n}</span></td>
+   <td><span class="nm">${p.n}</span></td>
    <td>${p.c}</td>
    <td class="mono">₩${p.p.toLocaleString()}</td>
    <td class="mono">${p.s}</td>
@@ -532,7 +532,7 @@ document.getElementById('stockT').innerHTML=`
    const cls=p.s===0?'out':p.s<=p.safe?'low':'';
    return `<tr>
    <td style="width:32px"><span class="thumb"><img referrerpolicy="no-referrer" src="https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/${p.img}.png"></span></td>
-   <td><span class="nm">서티 ${p.n}</span></td>
+   <td><span class="nm">${p.n}</span></td>
    <td class="mono"><b>${p.s}</b> <span style="color:var(--sub)">/ ${p.safe}</span></td>
    <td><div class="pgs"><div class="pbar ${cls}" style="max-width:120px"><div style="width:${pct}%"></div></div></div></td>
    <td>${statTag(p.s,p.safe)}</td>
