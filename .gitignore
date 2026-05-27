@@ -1,2 +1,7 @@
 .claude/settings.local.json
 supabase/.temp/
+_inventory_raw.json
+_q.json
+_import.js
+_seed*.js
+_analyze.js

@@ -318,6 +318,29 @@ table.t{width:100%;border-collapse:collapse;font-size:13px}
           <div class="ki alert"><div class="k">확인 필요</div><div class="v mono" id="sumPending">—</div><div class="d down" id="sumPendingCount">—</div></div>
         </div>
 
+        <!-- 빠른 정산 입력 (월별 누적) -->
+        <div style="background:linear-gradient(180deg,#fff8ef,#fff);border:1.5px solid #f0d9a0;border-radius:8px;padding:16px 20px;margin-bottom:18px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+            <b style="font-size:14px">＋ 정산 빠른 입력</b>
+            <small style="color:var(--sub);font-size:12px">입점처별 월 매출 입력 → settlements_monthly 즉시 반영</small>
+            <a id="qsTogglePaste" style="margin-left:auto;font-size:11.5px;color:var(--info);cursor:pointer;font-weight:700">📋 엑셀 붙여넣기</a>
+          </div>
+          <div id="qsRow" style="display:grid;grid-template-columns:1.5fr 1fr 1.5fr 1fr auto;gap:8px;align-items:center">
+            <select id="qsVendor" style="padding:9px 11px;border:1px solid var(--line);border-radius:5px;font-family:inherit;font-size:13px;outline:none;background:#fff"></select>
+            <input id="qsMonth" type="month" style="padding:8px 11px;border:1px solid var(--line);border-radius:5px;font-family:inherit;font-size:13px;outline:none;background:#fff">
+            <input id="qsAmount" type="number" min="0" placeholder="금액 (원)" style="padding:9px 11px;border:1px solid var(--line);border-radius:5px;font-family:'SF Mono',Menlo,monospace;font-size:13.5px;outline:none;background:#fff;text-align:right">
+            <input id="qsMemo" placeholder="메모 (선택)" style="padding:9px 11px;border:1px solid var(--line);border-radius:5px;font-family:inherit;font-size:13px;outline:none;background:#fff">
+            <button id="qsSubmit" class="btn btn-p" style="white-space:nowrap">＋ 저장</button>
+          </div>
+          <div id="qsPasteArea" style="display:none;margin-top:10px">
+            <small style="color:var(--sub);font-size:11.5px;display:block;margin-bottom:6px">엑셀에서 복사 → 아래에 붙여넣기. 형식: <code>매장명 ⇥ YYYY-MM ⇥ 금액</code> (1줄 = 1건). Tab 또는 콤마 구분.</small>
+            <textarea id="qsPasteText" rows="5" placeholder="본부대로	2026-01	1500000&#10;PLAY	2026-01	850000" style="width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:5px;font-family:'SF Mono',Menlo,monospace;font-size:12.5px;outline:none;background:#fff;resize:vertical"></textarea>
+            <button id="qsBulkSubmit" class="btn btn-p" style="margin-top:6px">＋ 일괄 저장</button>
+            <span id="qsBulkPreview" style="font-size:11.5px;color:var(--sub);margin-left:8px"></span>
+          </div>
+          <div id="qsResult" style="margin-top:8px;font-size:12.5px"></div>
+        </div>
+
         <div class="controls">
           <span class="seg"><a class="on" data-fs="all">전체</a><a data-fs="확인 필요">확인 필요 ⚠</a><a data-fs="완료">완료</a></span>
           <span class="seg"><a data-grp="flat">평면</a><a class="on" data-grp="month">월별</a><a data-grp="vendor">입점처별</a></span>
@@ -330,6 +353,52 @@ table.t{width:100%;border-collapse:collapse;font-size:13px}
 
         <div class="blk">
           <table class="t" id="settlementTable"></table>
+        </div>
+
+        <!-- 정산 수정 모달 -->
+        <div id="stEditModal" style="display:none;position:fixed;inset:0;background:rgba(20,18,15,.55);z-index:99999;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(6px)">
+          <div style="background:#fff;max-width:520px;width:100%;border-radius:10px;padding:28px 32px;box-shadow:0 30px 80px -20px rgba(0,0,0,.4)">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px">
+              <div>
+                <div style="font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)">EDIT SETTLEMENT</div>
+                <h2 id="stmTitle" style="font-size:20px;font-weight:800;margin-top:3px"></h2>
+                <small id="stmVendor" style="color:var(--sub);font-size:12px"></small>
+              </div>
+              <button id="stmClose" style="background:none;border:none;font-size:22px;color:var(--sub);cursor:pointer">✕</button>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+              <div><label style="font-size:11px;color:var(--sub);font-weight:700;display:block;margin-bottom:4px">정산일</label><input id="stmDate" type="date" style="width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:5px;font-family:inherit;font-size:13px"></div>
+              <div><label style="font-size:11px;color:var(--sub);font-weight:700;display:block;margin-bottom:4px">입금일</label><input id="stmPaid" type="date" style="width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:5px;font-family:inherit;font-size:13px"></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px">
+              <div><label style="font-size:11px;color:var(--sub);font-weight:700;display:block;margin-bottom:4px">총액 (₩)</label><input id="stmTotal" type="number" style="width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:5px;font-family:'SF Mono',Menlo,monospace;font-size:13px;text-align:right"></div>
+              <div><label style="font-size:11px;color:var(--sub);font-weight:700;display:block;margin-bottom:4px">공급가</label><input id="stmSupply" type="number" style="width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:5px;font-family:'SF Mono',Menlo,monospace;font-size:13px;text-align:right"></div>
+              <div><label style="font-size:11px;color:var(--sub);font-weight:700;display:block;margin-bottom:4px">부가세</label><input id="stmVat" type="number" style="width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:5px;font-family:'SF Mono',Menlo,monospace;font-size:13px;text-align:right"></div>
+            </div>
+            <div style="margin-bottom:14px">
+              <label style="font-size:11px;color:var(--sub);font-weight:700;display:block;margin-bottom:6px">상태</label>
+              <div style="display:flex;gap:6px" id="stmStatusGroup">
+                <a data-stm-status="확인 필요" class="btn">⚠ 확인 필요</a>
+                <a data-stm-status="완료" class="btn">✓ 완료</a>
+                <a data-stm-status="보류" class="btn">⏸ 보류</a>
+                <a data-stm-status="취소" class="btn">✕ 취소</a>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px;padding-top:14px;border-top:1px solid var(--line)">
+              <button id="stmDelete" class="btn" style="color:var(--bad);border-color:#f0b3b3">삭제</button>
+              <span style="flex:1"></span>
+              <button id="stmCancel" class="btn">취소</button>
+              <button id="stmSave" class="btn btn-p">저장</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 월별 누적 정산 (settlements_monthly) -->
+        <div class="blk" id="monthlyBlk" style="margin-top:30px">
+          <div class="blk-h"><h2>월별 누적 정산 <small id="monthlyCount" style="font-size:12px;color:var(--sub);font-weight:600;margin-left:6px"></small></h2>
+            <small style="color:var(--sub);font-size:12px">입점처별 월간 매출 합계 (settlements_monthly)</small>
+          </div>
+          <table class="t" id="monthlyTable"></table>
         </div>
       </section>
 
@@ -366,10 +435,13 @@ table.t{width:100%;border-collapse:collapse;font-size:13px}
 
 <script>
 // ====================== DATA ======================
-// Supabase 에서 비동기 로드 — 빈 배열로 시작 후 fetch 완료 시 채워짐
+// Supabase 에서 비동기 로드
 let VENDORS = [];
-let SETTLEMENTS = [];
+let SETTLEMENTS = [];     // legacy 개별 정산 (2026 Q1)
+let SETTLEMENTS_MONTHLY = [];  // 월별 누적
+let SHIPMENTS = [];
 let TAX = [];
+let vendorSearchQ = '';
 
 async function loadBizData(){
   try {
@@ -384,29 +456,55 @@ async function loadBizData(){
     const SB_URL = 'https://wzmtcomawebufylojffx.supabase.co';
     const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6bXRjb21hd2VidWZ5bG9qZmZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NTg5MjcsImV4cCI6MjA5NTQzNDkyN30.6P0ZSLTU7XPudr9Ove2S0Nc5XO7pdb87LUVDdVJKmEM';
     const sb = window.supabase.createClient(SB_URL, SB_KEY, {auth:{persistSession:true,autoRefreshToken:true,storageKey:'sb-wzmtcomawebufylojffx-auth-token'}});
-    const [v, s, t] = await Promise.all([
+    const [v, s, sm, sh, t] = await Promise.all([
       sb.from('vendors').select('*').order('id'),
       sb.from('settlements').select('*').order('id'),
+      sb.from('settlements_monthly').select('*').order('year_month',{ascending:false}),
+      sb.from('shipments').select('*').order('shipped_on',{ascending:false}),
       sb.from('tax_payments').select('*').order('id'),
     ]);
-    if (v.error || s.error || t.error) {
-      console.warn('biz load errors:', v.error, s.error, t.error);
-    }
     VENDORS = v.data || [];
     SETTLEMENTS = s.data || [];
+    SETTLEMENTS_MONTHLY = sm.data || [];
+    SHIPMENTS = sh.data || [];
     TAX = t.data || [];
-    // 페이지에서 정의한 render 함수들 재호출
+    window._bizSb = sb; // 빠른 입력 폼에서 재사용
     if (typeof renderOverview === 'function') renderOverview();
     if (typeof renderVendors === 'function') renderVendors();
     if (typeof renderSettlements === 'function') renderSettlements();
     if (typeof renderTax === 'function') renderTax();
+    if (typeof renderMonthly === 'function') renderMonthly();
+    if (typeof populateQs === 'function') populateQs();
   } catch (e) {
     console.error('biz 데이터 로드 실패', e);
   }
 }
-// 페이지 로드 후 데이터 fetch
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', loadBizData);
 else loadBizData();
+
+// vendor 별 통계 (legacy + monthly + shipments 합산)
+function vendorStatsOf(vendorName){
+  const monthly = SETTLEMENTS_MONTHLY.filter(s => s.vendor === vendorName);
+  const monthlyTotal = monthly.reduce((a,s) => a + (s.amount||0), 0);
+  const monthlyLatest = monthly.length ? monthly[0].year_month : null; // already sorted desc
+
+  const legacy = SETTLEMENTS.filter(s => s.vendor === vendorName);
+  const legacyTotal = legacy.reduce((a,s) => a + (s.total||0), 0);
+  const legacyPending = legacy.filter(s => s.status === '확인 필요').length;
+
+  const ships = SHIPMENTS.filter(s => s.vendor === vendorName);
+  const shipsTotal = ships.reduce((a,s) => a + (s.amount||0), 0);
+  const shipsLatest = ships.length ? ships[0].shipped_on : null;
+
+  return {
+    monthly, monthlyTotal, monthlyLatest,
+    legacy, legacyTotal, legacyPending,
+    ships, shipsTotal, shipsLatest,
+    cumTotal: monthlyTotal + legacyTotal,
+    cumCount: monthly.length + legacy.length,
+    pendingCount: legacyPending,
+  };
+}
 
 // ====================== HELPERS ======================
 const fmt = n => "₩" + n.toLocaleString();
@@ -494,42 +592,76 @@ function renderOverview(){
 
 // ====================== VENDORS ======================
 function renderVendors(){
-  // Calculate per-vendor totals
-  const vendorStats = {};
-  SETTLEMENTS.forEach(s => {
-    if (!vendorStats[s.vendor]) vendorStats[s.vendor] = {count:0, total:0, pending:0};
-    vendorStats[s.vendor].count++;
-    vendorStats[s.vendor].total += s.total;
-    if (s.status === "확인 필요") vendorStats[s.vendor].pending++;
-  });
+  // 검색 input 주입 (한 번만)
+  if (!document.getElementById('vendorSearchBar')) {
+    const bar = document.createElement('div');
+    bar.id = 'vendorSearchBar';
+    bar.style.cssText = 'display:flex;gap:8px;margin-bottom:12px;align-items:center;flex-wrap:wrap';
+    bar.innerHTML = `
+      <input id="vendorSearch" style="padding:8px 12px;border:1px solid var(--line);border-radius:5px;width:300px;font-family:inherit;outline:none" placeholder="🔍 매장명·사업자번호·전화·담당자 검색">
+      <span style="margin-left:auto;font-size:12px;color:var(--sub)" id="vendorCount"></span>
+    `;
+    document.getElementById('vendorTable').parentElement.insertBefore(bar, document.getElementById('vendorTable'));
+    document.getElementById('vendorSearch').addEventListener('input', e => {
+      vendorSearchQ = e.target.value.toLowerCase().trim();
+      renderVendors();
+    });
+  }
 
   const empty = !VENDORS.length;
+  // 검색 필터
+  const list = vendorSearchQ
+    ? VENDORS.filter(v => {
+        const hay = [v.name, v.biz_no, v.manager, v.phone, v.email, v.address, v.note].filter(Boolean).join(' ').toLowerCase();
+        return hay.includes(vendorSearchQ);
+      })
+    : VENDORS;
+  document.getElementById('vendorCount').textContent = empty ? '' : `${list.length}개${vendorSearchQ?' (검색됨)':''} / 전체 ${VENDORS.length}개`;
+
   const html = `
     <thead><tr>
-      <th class="check"><input type="checkbox"></th>
       <th>매장명 · 사업자번호</th>
-      <th>담당자</th>
-      <th>업종 / 카테고리</th>
-      <th>이메일</th>
+      <th>연락처</th>
       <th>수수료</th>
       <th class="right">누적 정산</th>
-      <th>정산 건수</th>
+      <th>최근 정산</th>
+      <th>발송</th>
+      <th>기타사항</th>
       <th></th>
     </tr></thead>
     <tbody>
-    ${empty ? `<tr><td colspan="9" style="padding:50px;text-align:center;color:var(--sub)">입점처 데이터를 불러오는 중이에요. 표시되지 않으면 관리자 로그인 상태인지 확인해주세요.</td></tr>` : VENDORS.map(v => {
-      const st = vendorStats[v.name] || {count:0, total:0, pending:0};
+    ${empty
+      ? `<tr><td colspan="8" style="padding:50px;text-align:center;color:var(--sub)">입점처 데이터를 불러오는 중이에요. 표시되지 않으면 관리자 로그인 확인.</td></tr>`
+      : !list.length
+        ? `<tr><td colspan="8" style="padding:40px;text-align:center;color:var(--sub)">검색 결과 없음. 다른 키워드로 시도해보세요.</td></tr>`
+        : list.map(v => {
+      const st = vendorStatsOf(v.name);
+      const noteShort = v.note ? (v.note.length > 30 ? v.note.slice(0,30)+'…' : v.note) : '';
+      const commission = v.commission_rate
+        ? `<span class="tag" style="background:#fff5e7;color:var(--accent);font-weight:800">${Math.round(v.commission_rate*100)}%</span>`
+        : v.commission
+          ? `<span class="tag" style="background:#fff5e7;color:var(--accent);font-weight:800">${v.commission}%</span>`
+          : `<span class="tag muted">미정</span>`;
+      const latestYM = st.monthlyLatest ? st.monthlyLatest.replace('-','년 ') + '월' : (st.legacy.length ? '2026 Q1' : '—');
       return `
-      <tr data-vendor="${v.name}" style="cursor:pointer" title="클릭하면 이 입점처의 정산만 보입니다">
-        <td class="check"><input type="checkbox"></td>
-        <td><span class="nm">${v.name}</span><br><small style="color:var(--sub);font-size:11px" class="mono">${v.biz_no||'—'}</small></td>
-        <td>${v.manager||'—'}<br><small style="color:var(--sub);font-size:11px">${v.address ? v.address.split(' ').slice(0,2).join(' ') : '—'}</small></td>
-        <td><small>${v.biz_type||'—'}</small><br><small style="color:var(--sub);font-size:11px">${v.biz_category||'—'}</small></td>
-        <td><small class="mono">${v.email||'—'}</small></td>
-        <td>${v.commission ? `<span class="tag" style="background:#fff5e7;color:var(--accent);font-weight:800">${v.commission}%</span>` : `<span class="tag muted">미정</span>`}</td>
-        <td class="tnum big mono">${st.total ? "₩"+st.total.toLocaleString() : "—"}</td>
-        <td><small>${st.count}건${st.pending ? ` <span class="tag bad" style="font-size:10px">⚠ ${st.pending}</span>` : ''}</small></td>
-        <td><a class="edit">편집</a></td>
+      <tr data-vendor="${v.name}" style="cursor:pointer" title="클릭하면 입점처 상세 정보 모달">
+        <td>
+          <span class="nm">${v.name}</span>
+          <br><small style="color:var(--sub);font-size:11px" class="mono">${v.biz_no||'—'}</small>
+        </td>
+        <td>
+          ${v.manager?`<b style="font-size:12.5px">${v.manager}</b><br>`:''}
+          ${v.phone?`<a href="tel:${v.phone}" onclick="event.stopPropagation()" style="color:var(--info);font-size:11.5px" class="mono">📞 ${v.phone}</a><br>`:''}
+          ${v.email?`<a href="mailto:${v.email}" onclick="event.stopPropagation()" style="color:var(--info);font-size:11px" class="mono">${v.email}</a>`:''}
+        </td>
+        <td>${commission}</td>
+        <td class="tnum big mono">${st.cumTotal ? "₩"+st.cumTotal.toLocaleString() : "—"}<br><small style="color:var(--sub);font-weight:600;font-size:11px">${st.cumCount}건${st.pendingCount?` <span class="tag bad" style="font-size:10px">⚠${st.pendingCount}</span>`:''}</small></td>
+        <td><small>${latestYM}</small></td>
+        <td>
+          ${st.ships.length?`<small><b>${st.ships.length}회</b><br><span style="color:var(--sub);font-size:11px">최근 ${st.shipsLatest||'—'}</span></small>`:'<small style="color:var(--sub)">—</small>'}
+        </td>
+        <td><small style="color:var(--sub);font-size:11.5px" title="${(v.note||'').replace(/"/g,'&quot;')}">${noteShort||'—'}</small></td>
+        <td><a class="edit">상세</a></td>
       </tr>`;
     }).join('')}
     </tbody>`;
@@ -571,17 +703,17 @@ function renderSettlements(){
   // GROUPING
   let bodyHTML = "";
   const rowHTML = s => `
-    <tr>
-      <td class="check"><input type="checkbox"></td>
+    <tr data-st-id="${s.id}" style="cursor:pointer" title="클릭해서 수정">
+      <td class="check"><input type="checkbox" onclick="event.stopPropagation()"></td>
       <td><span class="nm">${s.title}</span></td>
       <td>${s.vendor}</td>
-      <td class="mono"><small>${s.settlement_date}</small></td>
+      <td class="mono"><small>${s.settlement_date||'—'}</small></td>
       <td class="mono"><small style="color:${s.paid_date ? 'var(--ok)' : 'var(--sub)'}">${s.paid_date || "—"}</small></td>
-      <td class="tnum big mono">${s.total.toLocaleString()}</td>
-      <td class="tnum mono"><small>${s.supply.toLocaleString()}</small></td>
-      <td class="tnum mono"><small>${s.vat.toLocaleString()}</small></td>
+      <td class="tnum big mono">${(s.total||0).toLocaleString()}</td>
+      <td class="tnum mono"><small>${(s.supply||0).toLocaleString()}</small></td>
+      <td class="tnum mono"><small>${(s.vat||0).toLocaleString()}</small></td>
       <td>${statusTag(s.status)}</td>
-      <td><a class="edit">편집</a></td>
+      <td><a class="edit">수정</a></td>
     </tr>`;
 
   if (sGroupBy === "flat") {
@@ -838,11 +970,233 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && document.getElementById('vendorModal').style.display === 'flex') closeVendorModal();
 });
 
+// ====================== MONTHLY (settlements_monthly) ======================
+function renderMonthly(){
+  const tbl = document.getElementById('monthlyTable');
+  const cnt = document.getElementById('monthlyCount');
+  if (!tbl) return;
+  if (!SETTLEMENTS_MONTHLY.length) {
+    tbl.innerHTML = '<tbody><tr><td style="padding:40px;text-align:center;color:var(--sub)">월별 정산 데이터가 없어요. 위 "정산 빠른 입력"으로 추가하세요.</td></tr></tbody>';
+    if (cnt) cnt.textContent = '';
+    return;
+  }
+  if (cnt) cnt.textContent = `${SETTLEMENTS_MONTHLY.length}건`;
+  // pivot: rows = vendor, cols = year_month
+  const months = [...new Set(SETTLEMENTS_MONTHLY.map(s => s.year_month))].sort().reverse();
+  const vendors = [...new Set(SETTLEMENTS_MONTHLY.map(s => s.vendor))].sort();
+  const lookup = {};
+  SETTLEMENTS_MONTHLY.forEach(s => { lookup[s.vendor + '|' + s.year_month] = s; });
+  let html = `<thead><tr><th style="position:sticky;left:0;background:var(--paper);z-index:1">입점처</th>${months.map(m => `<th class="right">${m}</th>`).join('')}<th class="right" style="background:var(--ink);color:#fff">합계</th></tr></thead><tbody>`;
+  vendors.forEach(v => {
+    const row = months.map(m => lookup[v+'|'+m]);
+    const total = row.reduce((a,r) => a + (r?.amount||0), 0);
+    html += `<tr><td style="position:sticky;left:0;background:var(--paper);z-index:1"><b>${v}</b></td>${row.map(r => r ? `<td class="tnum mono"><span data-sm-edit="${r.id}" style="cursor:pointer" title="클릭해서 수정">${r.amount.toLocaleString()}</span></td>` : '<td style="color:var(--faint)" class="tnum">—</td>').join('')}<td class="tnum big mono" style="background:#fafaf7"><b>${total.toLocaleString()}</b></td></tr>`;
+  });
+  // 합계 row
+  const monthTotals = months.map(m => SETTLEMENTS_MONTHLY.filter(s => s.year_month === m).reduce((a,s)=>a+(s.amount||0),0));
+  const grand = monthTotals.reduce((a,v)=>a+v,0);
+  html += `<tr style="background:var(--ink);color:#fff"><td style="position:sticky;left:0;background:var(--ink);z-index:1"><b>월합계</b></td>${monthTotals.map(t => `<td class="tnum mono"><b>${t.toLocaleString()}</b></td>`).join('')}<td class="tnum mono"><b>${grand.toLocaleString()}</b></td></tr>`;
+  html += '</tbody>';
+  tbl.innerHTML = html;
+  tbl.style.fontSize = '12px';
+}
+
+// 셀 클릭 → 인라인 수정 (settlements_monthly)
+document.addEventListener('click', async e => {
+  const span = e.target.closest('[data-sm-edit]');
+  if (!span) return;
+  const id = +span.dataset.smEdit;
+  const cur = SETTLEMENTS_MONTHLY.find(s => s.id === id);
+  if (!cur) return;
+  const v = prompt(`${cur.vendor} · ${cur.year_month} 금액 수정`, cur.amount);
+  if (v === null) return;
+  const newAmt = parseInt(v.replace(/[^0-9]/g,''), 10) || 0;
+  if (!window._bizSb) return;
+  const { error } = await window._bizSb.from('settlements_monthly').update({amount:newAmt}).eq('id', id);
+  if (error) { alert('수정 실패: '+error.message); return; }
+  cur.amount = newAmt;
+  renderMonthly();
+});
+
+// ====================== SETTLEMENT EDIT MODAL ======================
+let stmEditingId = null;
+function openStmModal(id){
+  const s = SETTLEMENTS.find(x => x.id === id);
+  if (!s) return;
+  stmEditingId = id;
+  document.getElementById('stmTitle').textContent = s.title || '(제목 없음)';
+  document.getElementById('stmVendor').textContent = s.vendor;
+  document.getElementById('stmDate').value = s.settlement_date || '';
+  document.getElementById('stmPaid').value = s.paid_date || '';
+  document.getElementById('stmTotal').value = s.total || 0;
+  document.getElementById('stmSupply').value = s.supply || 0;
+  document.getElementById('stmVat').value = s.vat || 0;
+  // 상태 버튼 active
+  document.querySelectorAll('[data-stm-status]').forEach(b => {
+    const isOn = b.dataset.stmStatus === s.status;
+    b.classList.toggle('btn-p', isOn);
+  });
+  document.getElementById('stEditModal').style.display = 'flex';
+}
+function closeStmModal(){ document.getElementById('stEditModal').style.display = 'none'; stmEditingId = null; }
+
+// row 클릭 → 모달
+document.addEventListener('click', e => {
+  if (e.target.closest('input,button,a')) return;
+  const row = e.target.closest('tr[data-st-id]');
+  if (!row) return;
+  openStmModal(+row.dataset.stId);
+});
+
+// 상태 버튼 클릭
+document.querySelectorAll('[data-stm-status]').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('[data-stm-status]').forEach(x => x.classList.remove('btn-p'));
+    b.classList.add('btn-p');
+  });
+});
+
+// 자동 계산 — total 입력 시 공급가/부가세 자동 산출 (VAT 10%)
+document.getElementById('stmTotal')?.addEventListener('input', e => {
+  const total = parseInt(e.target.value, 10) || 0;
+  // 한국 부가세 10%: total = supply * 1.1 → supply = round(total/1.1), vat = total - supply
+  const supply = Math.round(total / 1.1);
+  const vat = total - supply;
+  document.getElementById('stmSupply').value = supply;
+  document.getElementById('stmVat').value = vat;
+});
+
+document.getElementById('stmClose')?.addEventListener('click', closeStmModal);
+document.getElementById('stmCancel')?.addEventListener('click', closeStmModal);
+document.getElementById('stEditModal')?.addEventListener('click', e => {
+  if (e.target.id === 'stEditModal') closeStmModal();
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && document.getElementById('stEditModal').style.display === 'flex') closeStmModal();
+});
+
+document.getElementById('stmSave')?.addEventListener('click', async () => {
+  if (!stmEditingId || !window._bizSb) return;
+  const status = document.querySelector('[data-stm-status].btn-p')?.dataset?.stmStatus;
+  const patch = {
+    settlement_date: document.getElementById('stmDate').value || null,
+    paid_date: document.getElementById('stmPaid').value || null,
+    total: parseInt(document.getElementById('stmTotal').value, 10) || 0,
+    supply: parseInt(document.getElementById('stmSupply').value, 10) || 0,
+    vat: parseInt(document.getElementById('stmVat').value, 10) || 0,
+    status: status || '확인 필요',
+  };
+  const btn = document.getElementById('stmSave'); btn.disabled = true; btn.textContent = '저장 중…';
+  const { error } = await window._bizSb.from('settlements').update(patch).eq('id', stmEditingId);
+  btn.disabled = false; btn.textContent = '저장';
+  if (error) { alert('저장 실패: '+error.message); return; }
+  const s = SETTLEMENTS.find(x => x.id === stmEditingId);
+  if (s) Object.assign(s, patch);
+  closeStmModal();
+  renderSettlements();
+  renderOverview();
+});
+
+document.getElementById('stmDelete')?.addEventListener('click', async () => {
+  if (!stmEditingId || !window._bizSb) return;
+  if (!confirm('정말 삭제할까요?')) return;
+  const { error } = await window._bizSb.from('settlements').delete().eq('id', stmEditingId);
+  if (error) { alert('삭제 실패: '+error.message); return; }
+  SETTLEMENTS = SETTLEMENTS.filter(s => s.id !== stmEditingId);
+  closeStmModal();
+  renderSettlements();
+  renderOverview();
+});
+
+// ====================== QUICK SETTLEMENT INPUT ======================
+function populateQs(){
+  const sel = document.getElementById('qsVendor');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">매장 선택</option>' + VENDORS.map(v => `<option>${v.name}</option>`).join('');
+  // 이번 달로 기본 설정
+  const d = new Date();
+  document.getElementById('qsMonth').value = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+}
+
+function showQsResult(msg, kind){
+  const el = document.getElementById('qsResult');
+  const colors = {ok:'#3a8a6a', bad:'#b03a3a', warn:'#b07a2a'};
+  el.style.color = colors[kind] || '#3a82d6';
+  el.textContent = msg;
+  setTimeout(() => { el.textContent = ''; }, 4000);
+}
+
+document.getElementById('qsSubmit')?.addEventListener('click', async () => {
+  const vendor = document.getElementById('qsVendor').value;
+  const monthVal = document.getElementById('qsMonth').value; // YYYY-MM
+  const amount = parseInt(document.getElementById('qsAmount').value, 10);
+  const memo = document.getElementById('qsMemo').value.trim();
+  if (!vendor) { showQsResult('매장을 선택해주세요', 'warn'); return; }
+  if (!monthVal) { showQsResult('월을 선택해주세요', 'warn'); return; }
+  if (!amount || amount <= 0) { showQsResult('금액 확인', 'warn'); return; }
+  if (!window._bizSb) { showQsResult('Supabase 미준비', 'bad'); return; }
+  const btn = document.getElementById('qsSubmit'); btn.disabled = true; btn.textContent = '저장 중…';
+  const { error } = await window._bizSb.from('settlements_monthly').upsert({
+    vendor, year_month: monthVal, amount, ...(memo?{memo}:{})
+  }, { onConflict: 'vendor,year_month' });
+  btn.disabled = false; btn.textContent = '＋ 저장';
+  if (error) { showQsResult('저장 실패: ' + error.message, 'bad'); return; }
+  showQsResult(`✓ ${vendor} ${monthVal} ₩${amount.toLocaleString()} 저장됨`, 'ok');
+  // 메모리에도 반영
+  const idx = SETTLEMENTS_MONTHLY.findIndex(s => s.vendor===vendor && s.year_month===monthVal);
+  if (idx >= 0) SETTLEMENTS_MONTHLY[idx].amount = amount;
+  else SETTLEMENTS_MONTHLY.unshift({vendor, year_month:monthVal, amount, id:Date.now()});
+  document.getElementById('qsAmount').value = '';
+  document.getElementById('qsMemo').value = '';
+  renderMonthly();
+  renderVendors();
+  renderOverview();
+});
+
+// 엑셀 붙여넣기 토글
+document.getElementById('qsTogglePaste')?.addEventListener('click', () => {
+  const a = document.getElementById('qsPasteArea');
+  a.style.display = a.style.display === 'none' ? 'block' : 'none';
+});
+
+function parsePaste(text){
+  return text.split(/\r?\n/).map(line => {
+    const cols = line.split(/\t|,/).map(c => c.trim());
+    if (cols.length < 3) return null;
+    const [vendor, ym, amtStr] = cols;
+    const amt = parseInt(String(amtStr).replace(/[^0-9-]/g,''),10);
+    const ymMatch = String(ym).match(/(\d{4})\D?(\d{1,2})/);
+    if (!vendor || !ymMatch || !amt) return null;
+    return { vendor, year_month: `${ymMatch[1]}-${ymMatch[2].padStart(2,'0')}`, amount: amt };
+  }).filter(Boolean);
+}
+
+document.getElementById('qsPasteText')?.addEventListener('input', e => {
+  const rows = parsePaste(e.target.value);
+  document.getElementById('qsBulkPreview').textContent = rows.length ? `${rows.length}건 파싱됨` : '파싱 가능한 줄 없음';
+});
+
+document.getElementById('qsBulkSubmit')?.addEventListener('click', async () => {
+  const text = document.getElementById('qsPasteText').value;
+  const rows = parsePaste(text);
+  if (!rows.length) { showQsResult('파싱 가능한 줄이 없어요', 'warn'); return; }
+  if (!window._bizSb) return;
+  const btn = document.getElementById('qsBulkSubmit'); btn.disabled = true; btn.textContent = '저장 중…';
+  const { error } = await window._bizSb.from('settlements_monthly').upsert(rows, { onConflict: 'vendor,year_month' });
+  btn.disabled = false; btn.textContent = '＋ 일괄 저장';
+  if (error) { showQsResult('실패: ' + error.message, 'bad'); return; }
+  showQsResult(`✓ ${rows.length}건 일괄 저장 완료`, 'ok');
+  document.getElementById('qsPasteText').value = '';
+  document.getElementById('qsBulkPreview').textContent = '';
+  await loadBizData(); // 전체 새로고침
+});
+
 // initial render
 renderOverview();
 renderVendors();
 renderSettlements();
 renderTax();
+renderMonthly();
 </script>
 <script src="assets/admin-nav.js?v=5"></script>
 </body>

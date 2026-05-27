@@ -335,12 +335,14 @@
           </div>
         </div>
         <div class="blk">
-          <div style="display:flex;gap:8px;margin-bottom:12px">
-            <input class="nb" style="padding:8px 12px;border:1px solid var(--line);border-radius:5px;width:280px" placeholder="🔍 검색...">
+          <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center;flex-wrap:wrap">
+            <input id="prodSearch" style="padding:8px 12px;border:1px solid var(--line);border-radius:5px;width:240px;font-family:inherit;outline:none" placeholder="🔍 이름·카테고리 검색">
+            <input id="prodBarcodeInput" style="padding:8px 12px;border:1px solid var(--accent);border-radius:5px;width:200px;font-family:'SF Mono',Menlo,monospace;font-size:13px;outline:none;background:#fff8ef" placeholder="📷 바코드 스캔/입력" autocomplete="off">
             <span style="flex:1"></span>
-            <button class="btn">⤓ CSV</button>
+            <button class="btn" id="prodCsvBtn">⤓ CSV</button>
             <button class="btn btn-p" data-go="add">＋ 새 상품</button>
           </div>
+          <div id="prodBarcodeResult" style="display:none;margin-bottom:12px;padding:12px 16px;border-radius:6px;font-size:13px"></div>
           <table class="t" id="prodT"></table>
         </div>
       </section>
@@ -484,7 +486,7 @@ async function loadProducts(){
   try {
     const sb = await getSb();
     const { data, error } = await sb.from('products')
-      .select('id,name,category,price,image_url,image_id,state,stock,safe_stock,created_at')
+      .select('id,name,category,price,image_url,image_id,state,stock,safe_stock,created_at,barcode,wholesale_price,release_month')
       .order('created_at', { ascending: false });
     if (error) throw error;
     products = (data || []).map(p => ({
@@ -492,6 +494,7 @@ async function loadProducts(){
       img: p.image_url || p.image_id || '',
       s: p.stock || 0, safe: p.safe_stock || 10,
       state: p.state, createdAt: p.created_at,
+      barcode: p.barcode, dddPrice: p.wholesale_price, releaseMonth: p.release_month,
     }));
   } catch(e) {
     console.error('상품 로드 실패', e);
@@ -555,6 +558,93 @@ function renderProductTables(){
 }
 renderProductTables();
 loadProducts();
+
+// ===== 상품 검색 (이름/카테고리) =====
+let productSearchQ = '';
+function applyProductFilter(){
+  const q = productSearchQ.toLowerCase().trim();
+  if (!q) { renderProductTables(); return; }
+  const filtered = products.filter(p =>
+    (p.n||'').toLowerCase().includes(q) ||
+    (p.c||'').toLowerCase().includes(q));
+  // 임시로 products 를 필터된 걸로 보여줌 (원본 보존)
+  const orig = products;
+  window.products = filtered;
+  renderProductTables();
+  window.products = orig;
+}
+document.getElementById('prodSearch')?.addEventListener('input', e => {
+  productSearchQ = e.target.value;
+  applyProductFilter();
+});
+
+// ===== 바코드 스캔 =====
+const bcInput = document.getElementById('prodBarcodeInput');
+const bcResult = document.getElementById('prodBarcodeResult');
+function showBcResult(html, kind){
+  const colors = {ok:'#e7f4ec', warn:'#fef5e7', bad:'#fdebeb'};
+  const borders = {ok:'#3a8a6a', warn:'#b07a2a', bad:'#b03a3a'};
+  bcResult.style.background = colors[kind] || '#eef4fb';
+  bcResult.style.border = '1px solid ' + (borders[kind] || '#3a82d6');
+  bcResult.style.color = borders[kind] || '#3a82d6';
+  bcResult.innerHTML = html;
+  bcResult.style.display = 'block';
+  clearTimeout(window._bcResultTimer);
+  window._bcResultTimer = setTimeout(() => { bcResult.style.display = 'none'; }, 6000);
+}
+async function lookupBarcode(code){
+  if (!code) return;
+  const found = products.find(p => p.barcode === code);
+  if (found) {
+    showBcResult(
+      `<b>✓ ${found.n}</b> <small style="color:var(--sub);margin-left:8px">${found.c||'—'} · ₩${(found.p||0).toLocaleString()} · 재고 ${found.s}</small>
+       <div style="margin-top:6px;font-size:12px;color:var(--sub)">바코드 <code style="font-family:'SF Mono',Menlo,monospace">${code}</code> · 상품 ID ${found.id}</div>`,
+      'ok');
+    // 해당 row 로 스크롤 + 잠시 하이라이트
+    setTimeout(() => {
+      const row = document.querySelector(`[data-stock-id="${found.id}"]`)?.closest('tr');
+      if (row) {
+        row.scrollIntoView({behavior:'smooth', block:'center'});
+        row.style.background = '#fef5e7';
+        setTimeout(() => row.style.background = '', 2000);
+      }
+    }, 50);
+  } else {
+    showBcResult(
+      `<b>✗ 매칭되는 상품 없음</b>
+       <div style="margin-top:6px;font-size:12px">바코드 <code style="font-family:'SF Mono',Menlo,monospace">${code}</code> 로 등록된 상품이 없어요. <a data-go="add" style="color:var(--accent);font-weight:700;cursor:pointer;text-decoration:underline">＋ 새 상품 등록</a> 하시겠어요?</div>`,
+      'bad');
+  }
+}
+bcInput?.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    const v = bcInput.value.trim();
+    if (v) { lookupBarcode(v); bcInput.value = ''; }
+  }
+});
+// 스캐너는 매우 빠르게 입력함 — 50ms 내 무입력이면 자동 검색
+let bcTimer = null;
+bcInput?.addEventListener('input', () => {
+  clearTimeout(bcTimer);
+  const v = bcInput.value.trim();
+  if (v.length < 6) return; // 너무 짧으면 무시
+  bcTimer = setTimeout(() => {
+    if (bcInput.value.trim() === v) { lookupBarcode(v); bcInput.value = ''; }
+  }, 200);
+});
+
+// ===== CSV 내보내기 =====
+document.getElementById('prodCsvBtn')?.addEventListener('click', () => {
+  if (!products.length) { alert('내보낼 상품 없음'); return; }
+  const header = ['ID','바코드','상품명','카테고리','상태','정상가','도매가','재고','발매월'];
+  const rows = products.map(p => [p.id, p.barcode||'', p.n, p.c||'', p.state||'', p.p||0, p.dddPrice||'', p.s, p.createdAt?p.createdAt.slice(0,7):'']);
+  const csv = '﻿' + [header, ...rows].map(r => r.map(c => `"${String(c==null?'':c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `stty-products-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+});
 
 // ===== 새 상품 추가 폼 =====
 (function(){
