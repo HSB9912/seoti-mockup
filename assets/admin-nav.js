@@ -55,6 +55,9 @@
       ${item('Q&A 답변', '💬', 'admin-c.html', { badge: '8' })}
       ${item('회원·리뷰 관리', '⭐', 'admin-extensions.html')}
 
+      ${gh('작업', 'Workspace')}
+      ${item('요청 게시판', '📮', 'admin-feedback.html', { badge: 'NEW', alert: true })}
+
       ${gh('비즈니스', 'Business')}
       ${item('대시보드·정산', '📊', 'admin-business.html')}
       ${item('입점처·세금·관리비', '🧾', 'admin-business.html')}

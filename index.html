@@ -264,12 +264,22 @@ footer{border-top:1px solid var(--ink);padding:50px 0 36px;background:var(--pape
     </div>
     <div class="foot-bot">
       <span>© 2026 SEOTI — Artist Archive · 디자인 시안용 목업</span>
-      <span><span data-content="contact.email">seoti.studio@gmail.com</span> · <span data-content="contact.instagram">@seoti.studio</span> · <a href="admin-c.html" style="color:var(--sub);opacity:.5;font-size:11px;margin-left:10px" title="관리자 (비번 필요)">⚙ admin</a></span>
+      <span><span data-content="contact.email">stty.studio@gmail.com</span> · <span data-content="contact.instagram">@stty.studio</span> <a id="adminLink" href="admin-c.html" style="color:var(--sub);opacity:.5;font-size:11px;margin-left:10px;display:none" title="관리자">⚙ admin</a></span>
     </div>
   </div>
 </footer>
 
 <script src="assets/app.js"></script>
 <script src="assets/nav.js"></script>
+<script>
+// 관리자 링크: 로그인 + is_admin 일 때만 표시
+(async function(){
+  try{
+    if (!SEOTI.api.isLoggedIn()) return;
+    const isAdmin = await SEOTI.api.isAdmin();
+    if (isAdmin) document.getElementById('adminLink').style.display='inline';
+  }catch(e){}
+})();
+</script>
 </body>
 </html>

@@ -2,8 +2,9 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>서티 SEOTI · 로그인·회원가입 변형 B — 좌우 분할</title>
+<title>STTY · 로그인·회원가입</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css">
+<script src="assets/app.js"></script>
 <style>
 :root{--bg:#fff;--ink:#161412;--sub:#8c8781;--faint:#bdb8b1;--line:#e7e4df;--paper:#f6f3ee;--accent:#e8503a}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -128,8 +129,13 @@ img{display:block;max-width:100%}a{color:inherit;text-decoration:none}button,inp
         <button class="submit" id="loginBtn">로그인</button>
         <div class="divider">OR · SNS 로그인</div>
         <div class="social-row">
-          <a class="kakao">카카오</a><a class="naver">네이버</a><a>Google</a>
+          <a class="kakao" data-provider="kakao">카카오</a>
+          <a data-provider="google">Google</a>
+          <a data-provider="github" style="background:#161412;color:#fff;border-color:#161412">GitHub</a>
         </div>
+        <p style="font-size:11px;color:var(--sub);margin-top:8px;text-align:center;line-height:1.6">
+          ※ Supabase에서 해당 provider 활성화 후 사용 가능
+        </p>
         <div class="bottom-link">계정이 없으신가요?<a data-go="signup">회원가입 →</a></div>
         <div class="guest-link" style="background:var(--paper);padding:14px 18px;margin-top:18px;font-size:12.5px;color:var(--sub);line-height:1.7;border-radius:4px">
           💡 <b style="color:var(--ink)">일반 페이지(Notice/Collection/Archive 등)는 가입 없이</b> 자유롭게 둘러보실 수 있어요. 회원가입은 Group Order 신청 시에만 필요합니다.
@@ -258,9 +264,18 @@ document.getElementById('suBtn')?.addEventListener('click', async ()=>{
   }
 });
 
-// SNS 로그인 — 시안용 mock
-document.querySelectorAll('.social-row a').forEach(a => a.addEventListener('click', ()=>{
-  SEOTI.toast('SNS 로그인은 Supabase 연동 시 활성화돼요', 'info');
+// SNS 로그인 — Supabase OAuth
+document.querySelectorAll('.social-row a[data-provider]').forEach(a => a.addEventListener('click', async ()=>{
+  const provider = a.dataset.provider;
+  if (!provider) return;
+  // 리다이렉트 후 돌아올 위치는 어디서 왔는지에 따라
+  const redirect = sessionStorage.getItem('seoti_redirect_after_login');
+  if (redirect) { /* 그대로 두고 OAuth 후 onAuthStateChange에서 처리 */ }
+  a.style.opacity = '.5';
+  a.style.pointerEvents = 'none';
+  await SEOTI.api.loginWithProvider(provider);
+  // 성공 시 Supabase가 리다이렉트하므로 이 줄은 사실상 안 실행됨
+  a.style.opacity = '1'; a.style.pointerEvents = 'auto';
 }));
 
 // 이메일 인증 — 시안용 mock
@@ -275,6 +290,5 @@ document.getElementById('suVerify')?.addEventListener('click', ()=>{
   else SEOTI.toast('인증번호가 맞지 않아요', 'error');
 });
 </script>
-<script src="assets/app.js"></script>
 </body>
 </html>

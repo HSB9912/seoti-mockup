@@ -241,6 +241,48 @@
       toast('로그아웃 되었어요');
     },
 
+    // OAuth — Google / Kakao 등 (Supabase에서 provider 활성화 필요)
+    async loginWithProvider(provider) {
+      try {
+        const client = await ensureSupabase();
+        const { error } = await client.auth.signInWithOAuth({
+          provider, // 'google' | 'kakao' | 'github' 등
+          options: { redirectTo: location.href }
+        });
+        if (error) {
+          toast(translateAuthError(error.message) + ` (${provider})`, 'error');
+          if (error.message.includes('not enabled') || error.message.includes('not supported')) {
+            toast(`${provider} 로그인은 Supabase에서 먼저 활성화해야 해요`, 'warn');
+          }
+          return false;
+        }
+        return true; // redirect 발생
+      } catch (e) {
+        toast('소셜 로그인 실패', 'error');
+        console.error(e);
+        return false;
+      }
+    },
+
+    // 관리자 권한 체크 (profiles.is_admin)
+    async isAdmin() {
+      if (!state.user?.id) return false;
+      if (state.user.isAdmin !== undefined) return state.user.isAdmin;
+      try {
+        const client = await ensureSupabase();
+        const { data, error } = await client
+          .from('profiles')
+          .select('is_admin')
+          .eq('id', state.user.id)
+          .maybeSingle();
+        if (error) return false;
+        const v = !!(data && data.is_admin);
+        state.user.isAdmin = v;
+        commit();
+        return v;
+      } catch (e) { return false; }
+    },
+
     // 페이지에서 사용: SEOTI.api.requireLogin() 호출 시 로그인 안 되어 있으면 auth-b로 보냄
     requireLogin(reason) {
       if (state.user) return true;

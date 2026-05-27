@@ -206,6 +206,44 @@ DROP POLICY IF EXISTS "orders_anyone_insert" ON public.orders;
 CREATE POLICY "orders_anyone_insert" ON public.orders
   FOR INSERT WITH CHECK (auth.uid() = user_id OR user_id IS NULL);
 
+-- 9. FEEDBACK (작가용 요청·버그 게시판 — 관리자만)
+CREATE TABLE IF NOT EXISTS public.feedback (
+  id          bigserial PRIMARY KEY,
+  user_id     uuid REFERENCES auth.users ON DELETE SET NULL,
+  author      text,                            -- 작성자 표시명 (서티 / 클로드 등)
+  type        text DEFAULT 'bug'
+    CHECK (type IN ('bug','feature','design','content','idea')),
+  priority    text DEFAULT 'med'
+    CHECK (priority IN ('high','med','low')),
+  status      text DEFAULT 'open'
+    CHECK (status IN ('open','progress','done','wontfix')),
+  title       text NOT NULL,
+  body        text,
+  page_url    text,                            -- 어느 페이지에서 발견했는지
+  created_at  timestamptz DEFAULT now(),
+  updated_at  timestamptz DEFAULT now()
+);
+
+ALTER TABLE public.feedback ENABLE ROW LEVEL SECURITY;
+
+-- 관리자(profiles.is_admin)만 읽기·쓰기·수정·삭제 가능
+DROP POLICY IF EXISTS "feedback_admin_all" ON public.feedback;
+CREATE POLICY "feedback_admin_all" ON public.feedback
+  FOR ALL USING (
+    EXISTS (
+      SELECT 1 FROM public.profiles
+      WHERE id = auth.uid() AND is_admin = true
+    )
+  ) WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM public.profiles
+      WHERE id = auth.uid() AND is_admin = true
+    )
+  );
+
+CREATE INDEX IF NOT EXISTS feedback_status_idx ON public.feedback(status);
+CREATE INDEX IF NOT EXISTS feedback_created_idx ON public.feedback(created_at DESC);
+
 -- ============================================================
 -- SEED DATA · 사이트 콘텐츠 기본값
 -- ============================================================
