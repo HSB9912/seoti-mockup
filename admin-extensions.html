@@ -400,6 +400,11 @@ td .nm small{display:block;color:var(--sub);font-weight:500;font-size:11.5px;mar
 <script src="assets/app.js"></script>
 <script src="assets/admin-guard.js"></script>
 <script>
+// 모듈 스코프 변수 — TDZ 회피를 위해 IIFE 보다 먼저 선언
+let mClient = null;
+let allMembers = [];
+let adClient = null;
+
 const labels={members:"회원 관리",admins:"관리자 권한",reviews:"리뷰 관리",notices:"공지·이벤트 관리",coupons:"쿠폰 관리"};
 function activateTab(k){
   if(!labels[k]) return;
@@ -429,8 +434,6 @@ document.addEventListener('click',e=>{
 })();
 
 // ===== 회원 관리 =====
-let mClient=null;
-let allMembers=[];
 async function getMClient(){
   if(mClient) return mClient;
   await SEOTI.api.isAdmin();
@@ -471,7 +474,6 @@ document.getElementById('memberSearch')?.addEventListener('input',renderMembers)
 document.getElementById('memberRefreshBtn')?.addEventListener('click',loadMembers);
 
 // ===== 관리자 권한 관리 =====
-let adClient=null;
 async function getAdClient(){
   if(adClient) return adClient;
   await SEOTI.api.isAdmin(); // ensure Supabase loaded
