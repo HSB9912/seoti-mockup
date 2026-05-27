@@ -80,6 +80,29 @@
     </div>
   `;
 
+  // 사이드바 공통 스타일 주입 (각 페이지에 .item 스타일이 없어도 일관되게 보이도록)
+  if (!document.getElementById('admin-nav-style')) {
+    const st = document.createElement('style');
+    st.id = 'admin-nav-style';
+    st.textContent = `
+      aside.sb{background:#f9f8f4;border-right:1px solid #ededeb;font-size:13px;display:flex;flex-direction:column;min-width:0}
+      aside.sb .sb-tree{flex:1;overflow-y:auto;padding:0 6px 12px}
+      aside.sb .grp{margin-bottom:4px}
+      aside.sb .gh{padding:8px 8px 4px;color:#878680;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;margin-top:6px}
+      aside.sb .gh .en{opacity:.45;margin-left:5px;font-style:normal;font-size:.7em}
+      aside.sb .item{display:flex;align-items:center;gap:8px;padding:6px 8px 6px 22px;cursor:pointer;
+        border-radius:4px;color:#878680;font-weight:600;margin:1px 0;font-size:13px;text-decoration:none;line-height:1.3}
+      aside.sb .item:hover{background:#f5f4f0;color:#202020}
+      aside.sb .item.on{background:#202020;color:#fff}
+      aside.sb .item .ico{width:14px;text-align:center;font-size:13px;flex:none}
+      aside.sb .item .badge{margin-left:auto;font-size:10.5px;color:#d4d2cd;font-weight:700}
+      aside.sb .item.on .badge{color:rgba(255,255,255,.6)}
+      aside.sb .item.alert .badge{color:#b03a3a;font-weight:800}
+      aside.sb .item.on.alert .badge{color:#ffb3a8}
+    `;
+    document.head.appendChild(st);
+  }
+
   sb.innerHTML = html;
   sb.style.display = 'flex';
   sb.style.flexDirection = 'column';
