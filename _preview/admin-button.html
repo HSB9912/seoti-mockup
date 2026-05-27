@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>관리자 버튼 위치 비교</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css">
+<style>
+:root{--bg:#fafaf7;--paper:#fff;--ink:#161412;--sub:#8c8781;--line:#e7e4df;--accent:#e8503a}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Pretendard Variable',Pretendard,sans-serif;background:var(--bg);color:var(--ink);padding:30px}
+h1{font-size:18px;margin-bottom:20px;font-weight:800}
+.lbl{font-size:13px;font-weight:800;color:var(--accent);margin:30px 0 10px;letter-spacing:.04em;text-transform:uppercase}
+.demo{background:var(--paper);border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-bottom:20px}
+
+/* 공통 nav 흉내 */
+.seoti-nav{background:rgba(255,255,255,.96);border-bottom:1px solid #e7e4df;position:relative}
+.seoti-nav-wrap{max-width:1240px;margin:0 auto;padding:0 32px;display:flex;align-items:center;height:84px;gap:30px}
+.seoti-logo{display:flex;align-items:center;gap:12px;font-size:21px;font-weight:900;letter-spacing:.04em}
+.seoti-logo .mascot{width:46px;height:46px;display:grid;place-items:center;font-size:30px}
+.seoti-logo .brand b{color:#f4a8cf;font-weight:900;font-size:24px}
+.seoti-logo .brand .gray{color:#5a5550;font-size:20px}
+.seoti-logo .brand sup{font-size:9px;color:#a8a3a0;font-weight:700;margin-left:4px}
+.seoti-nav-menu{display:flex;gap:26px;margin-left:auto;font-size:13.5px;font-weight:600;align-items:center}
+.seoti-nav-menu a{color:#8c8781;cursor:pointer}
+.seoti-nav-menu a:hover{color:#161412}
+
+/* OPTION A — 네비 우측 끝, 강조 버튼 */
+.adminBtn-A{
+  display:inline-flex;align-items:center;gap:6px;
+  background:#161412;color:#fff;padding:9px 16px;border-radius:99px;
+  font-size:13px;font-weight:800;letter-spacing:.04em;cursor:pointer;
+  transition:.2s;margin-left:10px
+}
+.adminBtn-A:hover{background:var(--accent);transform:translateY(-1px)}
+.adminBtn-A .dot{width:6px;height:6px;border-radius:50%;background:#7fd296;display:inline-block}
+
+/* OPTION B — 우상단 고정(플로팅) */
+.adminBtn-B{
+  position:fixed;top:18px;right:24px;z-index:99999;
+  display:inline-flex;align-items:center;gap:8px;
+  background:#161412;color:#fff;padding:11px 20px;border-radius:99px;
+  font-size:13px;font-weight:800;letter-spacing:.04em;cursor:pointer;
+  box-shadow:0 8px 22px -8px rgba(0,0,0,.3),0 2px 6px rgba(0,0,0,.1);
+  transition:.2s
+}
+.adminBtn-B:hover{background:var(--accent);transform:translateY(-1px)}
+.adminBtn-B .dot{width:7px;height:7px;border-radius:50%;background:#7fd296}
+
+/* OPTION C — 네비 안에, 자연스러운 텍스트형 (현재 푸터의 ⚙admin 보다 크게) */
+.adminBtn-C{
+  display:inline-flex;align-items:center;gap:5px;
+  color:var(--accent);font-size:13.5px;font-weight:800;cursor:pointer;
+  padding:6px 10px;border:1px solid currentColor;border-radius:6px;margin-left:8px
+}
+.adminBtn-C:hover{background:var(--accent);color:#fff}
+
+.note{font-size:13px;color:var(--sub);padding:12px 18px;background:#fff8ef;border-left:3px solid #d4a04c;margin:20px 0}
+.row{display:flex;gap:10px;margin-top:20px}
+.row a{flex:1;text-align:center;padding:14px;background:#161412;color:#fff;border-radius:6px;font-size:13px;font-weight:800;text-decoration:none}
+.row a.choice{background:var(--accent)}
+</style>
+</head>
+<body>
+
+<h1>관리자 버튼 위치 비교 — 어느 게 좋아요?</h1>
+
+<div class="note">
+  관리자(누나)로 로그인된 상태에서만 보임 · 다른 손님한테는 안 보임.<br>
+  마우스 올려보면 색 바뀜.
+</div>
+
+<!-- OPTION A -->
+<div class="lbl">A. 네비 메뉴 끝 — 검정 알약 버튼 (추천)</div>
+<div class="demo">
+  <nav class="seoti-nav">
+    <div class="seoti-nav-wrap">
+      <a class="seoti-logo">
+        <span class="mascot">🐕</span>
+        <span class="brand"><span class="gray">s</span><b>TT</b><span class="gray">y</span><sup>STUDIO</sup></span>
+      </a>
+      <div class="seoti-nav-menu">
+        <a>Notice</a><a>Collection</a><a>Archive</a><a>Group Order</a><a>QnA</a><a>Contact</a>
+        <a class="adminBtn-A"><span class="dot"></span>⚙ ADMIN</a>
+      </div>
+    </div>
+  </nav>
+</div>
+
+<!-- OPTION B -->
+<div class="lbl">B. 우상단 고정 — 둥둥 떠다님</div>
+<div class="demo" style="position:relative;height:120px">
+  <nav class="seoti-nav">
+    <div class="seoti-nav-wrap">
+      <a class="seoti-logo">
+        <span class="mascot">🐕</span>
+        <span class="brand"><span class="gray">s</span><b>TT</b><span class="gray">y</span><sup>STUDIO</sup></span>
+      </a>
+      <div class="seoti-nav-menu">
+        <a>Notice</a><a>Collection</a><a>Archive</a><a>Group Order</a><a>QnA</a><a>Contact</a>
+      </div>
+    </div>
+  </nav>
+  <a class="adminBtn-B" style="position:absolute;top:18px;right:24px"><span class="dot"></span>⚙ ADMIN</a>
+</div>
+
+<!-- OPTION C -->
+<div class="lbl">C. 네비 메뉴 끝 — 빨간 테두리 (조금 더 부드러운 느낌)</div>
+<div class="demo">
+  <nav class="seoti-nav">
+    <div class="seoti-nav-wrap">
+      <a class="seoti-logo">
+        <span class="mascot">🐕</span>
+        <span class="brand"><span class="gray">s</span><b>TT</b><span class="gray">y</span><sup>STUDIO</sup></span>
+      </a>
+      <div class="seoti-nav-menu">
+        <a>Notice</a><a>Collection</a><a>Archive</a><a>Group Order</a><a>QnA</a><a>Contact</a>
+        <a class="adminBtn-C">⚙ ADMIN</a>
+      </div>
+    </div>
+  </nav>
+</div>
+
+<div class="note">
+  <b>A vs B 차이:</b><br>
+  · A는 메뉴와 같이 스크롤됨 (sticky)<br>
+  · B는 항상 화면 우상단에 떠 있어서 어디서든 한 번에 가능
+</div>
+
+<div class="row">
+  <a>"A 가자" 라고 알려주세요</a>
+  <a>"B 가자"</a>
+  <a>"C 가자"</a>
+</div>
+
+</body>
+</html>

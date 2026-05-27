@@ -284,10 +284,10 @@
       }
     },
 
-    // 관리자 권한 체크 (profiles.is_admin)
+    // 관리자 권한 체크 (profiles.is_admin) — 항상 DB 재조회 (캐시 X)
+    // 캐시하면 DB에서 승급한 뒤에도 false가 박혀서 어드민 진입 불가
     async isAdmin() {
       if (!state.user?.id) return false;
-      if (state.user.isAdmin !== undefined) return state.user.isAdmin;
       try {
         const client = await ensureSupabase();
         const { data, error } = await client
