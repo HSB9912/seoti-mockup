@@ -19,7 +19,7 @@ a{color:inherit;text-decoration:none}
 .mono{font-family:'SF Mono',Menlo,monospace;font-variant-numeric:tabular-nums}
 
 .app{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
-.sb{background:#f9f8f4;border-right:1px solid var(--line);font-size:13px;display:none}
+.sb{background:#f9f8f4;border-right:1px solid var(--line);font-size:13px;display:flex;flex-direction:column}
 
 .main{display:flex;flex-direction:column;min-width:0}
 .top{padding:14px 28px;display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--line)}
@@ -57,13 +57,13 @@ a{color:inherit;text-decoration:none}
 .filters button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
 .filters .count{margin-left:5px;opacity:.6;font-size:11px}
 
-/* 카드 리스트 */
+/* 카드 리스트 — .list 안의 .item 만 (사이드바의 .item 과 충돌 방지) */
 .list{display:flex;flex-direction:column;gap:8px}
-.item{background:#fff;border:1px solid var(--line);border-radius:7px;padding:14px 16px;transition:.12s}
-.item:hover{border-color:var(--ink);box-shadow:0 4px 14px -8px rgba(0,0,0,.1)}
-.item.done{opacity:.55;background:#f9f9f6}
-.item .h{display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap}
-.item .h .tag{font-size:10px;font-weight:800;letter-spacing:.08em;padding:2px 7px;border-radius:3px;text-transform:uppercase}
+.list .item{background:#fff;border:1px solid var(--line);border-radius:7px;padding:14px 16px;transition:.12s}
+.list .item:hover{border-color:var(--ink);box-shadow:0 4px 14px -8px rgba(0,0,0,.1)}
+.list .item.done{opacity:.55;background:#f9f9f6}
+.list .item .h{display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap}
+.list .item .h .tag{font-size:10px;font-weight:800;letter-spacing:.08em;padding:2px 7px;border-radius:3px;text-transform:uppercase}
 .tag.bug{background:#fdebeb;color:var(--bad)}
 .tag.feature{background:#e6eff9;color:var(--info)}
 .tag.design{background:#f4ecfa;color:#7a4ab0}
