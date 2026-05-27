@@ -21,6 +21,17 @@ a{color:inherit;text-decoration:none}
 .app{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
 .sb{background:#f9f8f4;border-right:1px solid var(--line);font-size:13px;display:flex;flex-direction:column}
 
+/* 사이드바 네비 항목 (admin-nav.js 가 .item 클래스로 생성) */
+.item{display:flex;align-items:center;gap:8px;padding:5px 8px 5px 22px;cursor:pointer;
+  border-radius:4px;color:var(--sub);font-weight:600;margin:1px 0;font-size:13px}
+.item:hover{background:var(--hover);color:var(--ink)}
+.item.on{background:var(--ink);color:#fff}
+.item .ico{width:14px;text-align:center;font-size:13px;flex:none}
+.item .badge{margin-left:auto;font-size:10.5px;color:var(--faint);font-weight:700}
+.item.on .badge{color:rgba(255,255,255,.6)}
+.item.alert .badge{color:var(--bad);font-weight:800}
+.item.on.alert .badge{color:#ffb3a8}
+
 .main{display:flex;flex-direction:column;min-width:0}
 .top{padding:14px 28px;display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--line)}
 .crumb{font-size:13px;color:var(--sub)}.crumb b{color:var(--ink);font-weight:700}
