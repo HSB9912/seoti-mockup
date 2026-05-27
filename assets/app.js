@@ -73,6 +73,8 @@
               if (state.user) { state.user = null; commit(); }
             }
           });
+          // site_content 테이블에서 사이트 콘텐츠 로드 (비동기, 실패해도 무시)
+          loadContentFromSupabase().catch(e => console.warn('site_content 로드 실패:', e));
           return sb;
         } catch (e) {
           console.error('Supabase init 실패:', e);
@@ -417,23 +419,24 @@
   // Supabase 연동 시: content를 'site_content' 테이블로 옮기면 됨
   const CONTENT_KEY = 'seoti_content_v1';
 
-  // 기본값 (관리자가 수정하기 전엔 이게 보임)
+  // 기본값은 비워둠 — 실제 값은 Supabase site_content 테이블에서 비동기 로드
+  // (Supabase 도착 전엔 HTML 안의 placeholder 텍스트가 fallback으로 보임)
   const CONTENT_DEFAULTS = {
-    'home.eyebrow.main': 'SEOTI Studio',
-    'home.eyebrow.sub':  '손그림 일러스트 아카이브',
-    'home.title.line1':  '다정한 종이 위의',
-    'home.title.line2':  '작은 풍경들.',
-    'home.subtitle':     '2022년부터 손으로 그린 다꾸 일러스트·스티커·마스킹테이프를 기록하는 아카이브입니다.',
-    'home.stat1.label':  '출시 컬렉션',
-    'home.stat1.value':  '43',
-    'home.stat2.label':  '활동 연차',
-    'home.stat2.value':  '4년',
-    'home.stat3.label':  '누적 판매',
-    'home.stat3.value':  '12,000+',
-    'contact.email':     'seoti.studio@gmail.com',
-    'contact.instagram': '@seoti.studio',
-    'contact.twitter':   '@seoti_studio',
-    'footer.copyright':  '© 2026 SEOTI'
+    'home.eyebrow.main': '',
+    'home.eyebrow.sub':  '',
+    'home.title.line1':  '',
+    'home.title.line2':  '',
+    'home.subtitle':     '',
+    'home.stat1.label':  '',
+    'home.stat1.value':  '',
+    'home.stat2.label':  '',
+    'home.stat2.value':  '',
+    'home.stat3.label':  '',
+    'home.stat3.value':  '',
+    'contact.email':     '',
+    'contact.instagram': '',
+    'contact.twitter':   '',
+    'footer.copyright':  ''
   };
 
   function loadContent() {
@@ -445,7 +448,9 @@
 
   const content = {
     get(key, fallback) {
-      return siteContent[key] !== undefined ? siteContent[key] : (fallback ?? '');
+      // 빈 문자열도 fallback 대상 — Supabase 도착 전 HTML placeholder 유지
+      const v = siteContent[key];
+      return (v === undefined || v === '') ? (fallback ?? '') : v;
     },
     set(key, value) {
       siteContent[key] = value;
@@ -466,11 +471,26 @@
     }
   };
 
+  // Supabase site_content 테이블에서 콘텐츠 불러와서 메모리·DOM 반영
+  async function loadContentFromSupabase() {
+    if (!sb) return;
+    const { data, error } = await sb.from('site_content').select('key,value');
+    if (error || !Array.isArray(data)) return;
+    const obj = {};
+    data.forEach(row => { if (row.key) obj[row.key] = row.value ?? ''; });
+    Object.assign(siteContent, obj);
+    // localStorage 캐시도 갱신 (다음 페이지 로드 시 즉시 보임)
+    try { localStorage.setItem(CONTENT_KEY, JSON.stringify(siteContent)); } catch(e){}
+    window.dispatchEvent(new CustomEvent('seoti-content-change'));
+  }
+
   // [data-content="key"] 요소를 자동으로 채워줌
   function applyContent() {
     document.querySelectorAll('[data-content]').forEach(el => {
       const key = el.dataset.content;
-      const v = content.get(key, el.textContent);
+      // 첫 호출 시점의 textContent를 fallback 으로 보존 (이후 Supabase 도착 시 빈 값이면 placeholder 유지)
+      if (!el.dataset.fallback) el.dataset.fallback = el.textContent;
+      const v = content.get(key, el.dataset.fallback);
       el.textContent = v;
     });
   }
