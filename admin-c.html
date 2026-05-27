@@ -336,11 +336,33 @@
         </div>
         <div class="blk">
           <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center;flex-wrap:wrap">
-            <input id="prodSearch" style="padding:8px 12px;border:1px solid var(--line);border-radius:5px;width:240px;font-family:inherit;outline:none" placeholder="🔍 이름·카테고리 검색">
-            <input id="prodBarcodeInput" style="padding:8px 12px;border:1px solid var(--accent);border-radius:5px;width:200px;font-family:'SF Mono',Menlo,monospace;font-size:13px;outline:none;background:#fff8ef" placeholder="📷 바코드 스캔/입력" autocomplete="off">
+            <input id="prodSearch" style="padding:8px 12px;border:1px solid var(--line);border-radius:5px;width:240px;font-family:inherit;outline:none" placeholder="🔍 이름·카테고리·바코드 검색">
+            <input id="prodBarcodeInput" style="padding:8px 12px;border:1px solid var(--accent);border-radius:5px;width:200px;font-family:'SF Mono',Menlo,monospace;font-size:13px;outline:none;background:#fff8ef" placeholder="📷 바코드 스캔" autocomplete="off">
             <span style="flex:1"></span>
             <button class="btn" id="prodCsvBtn">⤓ CSV</button>
             <button class="btn btn-p" data-go="add">＋ 새 상품</button>
+          </div>
+          <!-- 필터 칩 -->
+          <div id="prodFilterBar" style="display:flex;gap:14px;margin-bottom:10px;flex-wrap:wrap;align-items:center;font-size:12px">
+            <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+              <b style="font-size:11.5px;color:var(--sub);font-weight:700">상태:</b>
+              <a class="chip on" data-pfilter="state:all" style="padding:4px 11px;border-radius:99px;cursor:pointer;font-weight:700;border:1px solid var(--line);background:var(--ink);color:#fff">전체</a>
+              <a class="chip" data-pfilter="state:in" style="padding:4px 11px;border-radius:99px;cursor:pointer;font-weight:700;border:1px solid var(--line);background:#fff;color:var(--sub)">판매중</a>
+              <a class="chip" data-pfilter="state:out" style="padding:4px 11px;border-radius:99px;cursor:pointer;font-weight:700;border:1px solid var(--line);background:#fff;color:var(--sub)">품절</a>
+              <a class="chip" data-pfilter="state:disc" style="padding:4px 11px;border-radius:99px;cursor:pointer;font-weight:700;border:1px solid var(--line);background:#fff;color:var(--sub)">단종</a>
+            </div>
+            <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+              <b style="font-size:11.5px;color:var(--sub);font-weight:700">재고:</b>
+              <a class="chip on" data-pfilter="stock:all" style="padding:4px 11px;border-radius:99px;cursor:pointer;font-weight:700;border:1px solid var(--line);background:var(--ink);color:#fff">전체</a>
+              <a class="chip" data-pfilter="stock:has" style="padding:4px 11px;border-radius:99px;cursor:pointer;font-weight:700;border:1px solid var(--line);background:#fff;color:var(--sub)">있음</a>
+              <a class="chip" data-pfilter="stock:low" style="padding:4px 11px;border-radius:99px;cursor:pointer;font-weight:700;border:1px solid var(--line);background:#fff;color:var(--sub)">부족 ⚠</a>
+              <a class="chip" data-pfilter="stock:zero" style="padding:4px 11px;border-radius:99px;cursor:pointer;font-weight:700;border:1px solid var(--line);background:#fff;color:var(--sub)">품절</a>
+            </div>
+            <div id="prodCatFilter" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;width:100%">
+              <b style="font-size:11.5px;color:var(--sub);font-weight:700">카테고리:</b>
+              <!-- 동적 생성 -->
+            </div>
+            <span id="prodResultCount" style="margin-left:auto;font-size:11.5px;color:var(--sub);font-weight:600"></span>
           </div>
           <div id="prodBarcodeResult" style="display:none;margin-bottom:12px;padding:12px 16px;border-radius:6px;font-size:13px"></div>
           <table class="t" id="prodT"></table>
@@ -586,11 +608,81 @@ function imgUrl(img){
   // 기존 image_id 형식 (folder/uuid) 이면 r2.dev URL 조립
   return `https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/${img}`;
 }
+// ===== 필터·정렬 상태 =====
+let prodFilter = { state: 'all', stock: 'all', category: 'all' };
+let prodSort = { key: 'name', dir: 'asc' }; // key: name | category | price | stock | id
+
+function getFilteredSortedProducts(){
+  const q = (productSearchQ||'').toLowerCase();
+  let list = products.slice();
+  // 검색
+  if (q) list = list.filter(p =>
+    (p.n||'').toLowerCase().includes(q) ||
+    (p.c||'').toLowerCase().includes(q) ||
+    (p.barcode||'').toLowerCase().includes(q)
+  );
+  // 상태 필터
+  if (prodFilter.state !== 'all') list = list.filter(p => p.state === prodFilter.state);
+  // 재고 필터
+  if (prodFilter.stock === 'has') list = list.filter(p => p.s > 0);
+  else if (prodFilter.stock === 'zero') list = list.filter(p => p.s === 0);
+  else if (prodFilter.stock === 'low') list = list.filter(p => p.s > 0 && p.s <= (p.safe||10));
+  // 카테고리 필터
+  if (prodFilter.category !== 'all') list = list.filter(p => p.c === prodFilter.category);
+  // 정렬
+  const dir = prodSort.dir === 'asc' ? 1 : -1;
+  list.sort((a,b) => {
+    let av, bv;
+    switch(prodSort.key) {
+      case 'name': av = a.n||''; bv = b.n||''; break;
+      case 'category': av = a.c||''; bv = b.c||''; break;
+      case 'price': av = a.p||0; bv = b.p||0; break;
+      case 'stock': av = a.s||0; bv = b.s||0; break;
+      case 'id': av = a.id; bv = b.id; break;
+      default: return 0;
+    }
+    if (typeof av === 'string') return av.localeCompare(bv) * dir;
+    return (av - bv) * dir;
+  });
+  return list;
+}
+
+function renderCategoryChips(){
+  const bar = document.getElementById('prodCatFilter');
+  if (!bar) return;
+  const cats = [...new Set(products.map(p => p.c).filter(Boolean))].sort();
+  const chips = ['<b style="font-size:11.5px;color:var(--sub);font-weight:700">카테고리:</b>',
+    `<a class="chip ${prodFilter.category==='all'?'on':''}" data-pfilter="category:all" style="padding:4px 11px;border-radius:99px;cursor:pointer;font-weight:700;border:1px solid var(--line);background:${prodFilter.category==='all'?'var(--ink)':'#fff'};color:${prodFilter.category==='all'?'#fff':'var(--sub)'}">전체</a>`];
+  cats.forEach(c => {
+    const on = prodFilter.category === c;
+    chips.push(`<a class="chip ${on?'on':''}" data-pfilter="category:${c}" style="padding:4px 11px;border-radius:99px;cursor:pointer;font-weight:700;border:1px solid var(--line);background:${on?'var(--ink)':'#fff'};color:${on?'#fff':'var(--sub)'}">${c}</a>`);
+  });
+  bar.innerHTML = chips.join('');
+}
+
+function sortIcon(key){
+  if (prodSort.key !== key) return '<span style="color:var(--faint);font-size:10px;margin-left:4px">↕</span>';
+  return `<span style="color:var(--accent);font-size:10px;margin-left:4px">${prodSort.dir==='asc'?'▲':'▼'}</span>`;
+}
+function thSort(label, key){
+  return `<th data-psort="${key}" style="cursor:pointer;user-select:none" title="클릭해서 정렬">${label}${sortIcon(key)}</th>`;
+}
+
 function renderProductTables(){
-  const empty = !products.length;
+  renderCategoryChips();
+  const list = getFilteredSortedProducts();
+  const totalCount = products.length;
+  document.getElementById('prodResultCount').textContent = list.length === totalCount
+    ? `${totalCount}개`
+    : `${list.length}개 (전체 ${totalCount})`;
+
+  const empty = !list.length;
+  const emptyMsg = totalCount === 0
+    ? `아직 등록된 상품이 없어요. <b style="color:var(--accent);cursor:pointer" onclick="document.querySelector('[data-go=add]').click()">＋ 새 상품</b>`
+    : '필터 조건에 맞는 상품이 없어요.';
   document.getElementById('prodT').innerHTML=`
-   <thead><tr><th></th><th>상품명 · 바코드</th><th>카테고리</th><th>가격</th><th>재고</th><th>상태</th><th>액션</th></tr></thead>
-   <tbody>${empty ? `<tr><td colspan="7" style="padding:40px;text-align:center;color:var(--sub)">아직 등록된 상품이 없어요. <b style="color:var(--accent);cursor:pointer" onclick="document.querySelector('[data-go=add]').click()">＋ 새 상품</b></td></tr>` : products.map(p=>`<tr data-prod-id="${p.id}" style="cursor:pointer" title="클릭해서 수정">
+   <thead><tr><th></th>${thSort('상품명 · 바코드','name')}${thSort('카테고리','category')}${thSort('가격','price')}${thSort('재고','stock')}<th>상태</th><th>액션</th></tr></thead>
+   <tbody>${empty ? `<tr><td colspan="7" style="padding:40px;text-align:center;color:var(--sub)">${emptyMsg}</td></tr>` : list.map(p=>`<tr data-prod-id="${p.id}" style="cursor:pointer" title="클릭해서 수정">
      <td style="width:32px"><span class="thumb">${p.img?`<img referrerpolicy="no-referrer" src="${imgUrl(p.img)}">`:''}</span></td>
      <td><span class="nm">${p.n}</span>${p.barcode?`<br><small class="mono" style="color:var(--sub);font-size:11px">${p.barcode}</small>`:''}</td>
      <td>${p.c||'—'}</td>
@@ -784,23 +876,37 @@ function showPeErr(msg){
   setTimeout(() => el.style.display = 'none', 6000);
 }
 
-// ===== 상품 검색 (이름/카테고리) =====
+// ===== 상품 검색 (이름·카테고리·바코드) =====
 let productSearchQ = '';
-function applyProductFilter(){
-  const q = productSearchQ.toLowerCase().trim();
-  if (!q) { renderProductTables(); return; }
-  const filtered = products.filter(p =>
-    (p.n||'').toLowerCase().includes(q) ||
-    (p.c||'').toLowerCase().includes(q));
-  // 임시로 products 를 필터된 걸로 보여줌 (원본 보존)
-  const orig = products;
-  window.products = filtered;
-  renderProductTables();
-  window.products = orig;
-}
 document.getElementById('prodSearch')?.addEventListener('input', e => {
   productSearchQ = e.target.value;
-  applyProductFilter();
+  renderProductTables();
+});
+
+// ===== 필터 칩 클릭 =====
+document.getElementById('prodFilterBar')?.addEventListener('click', e => {
+  const chip = e.target.closest('[data-pfilter]');
+  if (!chip) return;
+  const [type, val] = chip.dataset.pfilter.split(':');
+  prodFilter[type] = val;
+  // 같은 그룹 칩만 .on 토글
+  chip.parentElement?.querySelectorAll('[data-pfilter]').forEach(c => {
+    const isOn = c === chip;
+    c.classList.toggle('on', isOn);
+    c.style.background = isOn ? 'var(--ink)' : '#fff';
+    c.style.color = isOn ? '#fff' : 'var(--sub)';
+  });
+  renderProductTables();
+});
+
+// ===== 컬럼 헤더 클릭 → 정렬 =====
+document.getElementById('prodT')?.addEventListener('click', e => {
+  const th = e.target.closest('[data-psort]');
+  if (!th) return;
+  const key = th.dataset.psort;
+  if (prodSort.key === key) prodSort.dir = prodSort.dir === 'asc' ? 'desc' : 'asc';
+  else { prodSort.key = key; prodSort.dir = 'asc'; }
+  renderProductTables();
 });
 
 // ===== 바코드 스캔 =====
