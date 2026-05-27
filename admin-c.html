@@ -555,6 +555,7 @@ function imgUrl(img){
 // ===== 필터·정렬 상태 =====
 let prodFilter = { state: 'all', stock: 'all', category: 'all' };
 let prodSort = { key: 'name', dir: 'asc' }; // key: name | category | price | stock | id
+let productSearchQ = '';
 
 function getFilteredSortedProducts(){
   const q = (productSearchQ||'').toLowerCase();
@@ -820,8 +821,7 @@ function showPeErr(msg){
   setTimeout(() => el.style.display = 'none', 6000);
 }
 
-// ===== 상품 검색 (이름·카테고리·바코드) =====
-let productSearchQ = '';
+// ===== 상품 검색 (이름·카테고리·바코드) — productSearchQ 는 상단에 선언됨 =====
 document.getElementById('prodSearch')?.addEventListener('input', e => {
   productSearchQ = e.target.value;
   renderProductTables();
