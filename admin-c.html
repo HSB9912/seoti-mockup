@@ -280,29 +280,29 @@
       <section class="sect on" data-s="dash">
         <div class="ph">
           <span class="ico">📊</span>
-          <h1>대시보드 <small>2026-05-21 wed</small></h1>
+          <h1>대시보드 <small id="todayDate"></small></h1>
           <p class="desc">오늘의 운영 현황을 한 페이지에서. 미답변 Q&A·재고 알림 등 주의가 필요한 항목은 좌측에 빨간 숫자로 표시됩니다.</p>
           <div class="meta">
-            <div><b>최종 동기화</b><span>방금 전</span></div>
-            <div><b>활성 상품</b><span>39 / 43</span></div>
-            <div><b>이번 달</b><span>₩7.2M</span></div>
-            <div><b>상태</b><span class="tag warn">⚠ 재고 3건</span></div>
+            <div><b>최종 동기화</b><span>—</span></div>
+            <div><b>활성 상품</b><span id="metaProducts">—</span></div>
+            <div><b>이번 달</b><span id="metaRevenue">—</span></div>
+            <div><b>상태</b><span class="tag" id="metaStatus">준비 중</span></div>
           </div>
         </div>
 
-        <div class="callout warn">
-          <span class="ic">⚠️</span>
-          <div><b>처리가 필요한 항목 3건</b>
-            <p>품절 임박 상품 3개 · 미답변 Q&A 8건 · 견적 대기 Group Order 3건 — 사이드바에서 바로 이동할 수 있어요.</p></div>
+        <div class="callout" style="background:#eef4fb;border-color:#c7dcef">
+          <span class="ic">💡</span>
+          <div><b>대시보드 사용법</b>
+            <p>이곳은 매출·재고·Q&A·주문 상태를 한눈에 보는 곳입니다. 데이터는 상품이 등록되고 주문이 들어오면 자동 채워져요. 처리가 필요한 항목은 <b>좌측 사이드바 빨간 숫자</b>로 알림됩니다.</p></div>
         </div>
 
         <div class="blk">
           <h2>오늘 요약 <span class="h-cnt">· 전일 대비</span></h2>
           <div class="kpi-list">
-            <div class="ki"><div class="k">매출</div><div class="v mono">₩384,500</div><div class="d">▲ 12.3%</div></div>
-            <div class="ki"><div class="k">신규 주문</div><div class="v mono">27</div><div class="d">▲ 4건</div></div>
-            <div class="ki alert"><div class="k">재고 알림</div><div class="v mono">3</div><div class="d down">즉시 확인</div></div>
-            <div class="ki alert"><div class="k">미답변 Q&A</div><div class="v mono">8</div><div class="d down">평균 0.8일</div></div>
+            <div class="ki"><div class="k">매출</div><div class="v mono" id="kpiRevenue">—</div><div class="d">—</div></div>
+            <div class="ki"><div class="k">신규 주문</div><div class="v mono" id="kpiOrders">—</div><div class="d">—</div></div>
+            <div class="ki"><div class="k">재고 알림</div><div class="v mono" id="kpiStock">—</div><div class="d">—</div></div>
+            <div class="ki"><div class="k">미답변 Q&A</div><div class="v mono" id="kpiQna">—</div><div class="d">—</div></div>
           </div>
         </div>
 
@@ -310,23 +310,16 @@
           <h2>품절 임박 ⚠️ <span class="h-cnt">· 안전재고 미만</span></h2>
           <table class="t">
             <thead><tr><th>상품</th><th>카테고리</th><th>현재고 / 안전</th><th>상태</th><th>판매 추이</th><th></th></tr></thead>
-            <tbody>
-              <tr><td><span class="thumb"><img referrerpolicy="no-referrer" src="https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/202512/6df4ff16a044b3cd8dde5d8b78447e35.png"></span><span class="nm">초록책장 스티커</span></td><td>조각</td><td><b class="mono" style="color:var(--accent)">3</b> <span class="mono" style="color:var(--sub)">/ 10</span></td><td><span class="tag warn">⚠ 임박</span></td><td><span class="spark"><span style="height:60%"></span><span style="height:70%"></span><span style="height:50%"></span><span style="height:80%"></span><span style="height:100%"></span></span></td><td><a class="btn">＋ 입고</a></td></tr>
-              <tr><td><span class="thumb"><img referrerpolicy="no-referrer" src="https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/202602/a157d261092510f1542550274972a939.png"></span><span class="nm">설탕 눈마을 스티커</span></td><td>메모</td><td><b class="mono" style="color:var(--accent)">6</b> <span class="mono" style="color:var(--sub)">/ 10</span></td><td><span class="tag warn">⚠ 부족</span></td><td><span class="spark"><span style="height:90%"></span><span style="height:100%"></span><span style="height:75%"></span><span style="height:80%"></span><span style="height:95%"></span></span></td><td><a class="btn">＋ 입고</a></td></tr>
-              <tr><td><span class="thumb"><img referrerpolicy="no-referrer" src="https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/202508/d9342a7de8b65e19f073f6f99139560d.png"></span><span class="nm">선샤인데이 스티커</span></td><td>메모</td><td><b class="mono">9</b> <span class="mono" style="color:var(--sub)">/ 10</span></td><td><span class="tag warn">부족</span></td><td><span class="spark"><span style="height:40%"></span><span style="height:55%"></span><span style="height:70%"></span><span style="height:60%"></span><span style="height:85%"></span></span></td><td><a class="btn">＋ 입고</a></td></tr>
-              <tr><td><span class="thumb"><img referrerpolicy="no-referrer" src="https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/202503/58dafda9eee23c1a553c073971af033c.png"></span><span class="nm">크레페 말랑 키링</span></td><td>굿즈</td><td><b class="mono" style="color:var(--bad)">0</b> <span class="mono" style="color:var(--sub)">/ 5</span></td><td><span class="tag bad">품절</span></td><td><span class="spark"><span style="height:30%"></span><span style="height:50%"></span><span style="height:40%"></span><span style="height:30%"></span><span style="height:0"></span></span></td><td><a class="btn">＋ 입고</a></td></tr>
+            <tbody id="lowStockRows">
+              <tr><td colspan="6" style="padding:30px;text-align:center;color:var(--sub)">아직 등록된 상품이 없어요. 상품 관리에서 추가하세요.</td></tr>
             </tbody>
           </table>
         </div>
 
         <div class="blk">
           <h2>이번 달 TOP <span class="h-cnt">· 인기 상품</span></h2>
-          <div class="prod-row">
-            <div class="pc"><div class="ph"><img referrerpolicy="no-referrer" src="https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/202602/a157d261092510f1542550274972a939.png"></div><div class="bd"><b>설탕 눈마을</b><small>128개 판매</small></div></div>
-            <div class="pc"><div class="ph"><img referrerpolicy="no-referrer" src="https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/202508/d9342a7de8b65e19f073f6f99139560d.png"></div><div class="bd"><b>선샤인데이</b><small>94개</small></div></div>
-            <div class="pc"><div class="ph"><img referrerpolicy="no-referrer" src="https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/202602/8844055f11daba2bd37b69a6150cdac6.png"></div><div class="bd"><b>학교괴담</b><small>71개</small></div></div>
-            <div class="pc"><div class="ph"><img referrerpolicy="no-referrer" src="https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/202602/bc4816b7234830cacfd8e73dbc81ebcb.png"></div><div class="bd"><b>롱 메모팩</b><small>65개</small></div></div>
-            <div class="pc"><div class="ph"><img referrerpolicy="no-referrer" src="https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/202508/13260f931f04e15ddc8bb56a20dc0e90.png"></div><div class="bd"><b>키스컷 마테 2</b><small>58개</small></div></div>
+          <div class="prod-row" id="topProducts">
+            <div style="padding:30px;text-align:center;color:var(--sub);width:100%">판매 데이터가 쌓이면 여기에 표시됩니다.</div>
           </div>
         </div>
       </section>
@@ -552,6 +545,15 @@ document.addEventListener('click',e=>{
   document.getElementById('crumbNow').textContent=labels[k]||"";
   document.querySelector('.content').scrollTop=0;
 });
+
+// 오늘 날짜 표시
+(function(){
+  const el=document.getElementById('todayDate');
+  if(!el)return;
+  const d=new Date();
+  const days=['sun','mon','tue','wed','thu','fri','sat'];
+  el.textContent=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${days[d.getDay()]}`;
+})();
 </script>
 </body>
 </html>

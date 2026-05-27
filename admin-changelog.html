@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<script src="assets/app.js"></script>
+<script src="assets/admin-guard.js"></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>STTY · Admin · 업데이트 내역</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css" />
+<style>
+:root{--bg:#fefefc;--paper:#fff;--ink:#202020;--sub:#878680;--faint:#d4d2cd;
+  --line:#ededeb;--accent:#a06440;--hover:#f5f4f0;
+  --ok:#3a8a6a;--warn:#b07a2a;--bad:#b03a3a;--info:#3a82d6;--feature:#7a4ab0}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Pretendard Variable',Pretendard,sans-serif;background:var(--paper);
+  color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.55;font-size:13.5px}
+a{color:inherit;text-decoration:none}
+.en{font-size:.7em;opacity:.42;margin-left:5px;font-weight:500;letter-spacing:.02em;font-style:normal}
+
+.app{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+.sb{background:#f9f8f4;border-right:1px solid var(--line);font-size:13px;display:flex;flex-direction:column}
+
+.main{display:flex;flex-direction:column;min-width:0}
+.top{padding:14px 28px;display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--line)}
+.crumb{font-size:13px;color:var(--sub)}.crumb b{color:var(--ink);font-weight:700}
+.crumb .sep{color:var(--faint);margin:0 6px}
+.top .r{margin-left:auto;display:flex;gap:6px;font-size:12.5px}
+.top .r a{padding:6px 10px;border-radius:5px;cursor:pointer;color:var(--sub)}
+.top .r a:hover{background:var(--hover);color:var(--ink)}
+
+.content{padding:30px 36px 60px;flex:1;overflow-y:auto;max-width:980px;width:100%}
+
+.ph{margin-bottom:24px}
+.ph .ico{font-size:32px;display:block;margin-bottom:8px;color:var(--accent)}
+.ph h1{font-size:30px;font-weight:800;letter-spacing:-.02em;line-height:1.15;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.ph h1 small{font-size:12.5px;color:var(--sub);font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.ph .desc{font-size:13.5px;color:var(--sub);margin-top:8px;max-width:640px;line-height:1.7}
+
+.hint{background:#eef4fb;border:1px solid #c7dcef;border-radius:6px;padding:14px 18px;margin-bottom:24px;display:flex;gap:12px}
+.hint .ic{font-size:18px;flex:none}
+.hint b{font-weight:700;display:block;margin-bottom:3px}
+.hint p{font-size:12.5px;color:var(--sub);line-height:1.6}
+
+/* 필터 */
+.filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+.filters button{background:#fff;border:1px solid var(--line);color:var(--sub);padding:6px 12px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
+.filters button:hover{border-color:var(--ink);color:var(--ink)}
+.filters button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+/* 타임라인 */
+.timeline{position:relative;padding-left:24px}
+.timeline::before{content:'';position:absolute;left:7px;top:6px;bottom:6px;width:2px;background:var(--line);border-radius:99px}
+.entry{position:relative;margin-bottom:24px;background:#fff;border:1px solid var(--line);border-radius:8px;padding:16px 18px}
+.entry::before{content:'';position:absolute;left:-24px;top:18px;width:16px;height:16px;border-radius:50%;background:var(--paper);border:3px solid var(--accent);z-index:1}
+.entry.feature::before{border-color:var(--feature)}
+.entry.fix::before{border-color:var(--bad)}
+.entry.cleanup::before{border-color:var(--ok)}
+.entry.todo::before{border-color:var(--warn);background:#fef5e7}
+.entry .h{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+.entry .tag{font-size:10.5px;font-weight:800;letter-spacing:.08em;padding:2px 8px;border-radius:3px;text-transform:uppercase}
+.entry .tag.feature{background:#f4ecfa;color:var(--feature)}
+.entry .tag.fix{background:#fdebeb;color:var(--bad)}
+.entry .tag.cleanup{background:#e7f4ec;color:var(--ok)}
+.entry .tag.todo{background:#fef5e7;color:var(--warn)}
+.entry .dt{font-size:11.5px;color:var(--sub);margin-left:auto}
+.entry .commit{font-family:'SF Mono',Menlo,monospace;font-size:10.5px;color:var(--info);background:#eef4fb;padding:1px 6px;border-radius:3px}
+.entry h3{font-size:14.5px;font-weight:800;letter-spacing:-.01em;margin-bottom:6px}
+.entry p{font-size:12.5px;color:var(--ink);line-height:1.7}
+.entry ul{font-size:12.5px;color:var(--sub);line-height:1.7;margin:6px 0 0 18px}
+.entry ul li{margin-bottom:2px}
+.entry ul li b{color:var(--ink);font-weight:600}
+
+@media(max-width:880px){.app{grid-template-columns:1fr}.sb{display:none}}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="sb"></aside>
+  <main class="main">
+    <div class="top">
+      <div class="crumb"><b>업데이트 내역</b><span class="sep">·</span>Changelog</div>
+      <div class="r">
+        <a href="admin-c.html">← 대시보드</a>
+        <a href="https://github.com/3eotty-afk/seoti-mockup/commits/main" target="_blank">🔗 GitHub 커밋 전체</a>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="ph">
+        <span class="ico">📝</span>
+        <h1>업데이트 내역 <small>Changelog · What's Changed</small></h1>
+        <p class="desc">사이트에 무엇이 새로 추가되고 무엇이 처리됐는지 시간 순으로 기록합니다. 새 기능·버그 수정·데이터 정리·할 일 등이 표시돼요.</p>
+      </div>
+
+      <div class="hint">
+        <span class="ic">💡</span>
+        <div>
+          <b>사용법</b>
+          <p>각 항목 우측의 <span class="commit">커밋해시</span> 를 클릭하면 GitHub 에서 해당 변경의 코드 diff 를 볼 수 있어요. <b>TODO</b> 태그는 아직 처리 안 된 항목 — <b>요청 게시판</b> 으로 옮겨서 진행하세요.</p>
+        </div>
+      </div>
+
+      <div class="filters">
+        <button data-f="all" class="on">전체</button>
+        <button data-f="feature">✨ 새 기능</button>
+        <button data-f="fix">🐞 버그 수정</button>
+        <button data-f="cleanup">🧹 정리</button>
+        <button data-f="todo">⏳ 할 일</button>
+      </div>
+
+      <div class="timeline" id="timeline"></div>
+    </div>
+  </main>
+</div>
+
+<script src="assets/admin-nav.js"></script>
+<script>
+// 업데이트 내역 — 새 변경이 있을 때마다 위에 추가
+// type: feature | fix | cleanup | todo
+const CHANGELOG = [
+  {date:'2026-05-27', type:'feature', commit:'866f918', title:'관리자 권한 관리 UI',
+    body:'사이트 안에서 다른 회원을 관리자로 추가·회수할 수 있게 됨. SQL 없이 이메일만 입력.',
+    bullets:['admin-extensions.html → "관리자 권한" 탭','Supabase RPC promote_admin_by_email 추가','관리자 RLS 정책 보강']},
+  {date:'2026-05-27', type:'feature', commit:'673736d', title:'요청 게시판 — 첨부파일 + Claude 협업',
+    body:'요청 게시판이 list-first 로 재구조화. 이미지·파일 첨부 가능, "📋 Claude에 복사" 버튼으로 채팅에 바로 붙여넣기.',
+    bullets:['compose form 토글 (＋ 새 요청 작성)','Supabase Storage feedback-attachments 버킷','이미지 라이트박스 · 파일 다운로드 링크','각 카드에 Claude 복사 버튼']},
+  {date:'2026-05-27', type:'fix', commit:'fb8ebfa', title:'요청 게시판 사이드바 깨짐 수정',
+    body:'.sb { display:none } 이 잘못 들어가 있었음. .item 클래스가 사이드바와 피드백 카드 양쪽에 충돌.',
+    bullets:['display:none → display:flex','.item → .list .item 스코핑']},
+  {date:'2026-05-27', type:'cleanup', commit:'1f07986', title:'시안·SEOTI 흔적 일괄 제거',
+    body:'모든 페이지의 "디자인 시안용 목업" 푸터·"시안 단계" 안내·미선택 변형 14개 파일 삭제. 브랜드 표기 SEOTI/서티 → STTY.',
+    bullets:['active 페이지 푸터 통일: © 2026 STTY','어드민 사이드바 헤더 SEOTI → STTY','dead variant 14개 파일 삭제 (about-a/b, auth-a, …)']},
+  {date:'2026-05-27', type:'feature', commit:'109bfe3', title:'관리자 캐시 버그 수정 + 네비 미리보기',
+    body:'isAdmin() 가 한번 false 캐시되면 DB 승급 후에도 영원히 false 반환하던 버그 수정.',
+    bullets:['SEOTI.api.isAdmin() — 캐시 제거, 매번 DB 조회','_preview/admin-button.html — 위치 3 안 비교']},
+  {date:'2026-05-27', type:'feature', commit:'61505b1', title:'네비에 로그인/계정 UI 추가',
+    body:'그룹오더 페이지에만 있던 로그인 진입을 전 페이지 nav 우측에 글로벌화.',
+    bullets:['로그아웃 상태 → "로그인" 버튼','로그인 상태 → 아바타 + 닉네임 드롭다운 (마이/장바구니/위시/관리자/로그아웃)']},
+  {date:'2026-05-27', type:'feature', commit:'4cef50b', title:'CMS 어드민 저장 → Supabase upsert',
+    body:'admin-content.html 에서 콘텐츠 수정·저장 시 Supabase site_content 테이블로도 저장. 모든 기기에서 즉시 반영.',
+    bullets:['content.saveAll() 추가','site_content_admin_write RLS 정책','updated_at trigger']},
+  {date:'2026-05-27', type:'feature', commit:'38507c0', title:'사이트 콘텐츠를 Supabase 에서 비동기 로드',
+    body:'CONTENT_DEFAULTS 비우고 app.js 초기화 시 Supabase site_content 테이블 fetch. 도착 전엔 HTML placeholder 유지.',
+    bullets:['loadContentFromSupabase()','content.get() — 빈 문자열도 fallback 으로 처리']},
+  {date:'2026-05-27', type:'cleanup', commit:'1a34f3d', title:'product-detail-a · admin-content/inventory/business mockup 비움',
+    body:'정식 데이터로 채울 준비. 빈 상태 UI 로 교체.',
+    bullets:['product-detail-a → "상품을 준비 중이에요"','admin-inventory SEED 12개 → []','admin-business VENDORS/SETTLEMENTS/TAX → 빈 배열']},
+  {date:'2026-05-27', type:'todo', title:'Cloudflare R2 — 실제 이미지 업로드 연동',
+    body:'관리자가 어드민에서 끌어놓으면 R2 stty-images 버킷으로 업로드되도록. presigned URL 발급용 Supabase Edge Function 필요.'},
+  {date:'2026-05-27', type:'todo', title:'어드민 대시보드 mock 완전 비우기',
+    body:'admin-c.html 의 KPI·인기 상품·품절 임박 표는 placeholder 로 비웠지만, 데이터 자동 채움 로직(Supabase select)이 아직 없음. 추후 products·orders·qna 테이블에서 가져오게.'}
+];
+
+const filterBtns = document.querySelectorAll('.filters button');
+let curFilter = 'all';
+
+function render(){
+  const list = curFilter==='all' ? CHANGELOG : CHANGELOG.filter(e=>e.type===curFilter);
+  const labels = {feature:'✨ FEATURE',fix:'🐞 FIX',cleanup:'🧹 CLEANUP',todo:'⏳ TODO'};
+  const html = list.map(e=>{
+    const linkOpen = e.commit?`<a href="https://github.com/3eotty-afk/seoti-mockup/commit/${e.commit}" target="_blank" class="commit">${e.commit}</a>`:'';
+    const bullets = e.bullets?.length ? `<ul>${e.bullets.map(b=>`<li>${b}</li>`).join('')}</ul>` : '';
+    return `<div class="entry ${e.type}">
+      <div class="h">
+        <span class="tag ${e.type}">${labels[e.type]||e.type}</span>
+        ${linkOpen}
+        <span class="dt">${e.date}</span>
+      </div>
+      <h3>${e.title}</h3>
+      ${e.body?`<p>${e.body}</p>`:''}
+      ${bullets}
+    </div>`;
+  }).join('');
+  document.getElementById('timeline').innerHTML = html || '<div style="padding:60px;text-align:center;color:var(--sub)">해당 항목이 없어요.</div>';
+}
+
+filterBtns.forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    filterBtns.forEach(b=>b.classList.toggle('on',b===btn));
+    curFilter = btn.dataset.f;
+    render();
+  });
+});
+
+render();
+</script>
+</body>
+</html>

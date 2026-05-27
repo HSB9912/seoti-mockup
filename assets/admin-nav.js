@@ -57,6 +57,7 @@
 
       ${gh('작업', 'Workspace')}
       ${item('요청 게시판', '📮', 'admin-feedback.html', { badge: 'NEW', alert: true })}
+      ${item('업데이트 내역', '📝', 'admin-changelog.html')}
 
       ${gh('비즈니스', 'Business')}
       ${item('대시보드·정산', '📊', 'admin-business.html')}
