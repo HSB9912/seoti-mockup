@@ -120,4 +120,43 @@
     sessionStorage.removeItem('seoti_admin_auth_v1');
     location.reload();
   });
+
+  // 같은 파일 내 ?go=X 링크는 풀-리로드 없이 JS 로 탭만 전환
+  sb.addEventListener('click', (e) => {
+    const a = e.target.closest('a.item[href]');
+    if (!a) return;
+    const href = a.getAttribute('href') || '';
+    if (!href || href.startsWith('http') || href.startsWith('#')) return;
+    const [file, query] = href.split('?');
+    const targetFile = file.toLowerCase();
+    // 다른 파일이면 그냥 브라우저가 처리하게 두기
+    if (targetFile !== current) return;
+    const go = new URLSearchParams(query || '').get('go') || '';
+    e.preventDefault();
+    // history 상태 업데이트 (뒤로가기 가능)
+    const newUrl = location.pathname + (go ? '?go=' + encodeURIComponent(go) : '') + location.hash;
+    if (newUrl !== location.pathname + location.search + location.hash) {
+      history.pushState({ go }, '', newUrl);
+    }
+    // 사이드바 .on 즉시 토글
+    sb.querySelectorAll('a.item').forEach(x => x.classList.remove('on'));
+    a.classList.add('on');
+    // 페이지의 탭 전환 함수 호출 (페이지별로 이름 다름)
+    if (typeof window.activateTab === 'function') window.activateTab(go || 'members');
+    else if (typeof window.activateBizTab === 'function') window.activateBizTab(go || 'overview');
+  });
+
+  // 브라우저 뒤로/앞으로 갈 때도 탭 동기화
+  window.addEventListener('popstate', () => {
+    const go = new URLSearchParams(location.search).get('go') || '';
+    if (typeof window.activateTab === 'function') window.activateTab(go || 'members');
+    else if (typeof window.activateBizTab === 'function') window.activateBizTab(go || 'overview');
+    // 사이드바 .on 갱신
+    sb.querySelectorAll('a.item').forEach(x => {
+      const h = x.getAttribute('href') || '';
+      const [f, q] = h.split('?');
+      const xGo = new URLSearchParams(q || '').get('go') || '';
+      x.classList.toggle('on', f.toLowerCase() === current && xGo === go);
+    });
+  });
 })();
