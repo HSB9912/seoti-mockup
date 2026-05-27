@@ -462,6 +462,20 @@
       localStorage.setItem(CONTENT_KEY, JSON.stringify(siteContent));
       window.dispatchEvent(new CustomEvent('seoti-content-change'));
     },
+    // 어드민용: localStorage + Supabase 양쪽에 저장 (관리자 RLS 통과 필요)
+    async saveAll(obj) {
+      this.setAll(obj);
+      try {
+        const client = await ensureSupabase();
+        const rows = Object.entries(obj).map(([key, value]) => ({ key, value: value ?? '' }));
+        const { error } = await client.from('site_content').upsert(rows, { onConflict: 'key' });
+        if (error) throw error;
+        return { ok: true };
+      } catch (e) {
+        console.error('site_content upsert 실패:', e);
+        return { ok: false, error: e.message || String(e) };
+      }
+    },
     all() { return Object.assign({}, siteContent); },
     defaults() { return Object.assign({}, CONTENT_DEFAULTS); },
     reset() {

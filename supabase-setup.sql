@@ -87,6 +87,24 @@ DROP POLICY IF EXISTS "site_content_public_read" ON public.site_content;
 CREATE POLICY "site_content_public_read" ON public.site_content
   FOR SELECT USING (true);
 
+-- 관리자만 INSERT/UPDATE 가능
+DROP POLICY IF EXISTS "site_content_admin_write" ON public.site_content;
+CREATE POLICY "site_content_admin_write" ON public.site_content
+  FOR ALL TO authenticated
+  USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true))
+  WITH CHECK (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true));
+
+-- 저장 시 updated_at 자동 갱신
+CREATE OR REPLACE FUNCTION public.touch_site_content()
+RETURNS TRIGGER AS $$
+BEGIN NEW.updated_at = now(); RETURN NEW; END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS site_content_touch ON public.site_content;
+CREATE TRIGGER site_content_touch
+  BEFORE UPDATE ON public.site_content
+  FOR EACH ROW EXECUTE FUNCTION public.touch_site_content();
+
 -- 4. ARCHIVE PHOTOS (다꾸 갤러리)
 CREATE TABLE IF NOT EXISTS public.archive_photos (
   id         bigserial PRIMARY KEY,

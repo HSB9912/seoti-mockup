@@ -317,13 +317,22 @@ button,input,select,textarea{font-family:inherit}
     });
   });
 
-  document.getElementById('saveBtn').addEventListener('click', () => {
+  document.getElementById('saveBtn').addEventListener('click', async () => {
     const data = {};
     inputs.forEach(inp => { data[inp.dataset.key] = inp.value; });
-    SEOTI.content.setAll(data);
-    dirty = false;
-    updateSaveUI();
-    SEOTI.toast('사이트 콘텐츠가 저장되었어요. 페이지를 새로고침하면 반영됩니다.', 'success');
+    const btn = document.getElementById('saveBtn');
+    btn.disabled = true;
+    btn.textContent = '저장 중…';
+    const res = await SEOTI.content.saveAll(data);
+    btn.disabled = false;
+    if (res.ok) {
+      dirty = false;
+      updateSaveUI();
+      SEOTI.toast('사이트 콘텐츠가 저장되었어요. 모든 기기에서 즉시 반영됩니다.', 'success');
+    } else {
+      updateSaveUI();
+      SEOTI.toast('Supabase 저장 실패 — 로컬에만 저장됨 (' + (res.error || '권한 확인') + ')', 'warn');
+    }
   });
 
   document.getElementById('resetBtn').addEventListener('click', () => {
