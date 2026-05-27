@@ -45,8 +45,11 @@ td.r{text-align:right}
 <div class="bar">
   <button id="diffBtn" class="p">📊 1. DB와 비교 (Diff)</button>
   <button id="applyBtn" disabled>✅ 2. 적용 (UPSERT)</button>
+  <span style="flex:1"></span>
+  <button id="nukeBtn" style="background:#fdebeb;border-color:#f0b3b3;color:#b03a3a">🗑️ 전부 날리고 시트로 새로 채우기</button>
   <span id="stats"></span>
 </div>
+<p class="hint" style="color:#b03a3a">⚠ <b>날리기 모드</b>: 기존 products 전부 DELETE 후 시트 데이터로 새로 INSERT. 한 번 누르면 되돌릴 수 없음. 이름 잘못 들어간 게 많아서 한방에 정리하려면 이쪽이 깔끔.</p>
 
 <div class="box">
   <h2>실행 로그</h2>
@@ -366,8 +369,38 @@ async function runApply(){
   else log('로그인 OK: ' + session.user.email, 'ok');
 })();
 
+async function runNuke(){
+  const sheet = parseSheet();
+  if (!confirm(`정말 기존 products 전부 삭제하고 시트 ${sheet.length}개로 새로 채울까?\n\n되돌릴 수 없음.`)) return;
+  if (!confirm(`마지막 확인 — 진짜 삭제 + 재생성?`)) return;
+
+  log('전체 삭제 중…', 'info');
+  // 안전: id > 0 인 모든 행 삭제
+  const { error: delErr } = await sb.from('products').delete().gt('id', 0);
+  if (delErr) { log('삭제 실패: ' + delErr.message, 'err'); return; }
+  log('✓ DELETE 완료', 'ok');
+
+  log(`INSERT ${sheet.length}건 시작…`, 'info');
+  // 배치 단위로 INSERT (50개씩)
+  let ok=0, fail=0;
+  const batchSize = 50;
+  for (let i=0; i<sheet.length; i+=batchSize) {
+    const batch = sheet.slice(i, i+batchSize).map(s => ({
+      name: s.name, category: s.category, state: s.state,
+      stock: s.stock, price: s.price, barcode: s.barcode,
+      release_month: s.release_month, safe_stock: 10
+    }));
+    const { error } = await sb.from('products').insert(batch);
+    if (error) { log(`✕ batch ${i}-${i+batch.length}: ${error.message}`, 'err'); fail += batch.length; }
+    else { ok += batch.length; log(`+ batch ${i+1}-${i+batch.length} (${batch.length}건)`, 'ok'); }
+  }
+  log(`\n✅ INSERT 완료: ${ok}건 성공 / ${fail}건 실패`, fail?'err':'ok');
+  alert(`재생성 완료\n성공 ${ok}건 / 실패 ${fail}건\n\n상품관리·재고관리 페이지 새로고침해서 확인.`);
+}
+
 document.getElementById('diffBtn').addEventListener('click', runDiff);
 document.getElementById('applyBtn').addEventListener('click', runApply);
+document.getElementById('nukeBtn').addEventListener('click', runNuke);
 </script>
 </body>
 </html>
