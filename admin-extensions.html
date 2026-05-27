@@ -433,13 +433,24 @@ document.addEventListener('click',e=>{
   }
 })();
 
+// ===== Supabase 라이브러리 보장 — 로그아웃 상태에서도 lib 로드 =====
+function ensureSupabaseLib(){
+  if(window.supabase) return Promise.resolve();
+  return new Promise((resolve,reject)=>{
+    const s=document.createElement('script');
+    s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
+    s.async=true;s.onload=resolve;s.onerror=()=>reject(new Error('Supabase lib 로드 실패'));
+    document.head.appendChild(s);
+  });
+}
+const SB_URL='https://wzmtcomawebufylojffx.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6bXRjb21hd2VidWZ5bG9qZmZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NTg5MjcsImV4cCI6MjA5NTQzNDkyN30.6P0ZSLTU7XPudr9Ove2S0Nc5XO7pdb87LUVDdVJKmEM';
+
 // ===== 회원 관리 =====
 async function getMClient(){
   if(mClient) return mClient;
-  await SEOTI.api.isAdmin();
-  const URL='https://wzmtcomawebufylojffx.supabase.co';
-  const KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6bXRjb21hd2VidWZ5bG9qZmZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NTg5MjcsImV4cCI6MjA5NTQzNDkyN30.6P0ZSLTU7XPudr9Ove2S0Nc5XO7pdb87LUVDdVJKmEM';
-  mClient=window.supabase.createClient(URL,KEY,{auth:{persistSession:true,autoRefreshToken:true,storageKey:'sb-wzmtcomawebufylojffx-auth-token'}});
+  await ensureSupabaseLib();
+  mClient=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,storageKey:'sb-wzmtcomawebufylojffx-auth-token'}});
   return mClient;
 }
 async function loadMembers(){
@@ -476,10 +487,8 @@ document.getElementById('memberRefreshBtn')?.addEventListener('click',loadMember
 // ===== 관리자 권한 관리 =====
 async function getAdClient(){
   if(adClient) return adClient;
-  await SEOTI.api.isAdmin(); // ensure Supabase loaded
-  const URL='https://wzmtcomawebufylojffx.supabase.co';
-  const KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6bXRjb21hd2VidWZ5bG9qZmZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NTg5MjcsImV4cCI6MjA5NTQzNDkyN30.6P0ZSLTU7XPudr9Ove2S0Nc5XO7pdb87LUVDdVJKmEM';
-  adClient=window.supabase.createClient(URL,KEY,{auth:{persistSession:true,autoRefreshToken:true,storageKey:'sb-wzmtcomawebufylojffx-auth-token'}});
+  await ensureSupabaseLib();
+  adClient=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,storageKey:'sb-wzmtcomawebufylojffx-auth-token'}});
   return adClient;
 }
 
