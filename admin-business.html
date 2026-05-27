@@ -333,11 +333,47 @@ table.t{width:100%;border-collapse:collapse;font-size:13px}
 
 <script>
 // ====================== DATA ======================
-// 시드 데이터 — 어드민에서 입점처·정산·세금을 등록하면 여기에 자동 표시됨
-// (Supabase 연동 시 from('vendors').select() 등으로 교체)
-const VENDORS = [];
-const SETTLEMENTS = [];
-const TAX = [];
+// Supabase 에서 비동기 로드 — 빈 배열로 시작 후 fetch 완료 시 채워짐
+let VENDORS = [];
+let SETTLEMENTS = [];
+let TAX = [];
+
+async function loadBizData(){
+  try {
+    if (!window.supabase) {
+      await new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
+        s.async = true; s.onload = resolve; s.onerror = () => reject(new Error('Supabase lib 로드 실패'));
+        document.head.appendChild(s);
+      });
+    }
+    const SB_URL = 'https://wzmtcomawebufylojffx.supabase.co';
+    const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6bXRjb21hd2VidWZ5bG9qZmZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NTg5MjcsImV4cCI6MjA5NTQzNDkyN30.6P0ZSLTU7XPudr9Ove2S0Nc5XO7pdb87LUVDdVJKmEM';
+    const sb = window.supabase.createClient(SB_URL, SB_KEY, {auth:{persistSession:true,autoRefreshToken:true,storageKey:'sb-wzmtcomawebufylojffx-auth-token'}});
+    const [v, s, t] = await Promise.all([
+      sb.from('vendors').select('*').order('id'),
+      sb.from('settlements').select('*').order('id'),
+      sb.from('tax_payments').select('*').order('id'),
+    ]);
+    if (v.error || s.error || t.error) {
+      console.warn('biz load errors:', v.error, s.error, t.error);
+    }
+    VENDORS = v.data || [];
+    SETTLEMENTS = s.data || [];
+    TAX = t.data || [];
+    // 페이지에서 정의한 render 함수들 재호출
+    if (typeof renderOverview === 'function') renderOverview();
+    if (typeof renderVendors === 'function') renderVendors();
+    if (typeof renderSettlements === 'function') renderSettlements();
+    if (typeof renderTax === 'function') renderTax();
+  } catch (e) {
+    console.error('biz 데이터 로드 실패', e);
+  }
+}
+// 페이지 로드 후 데이터 fetch
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', loadBizData);
+else loadBizData();
 
 // ====================== HELPERS ======================
 const fmt = n => "₩" + n.toLocaleString();
