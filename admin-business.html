@@ -419,32 +419,44 @@ function renderOverview(){
   const byVendor = {};
   SETTLEMENTS.forEach(s => byVendor[s.vendor] = (byVendor[s.vendor] || 0) + s.total);
   const sorted = Object.entries(byVendor).sort((a,b) => b[1] - a[1]);
-  const max = sorted[0][1];
-  document.getElementById('vendorBars').innerHTML = sorted.map(([v, amt]) => `
-    <div class="bar-wrap">
-      <span class="name">${v}</span>
-      <div class="bar"><div style="width:${(amt/max*100).toFixed(0)}%"></div></div>
-      <span class="amt mono">${fmt(amt)}</span>
-      <span class="pct mono">${(amt/totalSettlement*100).toFixed(0)}%</span>
-    </div>`).join('');
+  const vendorBarsEl = document.getElementById('vendorBars');
+  if (vendorBarsEl) {
+    if (!sorted.length) {
+      vendorBarsEl.innerHTML = '<div style="padding:30px;text-align:center;color:var(--sub);font-size:13px">정산 데이터가 쌓이면 입점처별 매출 비교가 표시됩니다.</div>';
+    } else {
+      const max = sorted[0][1];
+      vendorBarsEl.innerHTML = sorted.map(([v, amt]) => `
+        <div class="bar-wrap">
+          <span class="name">${v}</span>
+          <div class="bar"><div style="width:${(amt/max*100).toFixed(0)}%"></div></div>
+          <span class="amt mono">${fmt(amt)}</span>
+          <span class="pct mono">${totalSettlement?(amt/totalSettlement*100).toFixed(0):0}%</span>
+        </div>`).join('');
+    }
+  }
 
-  // Expense summary
-  document.getElementById('expenseSummary').innerHTML = `
-    <div class="vc">
-      <div class="vc-top"><h3>사무실</h3><span class="com">${(totalOffice/totalTax*100).toFixed(0)}%</span></div>
-      <div class="meta">
-        <b>전대료·관리비</b><span class="mono">${fmt(totalOffice)}</span>
-        <b>건수</b><span>${TAX.filter(t => t.category === "사무실").length}건</span>
+  // Expense summary (총합 0 일 때 div-by-zero 가드)
+  const expEl = document.getElementById('expenseSummary');
+  if (expEl) {
+    const officePct = totalTax ? (totalOffice/totalTax*100).toFixed(0) : 0;
+    const taxPct    = totalTax ? (totalTaxOnly/totalTax*100).toFixed(0) : 0;
+    expEl.innerHTML = `
+      <div class="vc">
+        <div class="vc-top"><h3>사무실</h3><span class="com">${officePct}%</span></div>
+        <div class="meta">
+          <b>전대료·관리비</b><span class="mono">${fmt(totalOffice)}</span>
+          <b>건수</b><span>${TAX.filter(t => t.category === "사무실").length}건</span>
+        </div>
       </div>
-    </div>
-    <div class="vc">
-      <div class="vc-top"><h3>세금</h3><span class="com" style="background:#fdebeb;color:var(--bad)">${(totalTaxOnly/totalTax*100).toFixed(0)}%</span></div>
-      <div class="meta">
-        <b>종소세·지방세</b><span class="mono">${fmt(totalTaxOnly)}</span>
-        <b>건수</b><span>${TAX.filter(t => t.category === "세금").length}건</span>
+      <div class="vc">
+        <div class="vc-top"><h3>세금</h3><span class="com" style="background:#fdebeb;color:var(--bad)">${taxPct}%</span></div>
+        <div class="meta">
+          <b>종소세·지방세</b><span class="mono">${fmt(totalTaxOnly)}</span>
+          <b>건수</b><span>${TAX.filter(t => t.category === "세금").length}건</span>
+        </div>
       </div>
-    </div>
-  `;
+    `;
+  }
 }
 
 // ====================== VENDORS ======================
