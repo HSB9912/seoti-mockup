@@ -191,37 +191,19 @@ td .nm small{display:block;color:var(--sub);font-weight:500;font-size:11.5px;mar
       <section class="sect on" data-s="members">
         <div class="page-h">
           <div><h1>회원 관리<i class="en">Members</i></h1>
-            <div class="lead">전체 회원 1,842명 · 이번 달 +127명 · VIP 84명</div></div>
+            <div class="lead" id="memberLead">불러오는 중…</div></div>
           <div class="actions">
-            <button class="btn">📤 CSV 내보내기</button>
-            <button class="btn">📧 단체 메일 보내기</button>
-            <button class="btn btn-p">＋ 회원 직접 추가</button>
+            <button class="btn" id="memberRefreshBtn">🔄 새로고침</button>
           </div>
-        </div>
-
-        <div class="kpis">
-          <div class="kpi"><div class="lbl">총 회원</div><div class="val">1,842</div><div class="delta">▲ 127 이번달</div></div>
-          <div class="kpi"><div class="lbl">VIP (플래티넘+)</div><div class="val">84</div><div class="delta">▲ 6</div></div>
-          <div class="kpi"><div class="lbl">활성 회원 (30일)</div><div class="val">512</div><div class="delta">27.8%</div></div>
-          <div class="kpi"><div class="lbl">평균 LTV</div><div class="val">₩42k</div><div class="delta">▲ ₩2.1k</div></div>
         </div>
 
         <div class="card" style="padding:0">
           <div style="padding:14px 18px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--line)">
-            <span class="seg"><a class="on">전체 1,842</a><a>VIP 84</a><a>골드 218</a><a>실버 540</a><a>신규 (7일) 23</a><a>휴면</a></span>
-            <input style="margin-left:auto;background:var(--bg);border:1px solid var(--line);padding:8px 12px;font-size:13px;outline:none;width:240px" placeholder="🔍 이름·이메일·전화번호">
+            <input id="memberSearch" style="background:var(--bg);border:1px solid var(--line);padding:8px 12px;font-size:13px;outline:none;width:300px;border-radius:5px;font-family:inherit" placeholder="🔍 닉네임·국가·전화번호">
           </div>
           <table>
-            <thead><tr><th style="width:30px"><input type="checkbox"></th><th>회원</th><th>등급</th><th>가입일</th><th>최근 접속</th><th>총 구매</th><th>적립금</th><th>상태</th><th></th></tr></thead>
-            <tbody>
-              <tr><td><input type="checkbox"></td><td><span class="nm">다꾸요정<small>seoti.fan@example.com · 010-1234-****</small></span></td><td><span class="pill gold">골드</span></td><td>2026-05-01</td><td class="tnum">방금 전</td><td class="tnum">₩87,500<br><small style="color:var(--sub)">14건</small></td><td class="tnum">1,250P</td><td><span class="pill">활성</span></td><td class="row-act"><a>상세</a><a>메일</a></td></tr>
-              <tr><td><input type="checkbox"></td><td><span class="nm">송이*<small>song***@gmail.com · 010-2345-****</small></span></td><td><span class="pill purple">플래티넘</span></td><td>2025-12-08</td><td class="tnum">2시간 전</td><td class="tnum">₩324,800<br><small style="color:var(--sub)">38건</small></td><td class="tnum">4,830P</td><td><span class="pill">활성</span></td><td class="row-act"><a>상세</a><a>메일</a></td></tr>
-              <tr><td><input type="checkbox"></td><td><span class="nm">jenn*<small>🇺🇸 jenn***@gmail.com</small></span></td><td><span class="pill gold">골드</span></td><td>2025-08-14</td><td class="tnum">어제</td><td class="tnum">₩142,300<br><small style="color:var(--sub)">8건 (해외)</small></td><td class="tnum">540P</td><td><span class="pill">활성</span></td><td class="row-act"><a>상세</a><a>메일</a></td></tr>
-              <tr><td><input type="checkbox"></td><td><span class="nm">민지*<small>mj***@naver.com</small></span></td><td><span class="pill">실버</span></td><td>2026-03-22</td><td class="tnum">3일 전</td><td class="tnum">₩28,400<br><small style="color:var(--sub)">3건</small></td><td class="tnum">250P</td><td><span class="pill">활성</span></td><td class="row-act"><a>상세</a><a>메일</a></td></tr>
-              <tr><td><input type="checkbox"></td><td><span class="nm">하늘*<small>sky***@kakao.com</small></span></td><td><span class="pill">실버</span></td><td>2026-05-19</td><td class="tnum">오늘</td><td class="tnum">₩6,400<br><small style="color:var(--sub)">1건</small></td><td class="tnum">3,180P</td><td><span class="pill gray">신규</span></td><td class="row-act"><a>상세</a><a>메일</a></td></tr>
-              <tr><td><input type="checkbox"></td><td><span class="nm">유빈*<small>yoo***@daum.net</small></span></td><td><span class="pill">실버</span></td><td>2026-02-10</td><td class="tnum">60일 전</td><td class="tnum">₩42,500<br><small style="color:var(--sub)">5건</small></td><td class="tnum">820P</td><td><span class="pill warn">휴면 임박</span></td><td class="row-act"><a>상세</a><a>리마인드</a></td></tr>
-              <tr><td><input type="checkbox"></td><td><span class="nm">agency*<small>ad***@studio.kr</small></span></td><td><span class="pill ink">기업</span></td><td>2025-11-04</td><td class="tnum">1주 전</td><td class="tnum">₩1,840,000<br><small style="color:var(--sub)">3건 (대량)</small></td><td class="tnum">—</td><td><span class="pill">활성</span></td><td class="row-act"><a>상세</a><a>메일</a></td></tr>
-            </tbody>
+            <thead><tr><th>닉네임</th><th>국가</th><th>전화</th><th>가입일</th><th>관리자</th></tr></thead>
+            <tbody id="memberRows"><tr><td colspan="5" style="padding:40px;text-align:center;color:var(--sub)">불러오는 중…</td></tr></tbody>
           </table>
         </div>
       </section>
@@ -460,16 +442,74 @@ td .nm small{display:block;color:var(--sub);font-weight:500;font-size:11.5px;mar
 <script src="assets/admin-guard.js"></script>
 <script>
 const labels={members:"회원 관리",admins:"관리자 권한",reviews:"리뷰 관리",notices:"공지·이벤트 관리",coupons:"쿠폰 관리"};
-document.addEventListener('click',e=>{
-  const go=e.target.closest('[data-go]');if(!go)return;
-  e.preventDefault();
-  const k=go.dataset.go;
+function activateTab(k){
+  if(!labels[k]) return;
   document.querySelectorAll('.sect').forEach(s=>s.classList.toggle('on',s.dataset.s===k));
   document.querySelectorAll('.sb a').forEach(a=>a.classList.toggle('on',a.dataset.go===k));
   document.getElementById('crumbNow').textContent=labels[k]||"";
   document.querySelector('.content').scrollTop=0;
   if(k==='admins') loadAdmins();
+  if(k==='members') loadMembers();
+}
+document.addEventListener('click',e=>{
+  const go=e.target.closest('[data-go]');if(!go)return;
+  e.preventDefault();
+  activateTab(go.dataset.go);
 });
+// URL query (?go=admins) 로 탭 자동 전환 (admin-nav.js 링크가 사용)
+(function(){
+  const p = new URLSearchParams(location.search).get('go');
+  if (p && labels[p]) activateTab(p);
+  else if (location.hash) {
+    const k = location.hash.slice(1);
+    if (labels[k]) activateTab(k);
+  } else {
+    // 기본은 members 로드
+    setTimeout(()=>loadMembers(), 100);
+  }
+})();
+
+// ===== 회원 관리 =====
+let mClient=null;
+let allMembers=[];
+async function getMClient(){
+  if(mClient) return mClient;
+  await SEOTI.api.isAdmin();
+  const URL='https://wzmtcomawebufylojffx.supabase.co';
+  const KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6bXRjb21hd2VidWZ5bG9qZmZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NTg5MjcsImV4cCI6MjA5NTQzNDkyN30.6P0ZSLTU7XPudr9Ove2S0Nc5XO7pdb87LUVDdVJKmEM';
+  mClient=window.supabase.createClient(URL,KEY,{auth:{persistSession:true,autoRefreshToken:true,storageKey:'sb-wzmtcomawebufylojffx-auth-token'}});
+  return mClient;
+}
+async function loadMembers(){
+  const rowsEl=document.getElementById('memberRows');
+  const leadEl=document.getElementById('memberLead');
+  rowsEl.innerHTML='<tr><td colspan="5" style="padding:40px;text-align:center;color:var(--sub)">불러오는 중…</td></tr>';
+  try{
+    const c=await getMClient();
+    const {data,error}=await c.from('profiles').select('id,nickname,country,phone,is_admin,created_at').order('created_at',{ascending:false});
+    if(error) throw error;
+    allMembers=data||[];
+    leadEl.textContent=`전체 회원 ${allMembers.length}명 · 관리자 ${allMembers.filter(m=>m.is_admin).length}명`;
+    renderMembers();
+  }catch(e){
+    rowsEl.innerHTML=`<tr><td colspan="5" style="padding:40px;text-align:center;color:var(--bad)">불러오기 실패 — ${esc(e.message||e)}</td></tr>`;
+    leadEl.textContent='로드 실패';
+  }
+}
+function renderMembers(){
+  const q=(document.getElementById('memberSearch')?.value||'').toLowerCase().trim();
+  const rowsEl=document.getElementById('memberRows');
+  const list = q ? allMembers.filter(m=>{
+    return (m.nickname||'').toLowerCase().includes(q) || (m.country||'').toLowerCase().includes(q) || (m.phone||'').includes(q);
+  }) : allMembers;
+  if(!list.length){rowsEl.innerHTML='<tr><td colspan="5" style="padding:40px;text-align:center;color:var(--sub)">아직 회원이 없거나 검색 결과가 없어요.</td></tr>';return;}
+  rowsEl.innerHTML=list.map(m=>{
+    const dt=new Date(m.created_at).toLocaleDateString('ko-KR');
+    return `<tr><td><span class="nm">${esc(m.nickname||'—')}<small>${m.id.slice(0,8)}…</small></span></td><td>${esc(m.country||'—')}</td><td>${esc(m.phone||'—')}</td><td>${dt}</td><td>${m.is_admin?'<span class="pill purple">👑 관리자</span>':'—'}</td></tr>`;
+  }).join('');
+}
+document.getElementById('memberSearch')?.addEventListener('input',renderMembers);
+document.getElementById('memberRefreshBtn')?.addEventListener('click',loadMembers);
 
 // ===== 관리자 권한 관리 =====
 let adClient=null;

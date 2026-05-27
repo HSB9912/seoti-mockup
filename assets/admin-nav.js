@@ -45,18 +45,20 @@
 
       ${gh('상품·재고', 'Inventory')}
       ${item('상품 관리', '🏷', 'admin-c.html')}
-      ${item('재고·입고 관리', '📦', 'admin-inventory.html', { badge: '3', alert: true })}
+      ${item('재고·입고 관리', '📦', 'admin-inventory.html')}
 
       ${gh('주문', 'Orders')}
       ${item('일반 주문', '🚚', 'admin-c.html')}
-      ${item('Group Order', '📋', 'admin-c.html', { badge: '5' })}
+      ${item('Group Order', '📋', 'admin-c.html')}
 
       ${gh('고객', 'Customer')}
-      ${item('Q&A 답변', '💬', 'admin-c.html', { badge: '8' })}
-      ${item('회원·리뷰 관리', '⭐', 'admin-extensions.html')}
+      ${item('Q&A 답변', '💬', 'admin-c.html')}
+      ${item('회원 관리', '👥', 'admin-extensions.html?go=members')}
+      ${item('관리자 권한', '👑', 'admin-extensions.html?go=admins')}
+      ${item('리뷰 관리', '⭐', 'admin-extensions.html?go=reviews')}
 
       ${gh('작업', 'Workspace')}
-      ${item('요청 게시판', '📮', 'admin-feedback.html', { badge: 'NEW', alert: true })}
+      ${item('요청 게시판', '📮', 'admin-feedback.html', { alert: true })}
       ${item('업데이트 내역', '📝', 'admin-changelog.html')}
 
       ${gh('비즈니스', 'Business')}
@@ -64,12 +66,12 @@
       ${item('입점처·세금·관리비', '🧾', 'admin-business.html')}
 
       ${gh('사이트 콘텐츠', 'Site')}
-      ${item('콘텐츠 편집 (CMS)', '📝', 'admin-content.html', { badge: 'CMS' })}
-      ${item('공지·이벤트 관리', '📢', 'admin-extensions.html')}
+      ${item('콘텐츠 편집 (CMS)', '📝', 'admin-content.html')}
+      ${item('공지·이벤트 관리', '📢', 'admin-extensions.html?go=notices')}
 
       ${gh('출시 준비', 'Pre-Launch')}
-      ${item('진행 로드맵', '🗺', 'admin-roadmap.html', { badge: '5/9' })}
-      ${item('DB 연동 전 체크', '✅', 'admin-checklist.html', { badge: '42', alert: true })}
+      ${item('진행 로드맵', '🗺', 'admin-roadmap.html')}
+      ${item('DB 연동 전 체크', '✅', 'admin-checklist.html')}
     </div>
     <div class="sb-bot" style="padding:10px 14px;border-top:1px solid #ededeb;display:flex;align-items:center;gap:8px;font-size:12.5px;color:#878680">
       <span style="width:18px;height:18px;background:#a06440;color:#fff;border-radius:3px;display:grid;place-items:center;font-size:10px;font-weight:800">S</span>
