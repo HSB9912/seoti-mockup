@@ -203,8 +203,8 @@
       <div class="grp open">
         <div class="gh"><span class="chev">▸</span>상품<i class="en">Catalog</i></div>
         <div class="gc">
-          <div class="item" data-go="products"><span class="ico">🏷</span>전체 상품</div>
-          <a class="item" href="admin-inventory.html" style="text-decoration:none"><span class="ico">📦</span>재고·입고 관리</a>
+          <div class="item" data-go="products"><span class="ico">🏷</span>상품 관리</div>
+          <div class="item" data-go="stock"><span class="ico">📦</span>재고 관리</div>
           <div class="item" data-go="add"><span class="ico">＋</span>새 상품 등록</div>
         </div>
       </div>
@@ -327,7 +327,7 @@
       <section class="sect" data-s="products">
         <div class="ph">
           <span class="ico">🏷</span>
-          <h1>전체 상품 <small id="prodSummary">불러오는 중…</small></h1>
+          <h1>상품 관리 <small id="prodSummary">불러오는 중…</small></h1>
           <p class="desc">표 형태로 빠르게 훑고, 우상단 "＋ 새 상품"으로 추가하세요. Supabase products 테이블에서 실시간 로드.</p>
           <div class="meta">
             <div><b>판매중</b><span id="prodInCount">—</span></div><div><b>품절</b><span id="prodOutCount">—</span></div>
@@ -532,15 +532,15 @@ function imgUrl(img){
 function renderProductTables(){
   const empty = !products.length;
   document.getElementById('prodT').innerHTML=`
-   <thead><tr><th></th><th>상품명</th><th>카테고리</th><th>가격</th><th>재고</th><th>판매</th><th>액션</th></tr></thead>
-   <tbody>${empty ? `<tr><td colspan="7" style="padding:40px;text-align:center;color:var(--sub)">아직 등록된 상품이 없어요. <b style="color:var(--accent);cursor:pointer" onclick="document.querySelector('[data-go=add]').click()">＋ 새 상품</b></td></tr>` : products.map(p=>`<tr>
+   <thead><tr><th></th><th>상품명 · 바코드</th><th>카테고리</th><th>가격</th><th>재고</th><th>상태</th><th>액션</th></tr></thead>
+   <tbody>${empty ? `<tr><td colspan="7" style="padding:40px;text-align:center;color:var(--sub)">아직 등록된 상품이 없어요. <b style="color:var(--accent);cursor:pointer" onclick="document.querySelector('[data-go=add]').click()">＋ 새 상품</b></td></tr>` : products.map(p=>`<tr data-prod-id="${p.id}" style="cursor:pointer" title="클릭해서 수정">
      <td style="width:32px"><span class="thumb">${p.img?`<img referrerpolicy="no-referrer" src="${imgUrl(p.img)}">`:''}</span></td>
-     <td><span class="nm">${p.n}</span></td>
+     <td><span class="nm">${p.n}</span>${p.barcode?`<br><small class="mono" style="color:var(--sub);font-size:11px">${p.barcode}</small>`:''}</td>
      <td>${p.c||'—'}</td>
-     <td class="mono">₩${(p.p||0).toLocaleString()}</td>
+     <td class="mono">₩${(p.p||0).toLocaleString()}${p.dddPrice?`<br><small style="color:var(--sub);font-size:11px">도매 ₩${p.dddPrice.toLocaleString()}</small>`:''}</td>
      <td class="mono">${p.s}</td>
      <td>${statTag(p.s,p.safe)}</td>
-     <td><span style="color:var(--sub);font-size:11px">편집 · 복제 · 숨김</span></td>
+     <td><a class="edit" style="font-size:11.5px;color:var(--sub);font-weight:600">수정 →</a></td>
    </tr>`).join('')}</tbody>`;
   document.getElementById('stockT').innerHTML=`
    <thead><tr><th></th><th>상품명</th><th>현재고 / 안전</th><th>게이지</th><th>상태</th><th></th></tr></thead>
@@ -760,17 +760,29 @@ document.getElementById('prodCsvBtn')?.addEventListener('click', () => {
   });
 })();
 
-const labels={dash:"대시보드",products:"상품",stock:"재고 관리",add:"새 상품 등록",
+const labels={dash:"대시보드",products:"상품 관리",stock:"재고 관리",add:"새 상품 등록",
   bulk:"Group Order",qna:"Q&A",analytics:"판매 실적"};
-document.addEventListener('click',e=>{
-  const gh=e.target.closest('.gh');
-  if(gh){gh.parentElement.classList.toggle('open');return;}
-  const go=e.target.closest('[data-go]');if(!go)return;
-  const k=go.dataset.go;
+function activateTab(k){
+  if(!labels[k]) return;
   document.querySelectorAll('.sect').forEach(s=>s.classList.toggle('on',s.dataset.s===k));
   document.querySelectorAll('.item').forEach(a=>a.classList.toggle('on',a.dataset.go===k));
   document.getElementById('crumbNow').textContent=labels[k]||"";
   document.querySelector('.content').scrollTop=0;
+}
+// URL ?go=X 로 탭 자동 전환
+(function(){
+  const p = new URLSearchParams(location.search).get('go');
+  if (p && labels[p]) setTimeout(() => activateTab(p), 30);
+})();
+window.activateTab = activateTab;
+document.addEventListener('click',e=>{
+  const gh=e.target.closest('.gh');
+  if(gh){gh.parentElement.classList.toggle('open');return;}
+  const go=e.target.closest('[data-go]');if(!go)return;
+  // <a href> with data-go: 외부 페이지 이동 → admin-nav.js SPA 핸들러가 처리
+  if (go.tagName === 'A' && go.href) return;
+  const k=go.dataset.go;
+  activateTab(k);
 });
 
 // 오늘 날짜 표시

@@ -52,8 +52,9 @@
       ${item('판매 실적', '📈', 'admin-c.html')}
 
       ${gh('상품·재고', 'Inventory')}
-      ${item('상품 관리', '🏷', 'admin-c.html')}
-      ${item('재고·입고 관리', '📦', 'admin-inventory.html')}
+      ${item('상품 관리',    '🏷', 'admin-c.html?go=products')}
+      ${item('재고 관리',    '📦', 'admin-c.html?go=stock')}
+      ${item('새 상품 등록', '＋', 'admin-c.html?go=add')}
 
       ${gh('주문', 'Orders')}
       ${item('일반 주문', '🚚', 'admin-c.html')}
