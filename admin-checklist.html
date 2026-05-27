@@ -631,11 +631,25 @@ a{color:inherit;text-decoration:none}img{display:block;max-width:100%}
   const barFill = document.getElementById('barFill');
   totalCount.textContent = tasks.length;
 
-  // 초기값 적용
+  // Claude가 코드 레벨로 이미 처리한 항목들 — 자동 체크 (사용자가 풀 수 있음)
+  const AUTO_CHECKED = ['sec-8'];
+
+  // 초기값 적용 (저장된 값 + 자동 체크)
   tasks.forEach(t => {
     const cb = t.querySelector('input[type=checkbox]');
     const id = t.dataset.id;
-    if (saved[id]) { cb.checked = true; t.classList.add('done'); }
+    const auto = AUTO_CHECKED.includes(id);
+    if (saved[id] || (auto && saved[id] !== false)) {
+      cb.checked = true;
+      t.classList.add('done');
+      if (auto && !saved[id]) {
+        // 시각적 표시
+        const tag = document.createElement('span');
+        tag.style.cssText = 'font-size:10px;font-weight:800;color:#3a8a6a;background:#e7f4ec;padding:2px 7px;border-radius:3px;margin-left:6px';
+        tag.textContent = '🤖 자동 점검';
+        t.querySelector('.body b')?.appendChild(tag);
+      }
+    }
   });
 
   function updateProgress(){

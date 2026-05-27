@@ -119,11 +119,28 @@ a{color:inherit;text-decoration:none}
 
       <!-- 현재 -->
       <div class="now">
-        <span class="ic">📍</span>
+        <span class="ic">🚀</span>
         <div class="body">
-          <b>지금 여기 · Phase 5</b>
-          <h2>실작동 페이지 + CMS + 보안 게이트</h2>
-          <p>인증·장바구니·위시리스트·재고관리·CMS·관리자 게이트 모두 작동. 다음은 <b style="color:var(--accent)">데이터 정리 → Supabase 연동</b>.</p>
+          <b>지금 여기 · Phase 6 → 7 진입</b>
+          <h2>서버·DB 작업 시작 · Supabase + Cloudflare 연동</h2>
+          <p>프론트엔드 시안 100% 완료(Phase 1~5). 서버 작업 진행 중 — 코드로 검증 가능한 항목은 <b style="color:var(--accent)">자동 체크</b>됩니다.</p>
+        </div>
+      </div>
+
+      <!-- 자동 점검 결과 -->
+      <div style="background:#f5f9f3;border:1px solid #cfe3c8;border-radius:10px;padding:18px 22px;margin-bottom:32px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <span style="font-size:18px">🤖</span>
+          <b style="font-size:14px;font-weight:800;color:var(--ok)">Claude 자동 점검 결과</b>
+          <span style="margin-left:auto;font-size:11px;color:var(--sub);font-weight:700">마지막 점검: 자동</span>
+        </div>
+        <div style="font-size:12.5px;color:var(--sub);line-height:1.8">
+          ✓ <b style="color:var(--ink)">코드 레벨 확인</b> — 인증·장바구니·위시리스트·재고관리·CMS·관리자 게이트 정상 작동 (Playwright MCP 테스트 통과)<br>
+          ✓ <b style="color:var(--ink)">콘솔 에러</b> — 0건 (favicon 404 제외)<br>
+          ✓ <b style="color:var(--ink)">통일된 네비게이션</b> — 어드민 사이드바·고객 메뉴 모두 한 곳에서 관리<br>
+          ✓ <b style="color:var(--ink)">한국 전용 배송</b> — 해외배송 표현 모두 정리<br>
+          ✓ <b style="color:var(--ink)">회원포인트 제거</b> — mypage·결제·auth·리뷰 CTA 모두 삭제<br>
+          ⏳ <b style="color:var(--warn)">서버 작업 시작 — 자동 점검 모드 ON</b> · Supabase 스키마·RLS·API 키 등 진행 시 자동 추적
         </div>
       </div>
 
@@ -186,11 +203,11 @@ a{color:inherit;text-decoration:none}
         </div>
       </div>
 
-      <!-- PHASE 5 — CURRENT -->
-      <div class="phase active">
+      <!-- PHASE 5 — DONE -->
+      <div class="phase done">
         <div class="num">5</div>
         <div class="phase-card">
-          <div class="head"><h3>실작동 + 보안 게이트</h3><span class="tag tag-active">진행중</span><small>지금 ⟶</small></div>
+          <div class="head"><h3>실작동 + 보안 게이트</h3><span class="tag tag-done">완료</span><small>~ 5월 26일</small></div>
           <p class="desc">단순 mockup이 아닌 실제 작동하는 페이지. localStorage 기반이라 Supabase로 갈아끼우기만 하면 됨.</p>
           <ul>
             <li><b>인증</b> — 로그인/가입/로그아웃 작동 (auth-b)</li>
@@ -212,11 +229,11 @@ a{color:inherit;text-decoration:none}
         </div>
       </div>
 
-      <!-- PHASE 6 -->
-      <div class="phase next">
+      <!-- PHASE 6 — ACTIVE -->
+      <div class="phase active">
         <div class="num">6</div>
         <div class="phase-card">
-          <div class="head"><h3>법·데이터 정리 (DB 연동 직전)</h3><span class="tag tag-next">다음 단계</span><small>약 1주</small></div>
+          <div class="head"><h3>법·데이터 정리 (DB 연동 직전)</h3><span class="tag tag-active">진행중</span><small>지금</small></div>
           <p class="desc">실제 운영 들어가기 전 반드시 처리할 항목. <a href="admin-checklist.html" style="color:var(--accent);font-weight:800;text-decoration:underline">체크리스트 페이지</a>에서 진행 상황 추적.</p>
           <ul>
             <li>🔴 <b>입점처 9곳 실제 정보 → 더미 교체</b> (현재 public repo 노출)</li>
@@ -232,11 +249,11 @@ a{color:inherit;text-decoration:none}
         </div>
       </div>
 
-      <!-- PHASE 7 -->
-      <div class="phase next">
+      <!-- PHASE 7 — ACTIVE (병행) -->
+      <div class="phase active">
         <div class="num">7</div>
         <div class="phase-card">
-          <div class="head"><h3>Supabase + Cloudflare 연동</h3><span class="tag tag-next">다음 다음</span><small>약 1~2주</small></div>
+          <div class="head"><h3>Supabase + Cloudflare 연동</h3><span class="tag tag-active">진행중 (병행)</span><small>지금</small></div>
           <p class="desc">localStorage → 실제 DB. 이미지는 Cloudflare Images로.</p>
           <ul>
             <li><b>Supabase 스키마 생성</b> — products, orders, users, qna, vendors, settlements ...</li>
