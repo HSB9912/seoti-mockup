@@ -523,6 +523,22 @@
     content,
     state: () => state,
     // 디버그용
-    _reset() { localStorage.removeItem(STORAGE_KEY); location.reload(); }
+    _reset() { localStorage.removeItem(STORAGE_KEY); location.reload(); },
+    // 외부에서 Supabase 강제 초기화 (OAuth callback hash 처리 등)
+    ensureAuth: () => ensureSupabase(),
   };
+
+  // OAuth callback 으로 들어왔거나 (URL 에 access_token 있음) 이미 세션이
+  // 있을 가능성이 있으면 lazy 초기화 대신 즉시 Supabase 를 로드해서
+  // detectSessionInUrl 이 hash 를 처리하도록 한다.
+  const hasOAuthHash = typeof location !== 'undefined' && /[#&]access_token=/.test(location.hash || '');
+  const hasPersistedSession = (() => {
+    try {
+      const k = 'sb-' + SUPABASE_URL.replace(/^https?:\/\//, '').split('.')[0] + '-auth-token';
+      return !!localStorage.getItem(k);
+    } catch(e) { return false; }
+  })();
+  if (hasOAuthHash || hasPersistedSession) {
+    ensureSupabase().catch(e => console.warn('Supabase auto-init failed:', e));
+  }
 })(window);

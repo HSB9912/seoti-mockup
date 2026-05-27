@@ -208,14 +208,15 @@ function applyLoggedInUI(){
   setTimeout(()=> location.href = redirect, 400);
   return true;
 }
-// 1) 페이지 로드 직후 시도
+// 1) 페이지 로드 직후 시도 (localStorage 캐시로 이미 로그인됐을 수도 있음)
 applyLoggedInUI();
-// 2) Supabase 가 OAuth callback 처리 끝나면 state-change 발생 → 다시 시도
+// 2) Supabase 가 OAuth callback (URL hash) 처리 끝나면 state-change 발생 → 다시 시도
 window.addEventListener('seoti-state-change', applyLoggedInUI);
-// 3) ensureSupabase 가 isAdmin 호출로만 트리거되므로 페이지 진입 직후 한 번 호출 (auth 세션 hydrate 강제)
-setTimeout(() => {
-  if (window.SEOTI && SEOTI.api && SEOTI.api.isAdmin) SEOTI.api.isAdmin().catch(()=>{});
-}, 100);
+// 3) Supabase 강제 초기화 — OAuth hash 든 cached session 이든 즉시 hydrate
+(function ensureAuthInit(){
+  if (!window.SEOTI) { setTimeout(ensureAuthInit, 30); return; }
+  if (SEOTI.ensureAuth) SEOTI.ensureAuth().catch(()=>{});
+})();
 
 // 로그인 이유 표시 (Group Order에서 리다이렉트된 경우)
 (function showReason(){
