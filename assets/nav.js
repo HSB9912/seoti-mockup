@@ -20,13 +20,13 @@
 .seoti-logo .mascot img{width:100%;height:100%;object-fit:contain;
   filter:drop-shadow(0 3px 6px rgba(0,0,0,.08))}
 .seoti-logo .mascot .fallback{font-size:34px}
-/* sTTy 텍스트 이미지 로고 (assets/logo/stty.png) 있으면 표시 */
-.seoti-logo .logo-img{height:42px;width:auto;display:none;
+/* sTTy 텍스트 이미지 로고 (assets/logo/stty.png) — 기본 표시 */
+.seoti-logo .logo-img{height:48px;width:auto;display:block;
   filter:drop-shadow(0 2px 4px rgba(0,0,0,.06))}
-.seoti-logo .logo-img.show{display:block}
-/* fallback CSS 텍스트 로고 — 이미지 없을 때만 보임 */
-.seoti-logo .brand{display:flex;align-items:center;gap:1px;letter-spacing:0}
-.seoti-logo .brand.hide{display:none}
+/* fallback CSS 텍스트 로고 — 이미지 실패 시에만 표시 */
+.seoti-logo .brand{display:none;align-items:center;gap:1px;letter-spacing:0}
+.seoti-logo.no-img .logo-img{display:none}
+.seoti-logo.no-img .brand{display:flex}
 .seoti-logo .brand b{color:#f4a8cf;font-weight:900;font-size:30px;line-height:1}
 .seoti-logo .brand .gray{color:#5a5550;font-size:24px;line-height:1}
 .seoti-logo .brand sup{font-size:10px;color:#a8a3a0;font-weight:700;letter-spacing:.06em;margin-left:5px;align-self:flex-start;margin-top:2px}
@@ -44,7 +44,7 @@
   .seoti-nav-wrap{padding:0 20px;height:68px}
   .seoti-logo{font-size:17px;gap:9px}
   .seoti-logo .mascot{width:46px;height:46px}
-  .seoti-logo .logo-img{height:30px}
+  .seoti-logo .logo-img{height:36px}
   .seoti-logo .brand b{font-size:22px}
   .seoti-logo .brand .gray{font-size:18px}
   .seoti-nav-menu{position:absolute;top:56px;left:0;right:0;
@@ -89,8 +89,7 @@
         <span class="fallback" style="display:none">🐕</span>
       </span>
       <img class="logo-img" src="assets/logo/stty.png" alt="sTTy"
-        onload="this.classList.add('show');this.nextElementSibling.classList.add('hide')"
-        onerror="this.remove()">
+        onerror="this.closest('.seoti-logo').classList.add('no-img');this.remove()">
       <span class="brand">
         <span class="gray">s</span><b>TT</b><span class="gray">y</span>
         <sup>STUDIO</sup>

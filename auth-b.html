@@ -67,7 +67,7 @@ img{display:block;max-width:100%}a{color:inherit;text-decoration:none}button,inp
 .divider{display:flex;align-items:center;gap:14px;margin:24px 0;color:var(--sub);font-size:11.5px;font-weight:700;letter-spacing:.06em}
 .divider::before,.divider::after{content:"";flex:1;height:1px;background:var(--line)}
 
-.social-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.social-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .social-row a{padding:13px;text-align:center;font-size:13px;font-weight:700;cursor:pointer;border:1px solid var(--line)}
 .social-row a:hover{border-color:var(--ink)}
 .social-row a.kakao{background:#fee500;border-color:#fee500}
@@ -129,12 +129,11 @@ img{display:block;max-width:100%}a{color:inherit;text-decoration:none}button,inp
         <button class="submit" id="loginBtn">로그인</button>
         <div class="divider">OR · SNS 로그인</div>
         <div class="social-row">
-          <a class="kakao" data-provider="kakao">카카오</a>
-          <a data-provider="google">Google</a>
-          <a data-provider="github" style="background:#161412;color:#fff;border-color:#161412">GitHub</a>
+          <a class="kakao" data-provider="kakao">카카오로 로그인</a>
+          <a data-provider="google">Google 로그인</a>
         </div>
         <p style="font-size:11px;color:var(--sub);margin-top:8px;text-align:center;line-height:1.6">
-          ※ Supabase에서 해당 provider 활성화 후 사용 가능
+          ※ Supabase 대시보드 → Auth → Providers 에서 활성화 후 사용 가능
         </p>
         <div class="bottom-link">계정이 없으신가요?<a data-go="signup">회원가입 →</a></div>
         <div class="guest-link" style="background:var(--paper);padding:14px 18px;margin-top:18px;font-size:12.5px;color:var(--sub);line-height:1.7;border-radius:4px">

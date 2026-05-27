@@ -242,21 +242,39 @@
     },
 
     // OAuth — Google / Kakao 등 (Supabase에서 provider 활성화 필요)
+    // provider 미활성화면 에러 페이지로 안 가고 토스트로 안내.
     async loginWithProvider(provider) {
       try {
         const client = await ensureSupabase();
-        const { error } = await client.auth.signInWithOAuth({
-          provider, // 'google' | 'kakao' | 'github' 등
-          options: { redirectTo: location.href }
+        // skipBrowserRedirect: URL만 받아서 미리 체크
+        const { data, error } = await client.auth.signInWithOAuth({
+          provider,
+          options: { redirectTo: location.href, skipBrowserRedirect: true }
         });
         if (error) {
           toast(translateAuthError(error.message) + ` (${provider})`, 'error');
-          if (error.message.includes('not enabled') || error.message.includes('not supported')) {
-            toast(`${provider} 로그인은 Supabase에서 먼저 활성화해야 해요`, 'warn');
-          }
           return false;
         }
-        return true; // redirect 발생
+        if (!data?.url) { toast('소셜 로그인 URL 생성 실패', 'error'); return false; }
+        // probe — provider 비활성화 시 Supabase는 JSON 400 반환
+        try {
+          const r = await fetch(data.url, { method: 'GET', redirect: 'manual' });
+          // 0 = opaqueredirect (정상 — 외부 OAuth로 리다이렉트 됨)
+          // 400 = provider 비활성화
+          if (r.status === 400) {
+            const body = await r.json().catch(() => ({}));
+            if ((body.msg || '').includes('not enabled')) {
+              toast(`${provider} 로그인이 아직 활성화되지 않았어요`, 'warn');
+              toast('Supabase → Auth → Providers 에서 켜야 작동해요', 'info');
+              return false;
+            }
+            toast(body.msg || 'OAuth 설정 오류', 'error');
+            return false;
+          }
+        } catch (e) { /* CORS로 막혀도 그냥 진행 — 정상 케이스 */ }
+        // 정상 → 리다이렉트
+        location.href = data.url;
+        return true;
       } catch (e) {
         toast('소셜 로그인 실패', 'error');
         console.error(e);
