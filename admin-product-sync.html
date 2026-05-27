@@ -51,6 +51,18 @@ td.r{text-align:right}
 </div>
 <p class="hint" style="color:#b03a3a">⚠ <b>날리기 모드</b>: 기존 products 전부 DELETE 후 시트 데이터로 새로 INSERT. 한 번 누르면 되돌릴 수 없음. 이름 잘못 들어간 게 많아서 한방에 정리하려면 이쪽이 깔끔.</p>
 
+<div class="box" style="border:1px solid #f0b3b3;background:#fdfaf9">
+  <h2 style="color:#b03a3a">🗑️ 비즈 데이터 초기화 (2026 새로 시작)</h2>
+  <p class="hint">정산·월별정산·발송·세금 데이터를 비우고 새로 입력 시작. <b>입점처(vendors)는 유지</b>됨.</p>
+  <div class="bar">
+    <button id="wipeAllBiz" style="background:#b03a3a;color:#fff;border-color:#b03a3a">⚠ 비즈 데이터 4종 한방에 비우기</button>
+    <button id="wipeSettlements">정산만 비우기</button>
+    <button id="wipeMonthly">월별정산만 비우기</button>
+    <button id="wipeShipments">발송만 비우기</button>
+    <button id="wipeTax">세금·관리비만 비우기</button>
+  </div>
+</div>
+
 <div class="box">
   <h2>실행 로그</h2>
   <div id="log">대기 중…</div>
@@ -398,9 +410,36 @@ async function runNuke(){
   alert(`재생성 완료\n성공 ${ok}건 / 실패 ${fail}건\n\n상품관리·재고관리 페이지 새로고침해서 확인.`);
 }
 
+async function wipeTable(table, label){
+  if (!confirm(`정말 ${label} 전부 삭제?\n되돌릴 수 없음.`)) return;
+  log(`${label} 삭제 중…`, 'info');
+  const { error, count } = await sb.from(table).delete({count:'exact'}).gt('id', 0);
+  if (error) { log(`✕ ${label}: ${error.message}`, 'err'); return; }
+  log(`✓ ${label} ${count||'전부'} 삭제 완료`, 'ok');
+}
+
+async function wipeAllBiz(){
+  if (!confirm('정말 정산·월별정산·발송·세금 4개 테이블 전부 비울까?\n(입점처 vendors는 유지)\n\n되돌릴 수 없음.')) return;
+  if (!confirm('마지막 확인 — 진짜 4개 테이블 전부 비움?')) return;
+  log('=== 비즈 데이터 4종 일괄 초기화 시작 ===', 'info');
+  for (const [t,l] of [['settlements','정산'],['settlements_monthly','월별정산'],['shipments','발송'],['tax_payments','세금·관리비']]) {
+    log(`${l} 삭제 중…`, 'info');
+    const { error, count } = await sb.from(t).delete({count:'exact'}).gt('id', 0);
+    if (error) log(`✕ ${l}: ${error.message}`, 'err');
+    else log(`✓ ${l} ${count||'전부'} 삭제`, 'ok');
+  }
+  log('\n✅ 비즈 데이터 4종 초기화 완료. 이제 새로 입력 시작.', 'ok');
+  alert('완료. 비즈니스 대시보드 새로고침해서 확인.');
+}
+
 document.getElementById('diffBtn').addEventListener('click', runDiff);
 document.getElementById('applyBtn').addEventListener('click', runApply);
 document.getElementById('nukeBtn').addEventListener('click', runNuke);
+document.getElementById('wipeAllBiz').addEventListener('click', wipeAllBiz);
+document.getElementById('wipeSettlements').addEventListener('click', () => wipeTable('settlements','정산'));
+document.getElementById('wipeMonthly').addEventListener('click', () => wipeTable('settlements_monthly','월별정산'));
+document.getElementById('wipeShipments').addEventListener('click', () => wipeTable('shipments','발송'));
+document.getElementById('wipeTax').addEventListener('click', () => wipeTable('tax_payments','세금·관리비'));
 </script>
 </body>
 </html>
