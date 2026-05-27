@@ -297,20 +297,9 @@ table.t{width:100%;border-collapse:collapse;font-size:13px}
   // 데이터 (Supabase 연동 시 from('products').select() 으로 교체)
   const STORAGE_KEY = 'seoti_inventory_v1';
 
-  const SEED = [
-    {id:1, n:"롱 메모 스티커팩", c:"메모 스티커", stock:42, safe:10, state:"auto", img:"202602/bc4816b7234830cacfd8e73dbc81ebcb"},
-    {id:2, n:"스위티 메모 스티커팩", c:"메모 스티커", stock:18, safe:10, state:"auto", img:"202602/3d92c3f2ae8a816bb0aaf8374372b46a"},
-    {id:3, n:"설탕 눈마을 스티커", c:"메모 스티커", stock:6, safe:10, state:"auto", img:"202602/a157d261092510f1542550274972a939"},
-    {id:4, n:"학교괴담 스티커", c:"메모 스티커", stock:31, safe:10, state:"auto", img:"202602/8844055f11daba2bd37b69a6150cdac6"},
-    {id:5, n:"메모빈티지 스티커팩", c:"메모 스티커", stock:24, safe:10, state:"auto", img:"202602/3dba9ab4bcc29cf34566d08a48284e13"},
-    {id:6, n:"초록책장 스티커", c:"조각 스티커", stock:3, safe:10, state:"auto", img:"202512/6df4ff16a044b3cd8dde5d8b78447e35"},
-    {id:7, n:"다이어리 스티코", c:"메모 스티커", stock:55, safe:10, state:"auto", img:"202512/cb676b86854d5dc018ea0576b99c897a"},
-    {id:8, n:"선샤인데이 스티커", c:"메모 스티커", stock:9, safe:10, state:"auto", img:"202508/d9342a7de8b65e19f073f6f99139560d"},
-    {id:9, n:"키스컷 마스킹테이프 2", c:"마스킹테이프", stock:27, safe:10, state:"auto", img:"202508/13260f931f04e15ddc8bb56a20dc0e90"},
-    {id:10, n:"마스킹테이프 4type", c:"마스킹테이프", stock:36, safe:10, state:"auto", img:"202508/383bee900dbacb6369f996fc668c0f42"},
-    {id:11, n:"냠냠만두 투명 스티커", c:"투명스티커", stock:14, safe:10, state:"auto", img:"202410/e80feba7a57b4fcf1a3364e5cfbb40d6"},
-    {id:12, n:"크레페 말랑 키링", c:"키링·굿즈", stock:0, safe:5, state:"disc", img:"202503/58dafda9eee23c1a553c073971af033c"}
-  ];
+  // 시드 데이터 — 어드민 → 상품 관리에서 제품을 등록하면 여기에 자동 표시됨
+  // (Supabase 연동 시 from('products').select() 으로 교체)
+  const SEED = [];
 
   function load(){
     try {
