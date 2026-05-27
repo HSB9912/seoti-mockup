@@ -202,67 +202,27 @@ td .nm small{display:block;color:var(--sub);font-weight:500;font-size:11.5px;mar
       <section class="sect" data-s="reviews">
         <div class="page-h">
           <div><h1>리뷰 관리<i class="en">Reviews</i></h1>
-            <div class="lead">전체 412건 · 미답글 12건 · 평균 평점 ★ 4.8</div></div>
+            <div class="lead" id="reviewLead">상품 리뷰가 들어오면 여기에 표시됩니다.</div></div>
           <div class="actions">
-            <span class="seg"><a class="on">미답글 12</a><a>전체 412</a><a>사진 리뷰 167</a><a>신고 1</a></span>
-            <button class="btn">📝 자주쓰는 답글 관리</button>
+            <span class="seg" id="reviewSeg">
+              <a class="on" data-rf="pending">미답글 <b id="rcPending">0</b></a>
+              <a data-rf="all">전체 <b id="rcAll">0</b></a>
+              <a data-rf="photo">사진 리뷰 <b id="rcPhoto">0</b></a>
+              <a data-rf="reported">신고 <b id="rcReported">0</b></a>
+            </span>
+            <button class="btn" id="reviewTemplatesBtn">📝 자주쓰는 답글 관리</button>
           </div>
         </div>
 
-        <div class="rev">
-          <div class="head">
-            <div class="h-thumb"><img referrerpolicy="no-referrer" src="https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/202602/a157d261092510f1542550274972a939.png"></div>
-            <div class="h-mid"><b>설탕 눈마을 스티커 · 단품</b><small>리뷰어 송이* (골드) · 2026-05-20</small></div>
-            <span class="stars">★★★★★</span>
-            <span class="pill">미답글</span>
-          </div>
-          <div class="pho"><div><img referrerpolicy="no-referrer" src="https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/202602/a157d261092510f1542550274972a939.png"></div><div><img referrerpolicy="no-referrer" src="https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/202512/cb676b86854d5dc018ea0576b99c897a.png"></div></div>
-          <p>다꾸할 때 한 페이지를 통째로 메꿔주는 느낌이라 너무 좋아요! 색감도 사진이랑 똑같고, 종이도 두꺼워서 만족합니다. 재입고 되자마자 또 샀어요 🥹</p>
-          <div class="reply-area">
-            <b>답글 작성<i class="en">Reply</i></b>
-            <textarea placeholder="자주쓰는 답글: ⌘+1 ~ ⌘+9"></textarea>
-          </div>
-          <div class="actions">
-            <button class="btn">⭐ 베스트 리뷰로 지정</button>
-            <button class="btn">🚩 신고</button>
-            <button class="btn btn-p">답글 등록 (+적립 100P)</button>
-          </div>
-        </div>
+        <div id="reviewList"></div>
 
-        <div class="rev">
-          <div class="head">
-            <div class="h-thumb"><img referrerpolicy="no-referrer" src="https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/202602/8844055f11daba2bd37b69a6150cdac6.png"></div>
-            <div class="h-mid"><b>학교괴담 스티커 · 단품</b><small>리뷰어 하늘* (실버) · 2026-05-15</small></div>
-            <span class="stars">★★★★☆</span>
-            <span class="pill warn">신중 검토</span>
-          </div>
-          <p>그림 자체는 예쁜데 살짝 작게 느껴졌어요. 그래도 색감 좋고 종이 질 좋아서 만족.</p>
-          <div class="reply-area">
-            <b>답글 작성</b>
-            <textarea placeholder="별점 4점 이하 리뷰는 답글로 더 정중하게..."></textarea>
-          </div>
-          <div class="actions">
-            <button class="btn">🚩 신고</button>
-            <button class="btn btn-p">답글 등록</button>
-          </div>
-        </div>
-
-        <div class="rev">
-          <div class="head">
-            <div class="h-thumb"><img referrerpolicy="no-referrer" src="https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/202508/d9342a7de8b65e19f073f6f99139560d.png"></div>
-            <div class="h-mid"><b>선샤인데이 스티커 · 2개 세트</b><small>리뷰어 minji* (골드) · 2026-05-14</small></div>
-            <span class="stars">★★★★★</span>
-            <span class="pill">미답글</span>
-          </div>
-          <p>다이어리 꾸미기에 진심인 친구한테 선물했는데 너무 좋아하더라구요. 2개 세트로 산 거 정말 잘했어요!</p>
-          <div class="reply-area">
-            <b>답글 작성</b>
-            <textarea placeholder="답글을 작성하세요..."></textarea>
-          </div>
-          <div class="actions">
-            <button class="btn">⭐ 베스트</button>
-            <button class="btn btn-p">답글 등록</button>
-          </div>
+        <div id="reviewEmpty" style="padding:60px 30px;text-align:center;background:#fafaf7;border:1px dashed var(--line);border-radius:8px;color:var(--sub)">
+          <div style="font-size:36px;margin-bottom:12px">💬</div>
+          <h3 style="font-size:15px;font-weight:800;color:var(--ink);margin-bottom:6px">아직 리뷰가 없어요</h3>
+          <p style="font-size:13px;line-height:1.6;max-width:420px;margin:0 auto">
+            상품 페이지에서 손님이 리뷰를 작성하면 여기에 표시됩니다.<br>
+            <small style="color:var(--faint);font-size:11.5px">리뷰 DB 테이블 연결 전 — 사이트 오픈 후 자동으로 쌓입니다.</small>
+          </p>
         </div>
       </section>
 
