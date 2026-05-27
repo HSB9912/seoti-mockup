@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>STTY 상품 동기화 (어드민 전용)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Pretendard Variable',Pretendard,sans-serif;background:#fafaf7;color:#161412;padding:24px;font-size:13.5px;line-height:1.5}
+.mono{font-family:'SF Mono',Menlo,monospace;font-variant-numeric:tabular-nums}
+h1{font-size:22px;font-weight:800;margin-bottom:6px}
+h2{font-size:15px;font-weight:800;margin:20px 0 10px}
+.hint{color:#878680;font-size:12.5px;margin-bottom:18px}
+.bar{display:flex;gap:10px;align-items:center;margin-bottom:18px;flex-wrap:wrap}
+button{padding:9px 16px;border:1px solid #ededeb;background:#fff;border-radius:5px;font-weight:700;cursor:pointer;font-family:inherit;font-size:13px}
+button.p{background:#161412;color:#fff;border-color:#161412}
+button:disabled{opacity:.4;cursor:not-allowed}
+.box{background:#fff;border:1px solid #ededeb;border-radius:6px;padding:18px;margin-bottom:18px}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{text-align:left;padding:8px 10px;background:#fafaf7;border-bottom:1px solid #ededeb;font-size:10.5px;letter-spacing:.04em;color:#878680;font-weight:800;text-transform:uppercase}
+td{padding:7px 10px;border-bottom:1px solid #f5f4f0}
+td.r{text-align:right}
+.tag{display:inline-block;padding:1px 7px;border-radius:99px;font-size:10.5px;font-weight:700}
+.tag.in{background:#eaf6ee;color:#3a8a6a}
+.tag.out{background:#fef0e7;color:#b07a2a}
+.tag.disc{background:#f5f4f0;color:#878680}
+.tag.event{background:#fff5e7;color:#a06440}
+.tag.dot{background:#eef4fb;color:#3a82d6}
+.diff{color:#b03a3a;font-weight:700}
+.same{color:#878680}
+.new{background:#eaf6ee;color:#3a8a6a;padding:1px 7px;border-radius:99px;font-size:10.5px;font-weight:700}
+#log{background:#161412;color:#7fd296;padding:14px;border-radius:6px;font-family:'SF Mono',Menlo,monospace;font-size:11.5px;max-height:220px;overflow-y:auto;white-space:pre-wrap;line-height:1.5}
+.stat{display:inline-block;background:#fff;border:1px solid #ededeb;padding:8px 14px;border-radius:5px;margin-right:8px;font-size:12px}
+.stat b{color:#161412;font-weight:800;font-size:14px;margin-right:4px}
+.auth-warn{background:#fdebeb;border:1px solid #f0b3b3;color:#b03a3a;padding:14px;border-radius:6px;margin-bottom:14px}
+</style>
+</head>
+<body>
+
+<h1>🔧 상품 데이터 동기화</h1>
+<p class="hint">엑셀 시트 데이터를 Supabase products 테이블에 일괄 반영. <b>바코드 기준</b>으로 매칭하여 이름·가격·재고·카테고리·상태 업데이트.</p>
+
+<div id="authWarn" class="auth-warn" style="display:none">⚠ 어드민 로그인 안 됨. <a href="auth-b.html" style="color:#b03a3a;text-decoration:underline">로그인 페이지로 이동</a></div>
+
+<div class="bar">
+  <button id="diffBtn" class="p">📊 1. DB와 비교 (Diff)</button>
+  <button id="applyBtn" disabled>✅ 2. 적용 (UPSERT)</button>
+  <span id="stats"></span>
+</div>
+
+<div class="box">
+  <h2>실행 로그</h2>
+  <div id="log">대기 중…</div>
+</div>
+
+<div class="box">
+  <h2>변경 미리보기 <small style="color:#878680;font-size:12px;font-weight:600">— Diff 누르면 표시</small></h2>
+  <div id="preview" style="overflow-x:auto"></div>
+</div>
+
+<!-- 원본 텍스트 (탭으로 분리) -->
+<script type="text/plain" id="rawSheet">
+바코드 넘버	ID	분류	분류명	품번	품명	단가	출시월	규격	무게	포장규격	재고	닷닷닷판매가격
+3024040101030	302404단종01030	단종	스티커	01	라멘가게 스티커	3000	2404	10X15	4.90	10.5X15.5	200	3000
+3024040102030	302404단종02030	단종	스티커	02	타코가게 스티커	3000	2404	10X15	4.90	10.5X15.5	200	3000
+3024040103030	302404단종03030	단종	스티커	03	디저트가게 스티커	3000	2404	10X15	4.90	10.5X15.5	250	3000
+3024060104010	302406단종04010	단종	스티커	04	미니 만두푸딩 스티커(2매)	1000	2406	8X3				0
+3024060105020	302406단종05020	단종	스티커	05	메모냥 스티커 2매	2000	2406	12X7				0
+3024060106030	302406단종06030	단종	스티커	06	공사장 스티커	3000	2406	10X15(배경10.5X17.5)	9.20	8X16	0
+3024060107030	302406단종07030	단종	스티커	07	뒹굴뒹굴 하루 스티커	3000	2406	10X15(배경10.5X17.5)	9.20	8X16	0
+3024080111030	302408단종11030	단종	스티커	11	바나나대작전_메모스티커	3000	2408	12.6X16.5(배경15.5X16.5)	13.48	16X18 tape	0
+3024040201035	302404단종01035	단종	투명스티커	01	타코타코 네모스티커	3500	2404	10X15(배경10.5X17.5)	9.98	11X18	230	3500
+3024040202035	302404단종02035	단종	투명스티커	02	냠냠클럽 네모스티커	3500	2404	10X15(배경10.5X17.5)	9.98	11X18	200	3500
+3024050203030	302405단종03030	단종	투명스티커	03	라멘가게 투명 스티커	3000	2405	7.5X13.6(배경7.7X15.5)	6.50	8X16	0
+3024050204030	302405단종04030	단종	투명스티커	04	타코가게 투명 스티커	3000	2405	7.5X13.6(배경7.7X15.5)	6.50	8X16	0
+3024050205030	302405단종05030	단종	투명스티커	05	디저트가게 투명 스티커	3000	2405	7.5X13.6(배경7.7X15.5)	6.50	8X16	0
+304192024001	304192024001	단종	스티커		요거트데이 스티커	2500		8.5X12.5(배경8.7X14.8)	5.53	9x15	0
+3024040301015	302404단종01015	단종	엽서	01	콜박스 엽서	1500	2404	10X14.8	3.80	10.5X15.5	0
+3024040402025	302404단종02025	단종	포커홀더	02	포카홀더_핑크	2500	2404	7X10	3.01	7.3X10.5	0
+3024040403025	302404단종03025	단종	포커홀더	03	포카홀더_옐로	2500	2404	7X10	3.01	7.3X10.5	0
+3024040404025	302404단종04025	단종	포커홀더	04	포카홀더_레드	2500	2404	7X10	3.01	7.3X10.5	0
+3024060502060	302406판매중02060	판매중	뱃지	02	외계통신 뱃지세트	6000	2406	4종(배경14.5X16.5)	37.00	15.5X21 tape	2	5000
+3024080801025	302408단종01025	단종	말랑키링	01	바나나대작전 말키_토끼	2500	2408	8.5X5.5	3.84	6X11.5 tape	0
+3024080802025	302408단종02025	단종	말랑키링	02	바나나대작전 말키_숭이	2500	2408	8.5X5.5	3.80	6X11.5 tape	0
+3024080803025	302408단종03025	단종	말랑키링	03	바나나대작전 말키_바나	2500	2408	8.5X5.5	3.91	6X11.5 tape	0
+3024080804025	302408단종04025	단종	말랑키링	04	바나나대작전 말키_소녀	2500	2408	8.5X5.5	3.70	6X11.5 tape	0
+3024061001220	302406단종01220	단종	티셔츠	01	빵타쿠 티셔츠(XS)	22000	2406					0
+3024061002220	302406단종02220	단종	티셔츠	02	빵타쿠 티셔츠(S)	22000	2406					0
+3024061003220	302406단종03220	단종	티셔츠	03	빵타쿠 티셔츠(M)	22000	2406			185.00		0
+3024061004220	302406단종04220	단종	티셔츠	04	빵타쿠 티셔츠(L)	22000	2406			200.00		0
+3024061005220	302406단종05220	단종	티셔츠	05	빵타쿠 티셔츠(XL)	22000	2406					0
+3024069902020	302406단종02020	단종	M8 콜라보	02	네모 다이어리스티커ver	2000	2406					0
+3024069903020	302406단종03020	단종	M8 콜라보	03	씰스티커 의사ver	2000	2406					0
+3024069904020	302406단종04020	단종	M8 콜라보	04	씰스티커 간호사ver	2000	2406					0
+3024060108020	302406판매중08020	판매중	스티커	08	엔젤로즈 스티커	2000	2406	5X15	4.54		300	1000
+3024060109020	302406판매중09020	판매중	스티커	09	햇님반 스티커	2000	2406	5X15	4.63		17	1000
+3024080110045	302408판매중10045	판매중	스티커	10	바나나대작전_씰스티커	4500	2408	12.6X16.5(배경15.5X16.5)	13.24	16X18 tape	150	3000
+304192024002	304192024002	판매중	스티커		목욕놀이 스티커	2500		8.5X12.5(배경8.7X14.8)	5.53	9x15	0
+304192024003	304192024003	판매중	스티커		숭숭이일기 스티커	3000		8.5X12.5(배경8.7X14.8)	5.84	9x15	600	2500
+304192024004	304192024004	판매중	투명스티커		냠냠만두 투명스티커	3000		7.5X13.6(배경7.7X15.5)	6.52	8X16	240
+304192024005	304192024005	판매중	투명스티커		갓파갓파 투명스티커	3000		7.5X13.6(배경7.7X15.5)	6.49	8X16	350	2500
+3024040302015	302404판매중지02015	판매중지	엽서	02	푸딩 엽서	1500	2404	10X14.8	3.80	10.5X15.5	152
+3024040303015	302404판매중지03015	판매중지	엽서	03	계산대 엽서	1500	2404	10X14.8	3.80	10.5X15.5	161
+3024040401025	302404판매중지01025	판매중지	포커홀더	01	포카홀더_블루	2500	2404	7X10	3.01	7.3X10.5	45
+3024040501060	302404단종01060	단종	뱃지	01	여름샐러드 뱃지세트	6000	2404	4종(배경14.5X16.5)	37.00	15.5X21 tape	0
+3024040601120	302404판매중지01120	판매중지	포스터	01	오늘의날씨 포스터A2	12000	2404	A2			종이박스	30
+3024040602050	302404판매중지02050	판매중지	포스터	02	전단지 포스터 A4	5000	2404	A4			A4 홀더	80
+3024069901040	302406판매중01040	판매중	M8 콜라보	01	콧물 뚝 병원 스티커	4000	2406	16.5X15	12.10	17X17 tape		4000
+304192024006	304192024006	판매중	메모팩		미니 메모팩_1탄	2500	2400					2500
+304192024009	304192024009	판매중	메모팩		미니 메모팩_2탄	2500	2400					2500
+304192025007	304192025007	판매중	메모팩		미니 메모팩_3탄	2500	2500					2500
+304192025009	304192025009	판매중	메모팩		미니 메모팩_4탄	2500	2500					2500
+304192024011	304192024011	판매중	스티커		퐁당 코코아 스티커	4500	2400
+304192024007	304192024007	판매중	스티커		해피뉴이어 스티커	4500	2400
+304192025001	304192025001	판매중	스티커		일상공유 ver1	3500	2500					3000
+304192025002	304192025002	판매중	스티커		일상공유 ver2	3500	2500					3000
+304192025005	304192025005	판매중	스티커		퍼피러브	2500	2500	75X155				2000
+304192025006	304192025006	판매중	스티커		펜슬케이스	2500	2500
+304192025004	304192025004	판매중	조각스티커		뽀송한하루	3500	2500
+304192025003	304192025003	판매중	조각스티커		로딩팩	3500	2500
+304192024008	304192024008	판매중지	스티커		신년메시지	3000	2400				36
+304192025101	304192025101	판매중	말랑키링		크레페말랑키링	2500	2500
+304192025010	304192025010	판매중	스티커		숭숭이일기 2 스티커	3000	2500					2500
+304192024013	304192024013	판매중	말랑키링		왕 말랑키링_왹	2500	2400
+304192024015	304192024015	판매중	말랑키링		왕 말랑키링_멍	2500	2400
+304192024014	304192024014	판매중	말랑키링		왕 말랑키링_냥	2500	2400
+304192025202	304192025202	단종	쿠션키링		쿠션_쿨쿨숭이	9000	2500				1
+304192025203	304192025203	단종	쿠션키링		쿠션_엔젤숭이	9000	2500				0
+3041920252031	3041920252031	판매중	키스컷		키스컷_뽀송	6500	2500	30mm*5m				6000
+3041920252032	3041920252032	판매중	키스컷		키스컷_냠냠	6500	2500					6000
+3041920252033	3041920252033	판매중	키스컷		키스컷_히힛	6500	2500					6000
+3041920252034	3041920252034	판매중	키스컷		키스컷_와글	6500	2500					6000
+304192025008	304192025008	판매중	키스컷		키스컷_이쪽이얌	6000	2500					5500
+3041920255001		판매중	말랑키링		말랑키링_바나나숭이(노랑연필)	3000	2505					2500
+3041920255002		판매중	말랑키링		말랑키링_오렌지숭이(분홍연필)	3000	2505					2500
+3041920255003		판매중	말랑키링		말랑키링_리본숭이(빨강연필)	3000	2505					2500
+3041920255004		판매중	말랑키링		말랑키링_쿠키냥(하늘연필)	3000	2505					2500
+3041920255005		판매중	말랑키링		말랑키링_당근토끼 말랑가위(핑크)	3000	2505					2500
+3041920255006		판매중	말랑키링		말랑키링_햄찌햄찌 말랑가위(노랑)	3000	2505					2500
+3041920255007		판매중	말랑키링		말랑키링_티타임 네임택	3000	2505					2500
+3041920255008		판매중	마스킹테이프		마테_딸기케이크	4500	2505					4500
+3041920255009		판매중	마스킹테이프		마테_딸기초코이모티콘	4500	2505					4500
+3041920255010		판매중	마스킹테이프		마테_말차초코롤케이크	4500	2505					4500
+3041920255011		판매중	마스킹테이프		마테_퍼피멜로디	4500	2505					4500
+3041920255012		판매중	스티커		선샤인데이	3500	2505		8.20			3000
+3041920255013		판매중	스티커		뽀송마스킹	2500	2505		5.20			2000
+3041920255014		판매중	키스컷		키스컷_미니티콘	6500	2505					6000
+3041920255015		판매중	키스컷		키스컷_줄줄이친구들	6500	2505					6000
+3041920255016		판매중	키스컷		키스컷_냥냥라벨	6500	2505					6000
+3041920255017		판매중	키스컷		키스컷_페브릭홈	6500	2505					6000
+3041920255018		판매중	스티커		메모쁘띠텔레콤	2500	2507		12.40			2000
+3041920255019		판매중	스티커		초록책장	3500	2507		7.80			3000
+3041920255020		판매중	스티커		집에서휴가	3500	2507		11.70			3000
+3041920255021		판매중 	스티커		네모메모빔	3000	2507		9.00			2500
+3041920250717a		닷닷닷	키스컷		키스컷_맛보기팩 1탄	2000						200	2000
+3041920250717b		닷닷닷	키스컷		키스컷_맛보기팩 2탄	2000						750	2000
+3041920250717c		닷닷닷	키스컷		키스컷_맛보기팩 이쪽이얌	2000						177	2000
+3041920250714		닷닷닷	키스컷		키스컷 4SET 2탄	20000						0	20000
+3041920250712		닷닷닷	마스킹테이프		마스킹 44SET	16000						0	16000
+3041920250715		닷닷닷	모조지		모조지팩 4SET	9000						0	9000
+3041920250718a		닷닷닷	집게		아크릴집게(파랑)	4000						50	4000
+3041920250718b		닷닷닷	집게		아크릴집게(핑크)	4000						50	4000
+3041920255022		판매중	스티커		서티다이어리 스티코	3500	2507		9.20			3000
+3041920255023		닷닷닷	스티커		7월뉴팩	12500	2507		52.80			0	12500
+3041920255024		판매중	메모팩		롱메모팩_1탄	3000	2508
+3041920255025		판매중	스티커		학교괴담_친구가되고싶어	3500	2508
+3041920255026		판매중	쿠션키링		8월신상쿠션키링	7000	2508
+3041920255027		판매중	스티커		쁘티카페 모조지	2500	2509
+3041920255028		판매중	스티커		카페에서 만나	3500	2509
+3041920251001		판매중	쿠션키링		엔젤숭이	10000	2508
+3041920251002		판매중	쿠션키링		쿨쿨숭이	10000	2508
+3041920251003		판매중	쿠션키링		하트숭이	10000	2508
+3041920251004		판매중	쿠션키링		라면냥이	10000	2508
+3041920251005		판매중	쿠션키링		닌자숭이	10000	2508
+3041920251006		판매중	쿠션키링		엘로폰	10000	2508
+3041920251007		판매중	쿠션키링		블루폰	10000	2508
+3041920251008		판매중	쿠션키링		핑크폰	10000	2508
+3041920251009		판매중	쿠션키링		냥냥	10000	2508
+3041920251010		판매중	쿠션키링		멍멍	10000	2508
+3041920251011		판매중	쿠션키링		메롱메롱	10000	2508
+3041920251012		판매중	쿠션키링		쁘이	10000	2508
+3041920251013		판매중	쿠션키링		천사	10000	2508
+3041920251014		판매중	쿠션키링		쿠킹핑크토끼	10000	2508
+3041920251015		판매중	쿠션키링		사랑애	10000	2508
+3041920251202		판매중	카드스티커		카드스티커(당근케이크)	2500	2509
+3041920251101		판매중	스티커		눈송이여행	3500	2511
+3041920251102		판매중	스티커		아이싱쿠키	2500	2511
+3041920251103		판매중	메모팩		메모빈티지팩	2500	2511
+202511110000		판매중	콜라보팩		리본 러쉬	9000	2511
+3041920251106		판매중	카드스티커		카드스티커(핑크카드)	2500	2511
+3041920251107		판매중	카드스티커		카드스티커(천억)	2500	2511
+3041920251201		판매중	스티커		NEW DAY DIARY	3500	2512
+3041920251203		판매중	메모팩		스위티 메모팩	3500	2512
+3041920251204		판매중	스티커		설탕눈마을	3500	2512
+3041920260201		판매중	스티커		쁘티룸	2500	2602
+3041920260202		판매중	스티커		룸라이프	3500	2602
+3041920260203		판매중	핀버튼		핀버튼SET_초코릿	4000	2601
+3041920260204		판매중	핀버튼		핀버튼SET_레이스	5000	2601
+3041920260205		판매중	로제트		로제트	25000	2601
+3041920260101		이벤트	키스컷		와글빌라_키스컷	6000	2602
+1000000000001		이벤트	랜덤카드		와글빌라_랜덤카드	2000	2602
+3041920260501		판매중	스티커		프레쉬 모닝	3500	2605
+3041920260502		판매중	스티커		픽 클릭 찰칵	3500	2605
+3041920260503		판매중	스티커		포춘쿠키	3000	2605
+3041920260504		판매중	라벨팩		라벨팩A	2500	2605
+3041920260505		판매중	라벨팩		라벨팩B	2500	2605
+3041920260506		판매중	스티커		라벨씰버전	3500	2605
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SB_URL = 'https://wzmtcomawebufylojffx.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6bXRjb21hd2VidWZ5bG9qZmZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NTg5MjcsImV4cCI6MjA5NTQzNDkyN30.6P0ZSLTU7XPudr9Ove2S0Nc5XO7pdb87LUVDdVJKmEM';
+const sb = window.supabase.createClient(SB_URL, SB_KEY, {
+  auth:{persistSession:true,autoRefreshToken:true,storageKey:'sb-wzmtcomawebufylojffx-auth-token'}
+});
+
+const logEl = document.getElementById('log');
+function log(msg, cls=''){
+  const line = (cls==='err'?'⚠ ':cls==='ok'?'✓ ':cls==='info'?'• ':'  ') + msg;
+  logEl.textContent += '\n' + line;
+  logEl.scrollTop = logEl.scrollHeight;
+}
+
+// ===== 분류 → state 매핑 =====
+function mapState(분류, stock){
+  if (분류 === '단종') return 'disc';
+  if (분류 === '판매중지') return 'disc';
+  if (분류 === '이벤트') return 'in';
+  if (분류 === '닷닷닷') return 'in';
+  if (분류 === '판매중') return (stock===0 ? 'out' : 'in');
+  return 'in';
+}
+
+// ===== 텍스트 시트 파싱 =====
+function parseSheet(){
+  const raw = document.getElementById('rawSheet').textContent.trim();
+  const lines = raw.split('\n');
+  const rows = [];
+  for (let i=1; i<lines.length; i++) {
+    const cols = lines[i].split('\t');
+    if (cols.length < 6) continue;
+    const barcode = (cols[0]||'').trim();
+    const id_str = (cols[1]||'').trim();
+    const 분류 = (cols[2]||'').trim();
+    const 분류명 = (cols[3]||'').trim();
+    const 품번 = (cols[4]||'').trim();
+    const name = (cols[5]||'').trim();
+    const price = parseInt((cols[6]||'').replace(/[,\s]/g,'')) || 0;
+    const release_month = (cols[7]||'').trim();
+    const size = (cols[8]||'').trim();
+    const weight = (cols[9]||'').trim();
+    const package_size = (cols[10]||'').trim();
+    const stock = parseInt((cols[11]||'').replace(/[,\s]/g,'')) || 0;
+    const dotPrice = parseInt((cols[12]||'').replace(/[,\s]/g,'')) || null;
+    if (!barcode || !name) continue;
+    rows.push({
+      barcode,
+      name,
+      category: 분류명 || '기타',
+      state: mapState(분류, stock),
+      price,
+      stock,
+      release_month: release_month || null,
+      _분류: 분류
+    });
+  }
+  return rows;
+}
+
+// ===== Diff with DB =====
+async function fetchCurrent(){
+  const { data, error } = await sb.from('products').select('id,name,category,state,stock,price,barcode,release_month');
+  if (error) throw error;
+  return data || [];
+}
+
+let diffData = null;
+async function runDiff(){
+  log('파싱…', 'info');
+  const sheet = parseSheet();
+  log(`시트 행 ${sheet.length}개`, 'ok');
+
+  log('현재 DB 조회…', 'info');
+  let current;
+  try { current = await fetchCurrent(); }
+  catch(e) { log('DB 조회 실패: ' + e.message, 'err'); return; }
+  log(`DB 행 ${current.length}개`, 'ok');
+
+  // 바코드 중복 제거 (시트 내 동일 바코드는 마지막 행 사용)
+  const dbByBc = {};
+  current.forEach(p => { if(p.barcode) dbByBc[p.barcode] = p; });
+
+  const updates = [];     // 기존 행 수정
+  const inserts = [];     // DB에 없는 신규 행
+  const same = [];
+
+  sheet.forEach(s => {
+    const db = dbByBc[s.barcode];
+    if (!db) { inserts.push(s); return; }
+    const diff = {};
+    if (db.name !== s.name) diff.name = [db.name, s.name];
+    if (db.category !== s.category) diff.category = [db.category, s.category];
+    if (db.state !== s.state) diff.state = [db.state, s.state];
+    if ((db.price||0) !== s.price) diff.price = [db.price, s.price];
+    if ((db.stock||0) !== s.stock) diff.stock = [db.stock, s.stock];
+    if (Object.keys(diff).length === 0) same.push(s);
+    else updates.push({ db, sheet:s, diff });
+  });
+
+  diffData = { updates, inserts, same };
+  document.getElementById('stats').innerHTML =
+    `<span class="stat"><b>${updates.length}</b>변경</span>` +
+    `<span class="stat"><b>${inserts.length}</b>신규</span>` +
+    `<span class="stat"><b>${same.length}</b>동일</span>`;
+
+  // Preview 표
+  const tag = (s) => `<span class="tag ${s}">${s}</span>`;
+  let html = `<table><thead><tr><th>바코드</th><th>이름</th><th>변경 항목</th></tr></thead><tbody>`;
+  updates.forEach(u => {
+    const parts = Object.entries(u.diff).map(([k,[a,b]]) =>
+      `<div><b>${k}</b>: <span class="same">${a}</span> → <span class="diff">${b}</span></div>`).join('');
+    html += `<tr><td class="mono" style="font-size:11px">${u.sheet.barcode}</td><td>${u.sheet.name}</td><td>${parts}</td></tr>`;
+  });
+  inserts.forEach(i => {
+    html += `<tr><td class="mono" style="font-size:11px">${i.barcode}</td><td>${i.name} <span class="new">NEW</span></td><td>분류 ${i.category} · 상태 ${tag(i.state)} · ${i.price.toLocaleString()}원 · 재고 ${i.stock}</td></tr>`;
+  });
+  html += '</tbody></table>';
+  document.getElementById('preview').innerHTML = html;
+
+  log(`✓ Diff 완료. 변경 ${updates.length}건 + 신규 ${inserts.length}건 = 적용 가능 ${updates.length+inserts.length}건`, 'ok');
+  document.getElementById('applyBtn').disabled = (updates.length + inserts.length === 0);
+}
+
+async function runApply(){
+  if (!diffData) return;
+  const { updates, inserts } = diffData;
+  log('업데이트 시작…', 'info');
+  let ok=0, fail=0;
+  for (const u of updates) {
+    const patch = {};
+    Object.entries(u.diff).forEach(([k,[_,b]]) => { patch[k] = b; });
+    const { error } = await sb.from('products').update(patch).eq('id', u.db.id);
+    if (error) { log(`✕ ${u.sheet.name}: ${error.message}`, 'err'); fail++; }
+    else ok++;
+  }
+  log(`${ok}건 업데이트 / ${fail}건 실패`, ok?'ok':'err');
+
+  for (const ins of inserts) {
+    const { error } = await sb.from('products').insert({
+      name: ins.name, category: ins.category, state: ins.state,
+      stock: ins.stock, price: ins.price, barcode: ins.barcode,
+      release_month: ins.release_month
+    });
+    if (error) { log(`✕ INSERT ${ins.name}: ${error.message}`, 'err'); fail++; }
+    else { log(`+ INSERT ${ins.name}`, 'ok'); ok++; }
+  }
+  log(`✅ 전체 ${ok}건 성공 / ${fail}건 실패`, fail?'err':'ok');
+  alert(`동기화 완료\n성공 ${ok}건 / 실패 ${fail}건`);
+}
+
+// 인증 체크
+(async () => {
+  const { data:{ session } } = await sb.auth.getSession();
+  if (!session) document.getElementById('authWarn').style.display = 'block';
+  else log('로그인 OK: ' + session.user.email, 'ok');
+})();
+
+document.getElementById('diffBtn').addEventListener('click', runDiff);
+document.getElementById('applyBtn').addEventListener('click', runApply);
+</script>
+</body>
+</html>
