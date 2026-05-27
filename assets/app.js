@@ -15,6 +15,86 @@
   const STORAGE_KEY = 'seoti_v1';
   const EVT = 'seoti-state-change';
 
+  // ============ Supabase 설정 ============
+  // anon key는 프론트엔드 노출 OK (RLS로 보호)
+  const SUPABASE_URL = 'https://wzmtcomawebufylojffx.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6bXRjb21hd2VidWZ5bG9qZmZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NTg5MjcsImV4cCI6MjA5NTQzNDkyN30.6P0ZSLTU7XPudr9Ove2S0Nc5XO7pdb87LUVDdVJKmEM';
+
+  let sb = null;
+  let sbReady = null; // Promise
+
+  function loadSupabaseLib() {
+    if (window.supabase) return Promise.resolve();
+    return new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
+      s.async = true;
+      s.onload = resolve;
+      s.onerror = () => reject(new Error('Supabase JS 로드 실패'));
+      document.head.appendChild(s);
+    });
+  }
+
+  async function ensureSupabase() {
+    if (sb) return sb;
+    if (!sbReady) {
+      sbReady = (async () => {
+        try {
+          await loadSupabaseLib();
+          sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+            auth: { persistSession: true, autoRefreshToken: true }
+          });
+          // 세션 복원
+          const { data } = await sb.auth.getUser();
+          if (data?.user) {
+            state.user = {
+              id: data.user.id,
+              email: data.user.email,
+              nickname: data.user.user_metadata?.nickname || data.user.email.split('@')[0],
+              country: data.user.user_metadata?.country || 'KR'
+            };
+            commit();
+          } else if (state.user && !state.user.id) {
+            // 옛 mock 유저 정리
+            state.user = null;
+            commit();
+          }
+          // 인증 상태 변경 리스너
+          sb.auth.onAuthStateChange((_evt, session) => {
+            if (session?.user) {
+              state.user = {
+                id: session.user.id,
+                email: session.user.email,
+                nickname: session.user.user_metadata?.nickname || session.user.email.split('@')[0],
+                country: session.user.user_metadata?.country || 'KR'
+              };
+              commit();
+            } else {
+              if (state.user) { state.user = null; commit(); }
+            }
+          });
+          return sb;
+        } catch (e) {
+          console.error('Supabase init 실패:', e);
+          sbReady = null;
+          throw e;
+        }
+      })();
+    }
+    return sbReady;
+  }
+
+  function translateAuthError(msg) {
+    if (!msg) return '오류가 발생했어요';
+    if (msg.includes('Invalid login credentials')) return '이메일·비밀번호가 맞지 않아요';
+    if (msg.includes('Email not confirmed')) return '이메일 인증을 완료해주세요 (받은 메일 확인)';
+    if (msg.includes('User already registered')) return '이미 가입된 이메일이에요';
+    if (msg.includes('Password should be at least')) return '비밀번호는 6자 이상';
+    if (msg.includes('rate limit')) return '요청이 너무 많아요 — 잠시 후 다시 시도';
+    if (msg.includes('Invalid email')) return '이메일 형식이 올바르지 않아요';
+    return msg;
+  }
+
   // ============ STATE (localStorage) ============
   function loadState() {
     try {
@@ -87,52 +167,75 @@
     isLoggedIn() { return !!state.user; },
     getUser() { return state.user; },
 
-    // 시안용 mock 로그인: 이메일/비번 형식만 맞으면 OK
-    // Supabase 교체 시: supabase.auth.signInWithPassword({email, password})
+    // Supabase Auth 연동
     async login(email, password) {
-      await wait(300);
       if (!email || !password) {
         toast('이메일과 비밀번호를 입력해주세요', 'error');
         return false;
       }
-      if (!email.includes('@')) {
-        toast('이메일 형식이 올바르지 않아요', 'error');
+      try {
+        const client = await ensureSupabase();
+        const { data, error } = await client.auth.signInWithPassword({ email, password });
+        if (error) {
+          toast(translateAuthError(error.message), 'error');
+          return false;
+        }
+        // onAuthStateChange 가 user 자동 반영
+        return true;
+      } catch (e) {
+        toast('서버 연결 실패 — 다시 시도해주세요', 'error');
+        console.error(e);
         return false;
       }
-      if (password.length < 4) {
-        toast('비밀번호는 4자 이상', 'error');
-        return false;
-      }
-      state.user = {
-        email,
-        nickname: email.split('@')[0],
-        country: 'KR',
-        joinedAt: new Date().toISOString()
-      };
-      commit();
-      toast(`다시 만나서 반가워요, ${state.user.nickname}님`, 'success');
-      return true;
     },
 
-    async signup(data) {
-      await wait(400);
-      if (!data.email || !data.password) {
+    async signup(d) {
+      if (!d.email || !d.password) {
         toast('이메일·비밀번호는 필수예요', 'error');
         return false;
       }
-      state.user = {
-        email: data.email,
-        nickname: data.nickname || data.email.split('@')[0],
-        country: data.country || 'KR',
-        phone: data.phone || null,  // 옵셔널 (해외 사용자 환영)
-        joinedAt: new Date().toISOString()
-      };
-      commit();
-      toast('서티 패밀리에 오신 걸 환영해요 🎀', 'success');
-      return true;
+      if (d.password.length < 6) {
+        toast('비밀번호는 6자 이상 (Supabase 기본 정책)', 'error');
+        return false;
+      }
+      try {
+        const client = await ensureSupabase();
+        const { data, error } = await client.auth.signUp({
+          email: d.email,
+          password: d.password,
+          options: {
+            data: {
+              nickname: d.nickname || d.email.split('@')[0],
+              country: d.country || 'KR',
+              phone: d.phone || null
+            }
+          }
+        });
+        if (error) {
+          toast(translateAuthError(error.message), 'error');
+          return false;
+        }
+        if (data.session) {
+          // 자동 로그인된 경우 (이메일 인증 OFF)
+          toast('가입 완료 🎀 환영합니다', 'success');
+          return true;
+        } else {
+          // 이메일 인증 필요
+          toast('가입 완료! 이메일 인증 후 로그인해주세요', 'info');
+          return false;
+        }
+      } catch (e) {
+        toast('서버 연결 실패 — 다시 시도해주세요', 'error');
+        console.error(e);
+        return false;
+      }
     },
 
-    logout() {
+    async logout() {
+      try {
+        const client = await ensureSupabase();
+        await client.auth.signOut();
+      } catch (e) { console.error(e); }
       state.user = null;
       commit();
       toast('로그아웃 되었어요');
