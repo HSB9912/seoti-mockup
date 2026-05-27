@@ -359,6 +359,63 @@
         </div>
       </section>
 
+      <!-- 상품 편집 모달 -->
+      <div id="prodEditModal" style="display:none;position:fixed;inset:0;background:rgba(20,18,15,.55);z-index:99999;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(6px)">
+        <div style="background:#fff;max-width:680px;width:100%;border-radius:10px;padding:30px 34px;max-height:92vh;overflow-y:auto;box-shadow:0 30px 80px -20px rgba(0,0,0,.4)">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px">
+            <div>
+              <div style="font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)">EDIT PRODUCT</div>
+              <h2 id="peName" style="font-size:22px;font-weight:800;margin-top:3px">상품 편집</h2>
+              <small id="peId" style="color:var(--sub);font-size:12px;font-family:'SF Mono',Menlo,monospace"></small>
+            </div>
+            <button id="peClose" style="background:none;border:none;font-size:22px;color:var(--sub);cursor:pointer">✕</button>
+          </div>
+
+          <div style="display:grid;grid-template-columns:140px 1fr;gap:20px;margin-bottom:14px">
+            <label class="img-up" id="peImgZone" style="cursor:pointer;display:block;aspect-ratio:1;padding:0;overflow:hidden">
+              <img id="peImgPreview" style="width:100%;height:100%;object-fit:cover;display:none">
+              <div id="peImgPrompt" style="height:100%;display:grid;place-items:center;text-align:center;padding:14px;font-size:11.5px;color:var(--sub)">📷<br>이미지 없음<br><small>클릭/끌어놓기로 추가</small></div>
+              <input id="peImgFile" type="file" accept="image/*" style="display:none">
+            </label>
+            <div>
+              <div class="nb"><label>상품명 *</label><input id="peNameInput"></div>
+              <div class="frow">
+                <div class="nb"><label>바코드</label><input id="peBarcode" class="mono" placeholder="3041920..."></div>
+                <div class="nb"><label>카테고리</label><input id="peCategory" placeholder="스티커, 마끼테 등"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="frow">
+            <div class="nb"><label>정가 (₩)</label><input id="pePrice" type="number" min="0"></div>
+            <div class="nb"><label>도매가 (₩)</label><input id="peWholesale" type="number" min="0"></div>
+          </div>
+          <div class="frow">
+            <div class="nb"><label>현재고</label><input id="peStock" type="number" min="0"></div>
+            <div class="nb"><label>안전재고</label><input id="peSafe" type="number" min="0"></div>
+          </div>
+          <div class="frow">
+            <div class="nb"><label>발매월 (YYMM)</label><input id="peReleaseMonth" placeholder="2506"></div>
+            <div class="nb"><label>상태</label>
+              <select id="peState">
+                <option value="in">판매중</option>
+                <option value="out">품절</option>
+                <option value="disc">단종</option>
+              </select>
+            </div>
+          </div>
+          <div class="nb"><label>상세 설명</label><textarea id="peDesc" placeholder="고객에게 보일 설명..."></textarea></div>
+
+          <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px;padding-top:14px;border-top:1px solid var(--line)">
+            <button id="peDelete" class="btn" style="color:var(--bad);border-color:#f0b3b3">삭제</button>
+            <span style="flex:1"></span>
+            <button id="peCancel" class="btn">취소</button>
+            <button id="peSave" class="btn btn-p">저장</button>
+          </div>
+          <div id="peErr" style="display:none;color:var(--bad);font-size:12.5px;margin-top:10px"></div>
+        </div>
+      </div>
+
       <!-- 신상등록 -->
       <section class="sect" data-s="add">
         <div class="ph">
@@ -558,6 +615,174 @@ function renderProductTables(){
 }
 renderProductTables();
 loadProducts();
+
+// ===== 상품 편집 모달 =====
+let peEditingId = null;
+let pePendingImage = null;
+let pePendingPreviewUrl = null;
+function openProductEdit(id){
+  const p = products.find(x => x.id === id);
+  if (!p) return;
+  peEditingId = id;
+  document.getElementById('peName').textContent = p.n;
+  document.getElementById('peId').textContent = `ID ${p.id}`;
+  document.getElementById('peNameInput').value = p.n || '';
+  document.getElementById('peBarcode').value = p.barcode || '';
+  document.getElementById('peCategory').value = p.c || '';
+  document.getElementById('pePrice').value = p.p || 0;
+  document.getElementById('peWholesale').value = p.dddPrice || '';
+  document.getElementById('peStock').value = p.s || 0;
+  document.getElementById('peSafe').value = p.safe || 10;
+  document.getElementById('peReleaseMonth').value = p.releaseMonth || '';
+  document.getElementById('peState').value = p.state || 'in';
+  // 이미지 미리보기
+  const img = document.getElementById('peImgPreview');
+  const prompt = document.getElementById('peImgPrompt');
+  if (p.img) {
+    img.src = imgUrl(p.img);
+    img.style.display = 'block';
+    prompt.style.display = 'none';
+  } else {
+    img.style.display = 'none';
+    prompt.style.display = 'grid';
+  }
+  // description은 별도 query 필요 — 단순화 위해 일단 그대로
+  document.getElementById('peDesc').value = '';
+  pePendingImage = null;
+  if (pePendingPreviewUrl) URL.revokeObjectURL(pePendingPreviewUrl);
+  pePendingPreviewUrl = null;
+  document.getElementById('peErr').style.display = 'none';
+  document.getElementById('prodEditModal').style.display = 'flex';
+}
+function closeProductEdit(){
+  document.getElementById('prodEditModal').style.display = 'none';
+  peEditingId = null;
+  if (pePendingPreviewUrl) URL.revokeObjectURL(pePendingPreviewUrl);
+  pePendingPreviewUrl = null;
+  pePendingImage = null;
+}
+
+// row 클릭
+document.getElementById('prodT')?.addEventListener('click', e => {
+  if (e.target.closest('input,button')) return;
+  const row = e.target.closest('[data-prod-id]');
+  if (!row) return;
+  openProductEdit(+row.dataset.prodId);
+});
+document.getElementById('stockT')?.addEventListener('click', e => {
+  if (e.target.closest('input,button')) return;
+  // stock 표는 이미 +/- 버튼이 있으니 click target 이 row 일 때만 모달
+  const row = e.target.closest('[data-stock-id]')?.closest('tr');
+  // 아무것도 안 하기 (stock table 은 +/-만 쓰게)
+});
+
+// 이미지 zone
+const peZone = document.getElementById('peImgZone');
+const peFile = document.getElementById('peImgFile');
+peZone?.addEventListener('click', e => { if (!e.target.closest('input')) peFile.click(); });
+peFile?.addEventListener('change', e => { if (e.target.files[0]) setPeImage(e.target.files[0]); });
+peZone?.addEventListener('dragover', e => { e.preventDefault(); peZone.style.borderColor = 'var(--accent)'; });
+peZone?.addEventListener('dragleave', () => { peZone.style.borderColor = ''; });
+peZone?.addEventListener('drop', e => {
+  e.preventDefault(); peZone.style.borderColor = '';
+  if (e.dataTransfer.files[0]) setPeImage(e.dataTransfer.files[0]);
+});
+function setPeImage(f){
+  if (pePendingPreviewUrl) URL.revokeObjectURL(pePendingPreviewUrl);
+  pePendingImage = f;
+  pePendingPreviewUrl = URL.createObjectURL(f);
+  const img = document.getElementById('peImgPreview');
+  img.src = pePendingPreviewUrl;
+  img.style.display = 'block';
+  document.getElementById('peImgPrompt').style.display = 'none';
+}
+
+document.getElementById('peClose')?.addEventListener('click', closeProductEdit);
+document.getElementById('peCancel')?.addEventListener('click', closeProductEdit);
+document.getElementById('prodEditModal')?.addEventListener('click', e => {
+  if (e.target.id === 'prodEditModal') closeProductEdit();
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && document.getElementById('prodEditModal').style.display === 'flex') closeProductEdit();
+});
+
+document.getElementById('peSave')?.addEventListener('click', async () => {
+  if (!peEditingId) return;
+  const name = document.getElementById('peNameInput').value.trim();
+  if (!name) { showPeErr('상품명은 필수예요'); return; }
+  const btn = document.getElementById('peSave'); btn.disabled = true; btn.textContent = '저장 중…';
+  try {
+    let imageUrl = null, imageKey = null;
+    if (pePendingImage) {
+      btn.textContent = '이미지 업로드 중…';
+      const r = await STTY.upload(pePendingImage, { folder: 'products' });
+      imageUrl = r.publicUrl; imageKey = r.key;
+    }
+    btn.textContent = '저장 중…';
+    const sb = await getSb();
+    const patch = {
+      name,
+      category: document.getElementById('peCategory').value.trim() || null,
+      price: parseInt(document.getElementById('pePrice').value, 10) || 0,
+      wholesale_price: document.getElementById('peWholesale').value ? parseInt(document.getElementById('peWholesale').value, 10) : null,
+      stock: parseInt(document.getElementById('peStock').value, 10) || 0,
+      safe_stock: parseInt(document.getElementById('peSafe').value, 10) || 10,
+      barcode: document.getElementById('peBarcode').value.trim() || null,
+      release_month: document.getElementById('peReleaseMonth').value.trim() || null,
+      state: document.getElementById('peState').value,
+      description: document.getElementById('peDesc').value.trim() || null,
+    };
+    if (imageUrl) { patch.image_url = imageUrl; patch.image_id = imageKey; }
+    const { error } = await sb.from('products').update(patch).eq('id', peEditingId);
+    if (error) throw error;
+    // memory 갱신
+    const p = products.find(x => x.id === peEditingId);
+    if (p) {
+      p.n = patch.name;
+      p.c = patch.category;
+      p.p = patch.price;
+      p.s = patch.stock;
+      p.safe = patch.safe_stock;
+      p.barcode = patch.barcode;
+      p.dddPrice = patch.wholesale_price;
+      p.releaseMonth = patch.release_month;
+      p.state = patch.state;
+      if (imageUrl) p.img = imageKey;
+    }
+    closeProductEdit();
+    renderProductTables();
+    updateProductSummary();
+  } catch(e) {
+    console.error(e);
+    showPeErr('저장 실패: ' + (e.message || e));
+  } finally {
+    btn.disabled = false; btn.textContent = '저장';
+  }
+});
+
+document.getElementById('peDelete')?.addEventListener('click', async () => {
+  if (!peEditingId) return;
+  if (!confirm('이 상품을 삭제할까요? 되돌릴 수 없어요.')) return;
+  const btn = document.getElementById('peDelete'); btn.disabled = true;
+  try {
+    const sb = await getSb();
+    const { error } = await sb.from('products').delete().eq('id', peEditingId);
+    if (error) throw error;
+    products = products.filter(p => p.id !== peEditingId);
+    closeProductEdit();
+    renderProductTables();
+    updateProductSummary();
+  } catch(e) {
+    showPeErr('삭제 실패: ' + (e.message || e));
+  } finally { btn.disabled = false; }
+});
+
+function showPeErr(msg){
+  const el = document.getElementById('peErr');
+  el.textContent = msg;
+  el.style.display = 'block';
+  setTimeout(() => el.style.display = 'none', 6000);
+}
 
 // ===== 상품 검색 (이름/카테고리) =====
 let productSearchQ = '';
