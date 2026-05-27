@@ -259,9 +259,40 @@ table.t{width:100%;border-collapse:collapse;font-size:13px}
         <div class="blk">
           <div class="blk-h">
             <h2>달별 돈의 흐름 <span class="h-cnt" id="flowYearCount">· 전체 데이터</span></h2>
-            <small style="color:var(--sub);font-size:11.5px">들어온 돈 = 입점처 정산 입금 · 나간 돈 = 전대료·관리비·세금 (실제 현금 지출)</small>
+            <small style="color:var(--sub);font-size:11.5px">들어온 돈 = 입점처 정산 + 직접 행사 매출 · 나간 돈 = 전대료·관리비·세금·재료비</small>
           </div>
           <div id="moneyFlow"></div>
+        </div>
+
+        <!-- 빠른 입력: 직접 행사 매출 / 재료비 -->
+        <div class="blk">
+          <div class="blk-h"><h2>빠른 입력 <span class="h-cnt">· 직접 행사 매출 · 재료비</span></h2></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+
+            <!-- 직접 행사 매출 -->
+            <div style="background:linear-gradient(180deg,#f5fbf7,#fff);border:1px solid #bce0c8;border-radius:6px;padding:16px 18px">
+              <h3 style="font-size:13.5px;font-weight:800;margin-bottom:10px;color:var(--ok)">💰 직접 행사 매출</h3>
+              <div style="display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:8px;margin-bottom:8px">
+                <div><label style="font-size:10.5px;color:var(--sub);font-weight:700;display:block;margin-bottom:3px">행사명</label><input id="evIn_name" placeholder="예: 일러스타페어" style="width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:4px;font-family:inherit;font-size:12.5px"></div>
+                <div><label style="font-size:10.5px;color:var(--sub);font-weight:700;display:block;margin-bottom:3px">일자</label><input id="evIn_date" type="date" style="width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:4px;font-family:inherit;font-size:12.5px"></div>
+                <div><label style="font-size:10.5px;color:var(--sub);font-weight:700;display:block;margin-bottom:3px">금액 (₩)</label><input id="evIn_amt" type="number" placeholder="0" style="width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:4px;font-family:'SF Mono',Menlo,monospace;font-size:12.5px;text-align:right"></div>
+              </div>
+              <div style="display:flex;gap:6px"><input id="evIn_memo" placeholder="메모 (선택) — 장소·관람 인원 등" style="flex:1;padding:8px 10px;border:1px solid var(--line);border-radius:4px;font-family:inherit;font-size:12.5px"><button class="btn btn-p" id="evIn_save">＋ 추가</button></div>
+            </div>
+
+            <!-- 재료비 -->
+            <div style="background:linear-gradient(180deg,#fbf5f5,#fff);border:1px solid #f0b3b3;border-radius:6px;padding:16px 18px">
+              <h3 style="font-size:13.5px;font-weight:800;margin-bottom:10px;color:var(--bad)">📦 재료비 (제작·발주 비용)</h3>
+              <div style="display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:8px;margin-bottom:8px">
+                <div><label style="font-size:10.5px;color:var(--sub);font-weight:700;display:block;margin-bottom:3px">항목</label><input id="mat_name" placeholder="예: 스티커 인쇄 1000장" style="width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:4px;font-family:inherit;font-size:12.5px"></div>
+                <div><label style="font-size:10.5px;color:var(--sub);font-weight:700;display:block;margin-bottom:3px">날짜</label><input id="mat_date" type="date" style="width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:4px;font-family:inherit;font-size:12.5px"></div>
+                <div><label style="font-size:10.5px;color:var(--sub);font-weight:700;display:block;margin-bottom:3px">금액 (₩)</label><input id="mat_amt" type="number" placeholder="0" style="width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:4px;font-family:'SF Mono',Menlo,monospace;font-size:12.5px;text-align:right"></div>
+              </div>
+              <div style="display:flex;gap:6px"><input id="mat_memo" placeholder="메모 (선택) — 공급처·결제 방식 등" style="flex:1;padding:8px 10px;border:1px solid var(--line);border-radius:4px;font-family:inherit;font-size:12.5px"><button class="btn btn-p" id="mat_save">＋ 추가</button></div>
+            </div>
+
+          </div>
+          <small style="color:var(--sub);font-size:11px;display:block;margin-top:8px">💡 추가하면 위 "달별 돈의 흐름"에 자동 합산됨. 행사 매출은 <code>settlements_monthly</code> (vendor=직접행사)에, 재료비는 <code>tax_payments</code> (category=기타, 항목 앞에 "재료비:")에 저장.</small>
         </div>
       </section>
 
@@ -1196,6 +1227,71 @@ document.getElementById('taxESave').addEventListener('click', saveTaxEdit);
 document.getElementById('taxEDelete').addEventListener('click', deleteTaxEdit);
 document.getElementById('taxEditModal').addEventListener('click', e => {
   if (e.target.id === 'taxEditModal') closeTaxEdit();
+});
+
+// ====================== 빠른 입력: 직접 행사 매출 + 재료비 ======================
+function todayStr(){ return new Date().toISOString().slice(0,10); }
+
+// 페이지 로드 시 날짜 기본값
+setTimeout(() => {
+  const evD = document.getElementById('evIn_date');
+  const mtD = document.getElementById('mat_date');
+  if (evD && !evD.value) evD.value = todayStr();
+  if (mtD && !mtD.value) mtD.value = todayStr();
+}, 100);
+
+// 직접 행사 매출 저장
+document.getElementById('evIn_save')?.addEventListener('click', async () => {
+  const name = document.getElementById('evIn_name').value.trim();
+  const date = document.getElementById('evIn_date').value;
+  const amount = parseInt(document.getElementById('evIn_amt').value) || 0;
+  const memo = document.getElementById('evIn_memo').value.trim();
+
+  if (!name) { alert('행사명 입력'); return; }
+  if (!date) { alert('일자 선택'); return; }
+  if (!amount) { alert('금액 입력'); return; }
+  if (!window._bizSb) { alert('데이터 연결 안됨 — 새로고침'); return; }
+
+  const year_month = date.slice(0,7);
+  const display = '[행사] ' + name;
+  const { data, error } = await window._bizSb.from('settlements_monthly')
+    .insert({ vendor: '직접행사', year_month, amount, memo: name + (memo?' / '+memo:'') })
+    .select().single();
+  if (error) { alert('저장 실패: ' + error.message); return; }
+
+  SETTLEMENTS_MONTHLY.unshift(data);
+  document.getElementById('evIn_name').value = '';
+  document.getElementById('evIn_amt').value = '';
+  document.getElementById('evIn_memo').value = '';
+  renderOverview();
+  if (typeof renderMonthly === 'function') renderMonthly();
+  alert(`+ 직접행사 매출 ₩${amount.toLocaleString()} (${year_month}) 추가됨`);
+});
+
+// 재료비 저장
+document.getElementById('mat_save')?.addEventListener('click', async () => {
+  const name = document.getElementById('mat_name').value.trim();
+  const date = document.getElementById('mat_date').value;
+  const amount = parseInt(document.getElementById('mat_amt').value) || 0;
+  const memo = document.getElementById('mat_memo').value.trim() || null;
+
+  if (!name) { alert('항목 입력'); return; }
+  if (!date) { alert('날짜 선택'); return; }
+  if (!amount) { alert('금액 입력'); return; }
+  if (!window._bizSb) { alert('데이터 연결 안됨 — 새로고침'); return; }
+
+  const { data, error } = await window._bizSb.from('tax_payments')
+    .insert({ item: '재료비: ' + name, date, category: '기타', amount, memo })
+    .select().single();
+  if (error) { alert('저장 실패: ' + error.message); return; }
+
+  TAX.unshift(data);
+  document.getElementById('mat_name').value = '';
+  document.getElementById('mat_amt').value = '';
+  document.getElementById('mat_memo').value = '';
+  renderOverview();
+  if (typeof renderTax === 'function') renderTax();
+  alert(`+ 재료비 ₩${amount.toLocaleString()} (${date}) 추가됨`);
 });
 
 // ====================== VENDOR MODAL ======================
