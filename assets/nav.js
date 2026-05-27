@@ -40,6 +40,37 @@
   margin-right:5px;font-weight:800}
 .seoti-nav-mob{display:none;background:none;border:none;cursor:pointer;
   margin-left:auto;font-size:22px;color:#161412;padding:6px 8px}
+
+/* 로그인/계정 영역 */
+.seoti-acct{display:flex;align-items:center;gap:10px;margin-left:6px;padding-left:18px;border-left:1px solid #e7e4df}
+.seoti-acct .login-btn{font-size:13px;font-weight:800;color:#161412;cursor:pointer;
+  padding:8px 16px;border:1.5px solid #161412;border-radius:99px;letter-spacing:.02em;transition:.15s}
+.seoti-acct .login-btn:hover{background:#161412;color:#fff}
+.seoti-acct .admin-btn{display:none;align-items:center;gap:6px;
+  background:#161412;color:#fff;padding:8px 15px;border-radius:99px;
+  font-size:12.5px;font-weight:800;letter-spacing:.04em;cursor:pointer;transition:.15s}
+.seoti-acct .admin-btn:hover{background:#e8503a;transform:translateY(-1px)}
+.seoti-acct .admin-btn .dot{width:6px;height:6px;border-radius:50%;background:#7fd296}
+.seoti-acct .user-btn{display:flex;align-items:center;gap:7px;cursor:pointer;
+  font-size:13px;font-weight:700;color:#161412;padding:6px 10px;border-radius:99px;transition:.15s}
+.seoti-acct .user-btn:hover{background:#f5f3ee}
+.seoti-acct .user-btn .av{width:26px;height:26px;border-radius:50%;background:#161412;color:#fff;
+  display:grid;place-items:center;font-size:12px;font-weight:800}
+.seoti-acct .user-btn .chev{font-size:9px;color:#8c8781}
+.seoti-acct .menu-pop{position:absolute;top:62px;right:0;background:#fff;border:1px solid #e7e4df;
+  border-radius:10px;padding:6px;min-width:180px;box-shadow:0 14px 30px -14px rgba(0,0,0,.18);display:none;z-index:10000}
+.seoti-acct .menu-pop.open{display:block}
+.seoti-acct .menu-pop a{display:flex;align-items:center;gap:8px;padding:9px 12px;
+  font-size:13px;font-weight:600;color:#161412;border-radius:6px;text-decoration:none}
+.seoti-acct .menu-pop a:hover{background:#f5f3ee}
+.seoti-acct .menu-pop a.adm{color:#e8503a;font-weight:800}
+.seoti-acct .menu-pop hr{border:none;border-top:1px solid #f0ebe2;margin:4px 6px}
+.seoti-acct-wrap{position:relative}
+
+@media(max-width:760px){
+  .seoti-acct{margin-left:0;padding-left:0;border-left:none;border-top:1px solid #f0ebe2;padding-top:10px;width:100%;justify-content:flex-start;flex-wrap:wrap}
+}
+
 @media(max-width:760px){
   .seoti-nav-wrap{padding:0 20px;height:68px}
   .seoti-logo{font-size:17px;gap:9px}
@@ -96,7 +127,27 @@
       </span>
     </a>
     <button class="seoti-nav-mob" aria-label="menu" id="seoti-mob-btn">☰</button>
-    <div class="seoti-nav-menu" id="seoti-menu">${menuHTML}</div>
+    <div class="seoti-nav-menu" id="seoti-menu">
+      ${menuHTML}
+      <div class="seoti-acct" id="seoti-acct">
+        <a class="login-btn" id="seoti-login-btn" href="auth-b.html">로그인</a>
+        <div class="seoti-acct-wrap" id="seoti-user-wrap" style="display:none">
+          <a class="user-btn" id="seoti-user-btn">
+            <span class="av" id="seoti-user-av">·</span>
+            <span id="seoti-user-nick">·</span>
+            <span class="chev">▾</span>
+          </a>
+          <div class="menu-pop" id="seoti-user-pop">
+            <a href="mypage-b.html">👤 마이페이지</a>
+            <a href="cart-checkout-b.html">🛒 장바구니</a>
+            <a href="mypage-b.html">♡ 위시리스트</a>
+            <a class="adm" id="seoti-admin-link" href="admin-c.html" style="display:none">⚙ 관리자 페이지</a>
+            <hr>
+            <a id="seoti-logout-link" style="cursor:pointer">↪ 로그아웃</a>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </nav>`.trim();
 
@@ -122,6 +173,65 @@
         !e.target.closest('#seoti-menu') &&
         !e.target.closest('#seoti-mob-btn')) {
       menu.classList.remove('open');
+    }
+  });
+
+  // ---------- 로그인/계정 UI 동기화 ----------
+  function syncAcct() {
+    if (!window.SEOTI) return;
+    const logged = SEOTI.api && SEOTI.api.isLoggedIn && SEOTI.api.isLoggedIn();
+    const user   = SEOTI.state && SEOTI.state().user;
+    const loginBtn = document.getElementById('seoti-login-btn');
+    const userWrap = document.getElementById('seoti-user-wrap');
+    if (!loginBtn || !userWrap) return;
+    if (logged && user) {
+      loginBtn.style.display = 'none';
+      userWrap.style.display = 'block';
+      const nick = user.nickname || (user.email || '').split('@')[0] || '회원';
+      document.getElementById('seoti-user-nick').textContent = nick;
+      document.getElementById('seoti-user-av').textContent = nick.charAt(0).toUpperCase();
+      // 관리자 체크 (비동기)
+      if (SEOTI.api.isAdmin) {
+        SEOTI.api.isAdmin().then(isAdmin => {
+          const link = document.getElementById('seoti-admin-link');
+          if (link) link.style.display = isAdmin ? 'flex' : 'none';
+        }).catch(()=>{});
+      }
+    } else {
+      loginBtn.style.display = 'inline-block';
+      userWrap.style.display = 'none';
+    }
+  }
+
+  // SEOTI 로드 대기 (app.js 가 같은 페이지에 있다고 가정)
+  function whenReady(cb) {
+    if (window.SEOTI) return cb();
+    let n = 0;
+    const t = setInterval(() => {
+      if (window.SEOTI) { clearInterval(t); cb(); }
+      else if (++n > 50) clearInterval(t); // 5초 후 포기
+    }, 100);
+  }
+  whenReady(() => {
+    syncAcct();
+    window.addEventListener('seoti-state-change', syncAcct);
+  });
+
+  // 사용자 드롭다운 토글
+  document.addEventListener('click', e => {
+    const userBtn = e.target.closest('#seoti-user-btn');
+    const pop = document.getElementById('seoti-user-pop');
+    if (userBtn && pop) {
+      e.stopPropagation();
+      pop.classList.toggle('open');
+      return;
+    }
+    if (pop && !e.target.closest('#seoti-user-pop')) {
+      pop.classList.remove('open');
+    }
+    if (e.target.closest('#seoti-logout-link')) {
+      e.preventDefault();
+      if (window.SEOTI && SEOTI.api && SEOTI.api.logout) SEOTI.api.logout();
     }
   });
 })();
