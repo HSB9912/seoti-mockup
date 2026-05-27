@@ -144,17 +144,28 @@ CREATE TRIGGER site_content_touch
 CREATE TABLE IF NOT EXISTS public.archive_photos (
   id         bigserial PRIMARY KEY,
   image_id   text NOT NULL,
+  image_url  text,                 -- R2 공개 URL (image_id 와 함께 저장)
   category   text DEFAULT '다꾸',
   note       text,
   taken_at   date,
   created_at timestamptz DEFAULT now()
 );
 
+-- 기존 테이블에 image_url 컬럼이 없는 경우 추가
+ALTER TABLE public.archive_photos ADD COLUMN IF NOT EXISTS image_url text;
+
 ALTER TABLE public.archive_photos ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "archive_public_read" ON public.archive_photos;
 CREATE POLICY "archive_public_read" ON public.archive_photos
   FOR SELECT USING (true);
+
+-- 관리자만 archive_photos 에 쓰기 가능
+DROP POLICY IF EXISTS "archive_admin_write" ON public.archive_photos;
+CREATE POLICY "archive_admin_write" ON public.archive_photos
+  FOR ALL TO authenticated
+  USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true))
+  WITH CHECK (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true));
 
 -- 5. NOTICES (공지·행사·입점처·트웬티 통판)
 CREATE TABLE IF NOT EXISTS public.notices (
