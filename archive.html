@@ -293,24 +293,51 @@ lb.onclick = e => { if (e.target === lb) lb.classList.remove('on'); };
     }));
   }
 
-  document.getElementById('upSubmit').addEventListener('click', () => {
+  document.getElementById('upSubmit').addEventListener('click', async () => {
     if (!pending.length) { SEOTI.toast('사진을 먼저 선택해주세요', 'warn'); return; }
     const cat = document.getElementById('upCat').value;
     const note = document.getElementById('upNote').value.trim();
-    SEOTI.toast(`${pending.length}장 업로드 준비 완료 (CF 연동 시 자동 처리)`, 'success');
-    /* TODO: Cloudflare Images 연동
-    // POST multipart to your /api/upload endpoint
-    // → server gets one-time upload URL from Cloudflare
-    //   const { uploadURL } = await fetch('/api/cf-upload-url', { method:'POST' }).then(r=>r.json());
-    // → upload binary
-    //   await fetch(uploadURL, { method:'POST', body: formData });
-    // → save image ID + cat + note to Supabase
-    //   await supabase.from('archive_photos').insert({ image_id, category: cat, note, ... });
-    */
-    setTimeout(close, 800);
+    const btn = document.getElementById('upSubmit');
+    btn.disabled = true;
+    btn.textContent = `업로드 중… 0/${pending.length}`;
+
+    let ok = 0, fail = 0;
+    for (let i = 0; i < pending.length; i++) {
+      const p = pending[i];
+      btn.textContent = `업로드 중… ${i+1}/${pending.length}`;
+      try {
+        const { publicUrl, key } = await STTY.upload(p.file, { folder: 'archive' });
+        // archive_photos 에 기록
+        if (window.supabase) {
+          const sb = window.supabase.createClient(
+            'https://wzmtcomawebufylojffx.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6bXRjb21hd2VidWZ5bG9qZmZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NTg5MjcsImV4cCI6MjA5NTQzNDkyN30.6P0ZSLTU7XPudr9Ove2S0Nc5XO7pdb87LUVDdVJKmEM',
+            { auth: { persistSession: true, storageKey: 'sb-wzmtcomawebufylojffx-auth-token' } }
+          );
+          await sb.from('archive_photos').insert({ image_id: key, image_url: publicUrl, category: cat, note: note || null });
+        }
+        ok++;
+      } catch (e) {
+        console.error('업로드 실패', p.file.name, e);
+        fail++;
+      }
+    }
+    btn.disabled = false;
+    btn.textContent = '올리기';
+    if (ok && !fail) {
+      SEOTI.toast(`${ok}장 업로드 완료 🎨`, 'success');
+      close();
+      // 페이지 새로고침해서 새 사진 표시
+      setTimeout(() => location.reload(), 800);
+    } else if (ok && fail) {
+      SEOTI.toast(`${ok}장 성공 · ${fail}장 실패 (콘솔 확인)`, 'warn');
+    } else {
+      SEOTI.toast('업로드 실패 — 관리자 권한·R2 연동 확인', 'error');
+    }
   });
 })();
 </script>
+<script src="assets/uploader.js"></script>
 <script src="assets/nav.js"></script>
 </body>
 </html>
