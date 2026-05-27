@@ -475,12 +475,79 @@ table.t{width:100%;border-collapse:collapse;font-size:13px}
         <div class="controls">
           <span class="seg"><a class="on" data-ft="all">전체</a><a data-ft="사무실">사무실</a><a data-ft="세금">세금</a></span>
           <input class="search" placeholder="🔍 항목 검색" id="taxSearch">
-          <button class="btn">📥 CSV</button>
-          <button class="btn btn-p">＋ 새 항목</button>
+          <button class="btn" id="taxCsvBtn">📥 CSV</button>
+          <button class="btn btn-p" id="taxNewBtn">＋ 새 항목</button>
         </div>
 
         <div class="blk">
           <table class="t" id="taxTable"></table>
+        </div>
+
+        <!-- 빠른 추가 폼 -->
+        <div class="blk" id="taxQuickAdd" style="display:none;background:#fff8ef;border:1px dashed #f0d9a0;border-radius:6px;padding:18px 22px;margin-top:14px">
+          <h3 style="font-size:14px;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:8px">＋ 새 납부 내역 추가 <small style="color:var(--sub);font-size:11.5px;font-weight:600">전대료·관리비·세금 등</small></h3>
+          <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr auto;gap:10px;align-items:end">
+            <div>
+              <label style="font-size:11px;color:var(--sub);font-weight:700;display:block;margin-bottom:4px">항목명</label>
+              <input id="taxQItem" placeholder="예: 6월 전대료" style="width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:5px;font-family:inherit;font-size:13px">
+            </div>
+            <div>
+              <label style="font-size:11px;color:var(--sub);font-weight:700;display:block;margin-bottom:4px">납부일</label>
+              <input id="taxQDate" type="date" style="width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:5px;font-family:inherit;font-size:13px">
+            </div>
+            <div>
+              <label style="font-size:11px;color:var(--sub);font-weight:700;display:block;margin-bottom:4px">분류</label>
+              <select id="taxQCat" style="width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:5px;font-family:inherit;font-size:13px;background:#fff">
+                <option value="사무실">사무실 (전대료·관리비, 매월 고정)</option>
+                <option value="세금">세금 (소득세·지방세, 1회성)</option>
+                <option value="기타">기타</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:11px;color:var(--sub);font-weight:700;display:block;margin-bottom:4px">금액 (₩)</label>
+              <input id="taxQAmt" type="number" placeholder="0" style="width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:5px;font-family:'SF Mono',Menlo,monospace;font-size:13px;text-align:right">
+            </div>
+            <div style="display:flex;gap:6px">
+              <button class="btn" id="taxQCancel">취소</button>
+              <button class="btn btn-p" id="taxQSave">저장</button>
+            </div>
+          </div>
+          <div style="margin-top:10px">
+            <label style="font-size:11px;color:var(--sub);font-weight:700;display:block;margin-bottom:4px">메모 (선택)</label>
+            <input id="taxQMemo" placeholder="비고·납부 방식 등" style="width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:5px;font-family:inherit;font-size:13px">
+          </div>
+        </div>
+
+        <!-- 편집 모달 -->
+        <div id="taxEditModal" style="display:none;position:fixed;inset:0;background:rgba(20,18,15,.55);z-index:99999;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(6px)">
+          <div style="background:#fff;max-width:520px;width:100%;border-radius:10px;padding:28px 32px;box-shadow:0 30px 80px -20px rgba(0,0,0,.4)">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px">
+              <div>
+                <div style="font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)">EDIT TAX</div>
+                <h2 style="font-size:20px;font-weight:800;margin-top:3px">납부 항목 수정</h2>
+              </div>
+              <button id="taxECancel" style="background:none;border:none;font-size:22px;color:var(--sub);cursor:pointer">✕</button>
+            </div>
+            <div style="margin-bottom:10px"><label style="font-size:11px;color:var(--sub);font-weight:700;display:block;margin-bottom:4px">항목명</label><input id="taxEItem" style="width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:5px;font-family:inherit;font-size:13px"></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+              <div><label style="font-size:11px;color:var(--sub);font-weight:700;display:block;margin-bottom:4px">납부일</label><input id="taxEDate" type="date" style="width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:5px;font-family:inherit;font-size:13px"></div>
+              <div><label style="font-size:11px;color:var(--sub);font-weight:700;display:block;margin-bottom:4px">분류</label>
+                <select id="taxECat" style="width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:5px;font-family:inherit;font-size:13px;background:#fff">
+                  <option value="사무실">사무실 (매월 고정)</option>
+                  <option value="세금">세금 (1회성)</option>
+                  <option value="기타">기타</option>
+                </select>
+              </div>
+            </div>
+            <div style="margin-bottom:10px"><label style="font-size:11px;color:var(--sub);font-weight:700;display:block;margin-bottom:4px">금액 (₩)</label><input id="taxEAmt" type="number" style="width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:5px;font-family:'SF Mono',Menlo,monospace;font-size:13px;text-align:right"></div>
+            <div style="margin-bottom:14px"><label style="font-size:11px;color:var(--sub);font-weight:700;display:block;margin-bottom:4px">메모</label><input id="taxEMemo" style="width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:5px;font-family:inherit;font-size:13px"></div>
+            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px;padding-top:14px;border-top:1px solid var(--line)">
+              <button id="taxEDelete" class="btn" style="color:var(--bad);border-color:#f0b3b3">삭제</button>
+              <span style="flex:1"></span>
+              <button id="taxECancel2" class="btn">취소</button>
+              <button id="taxESave" class="btn btn-p">저장</button>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -595,7 +662,7 @@ function renderOverview(){
   SETTLEMENTS_MONTHLY.forEach(s => { const k = ym(s.year_month); if(k) inMap[k]=(inMap[k]||0)+(+s.amount||0); });
   SETTLEMENTS.forEach(s => { const k = ym(s.settled_at); if(k) inMap[k]=(inMap[k]||0)+(+s.total||0); });
   SHIPMENTS.forEach(s => { const k = ym(s.shipped_on); if(k) outMap[k]=(outMap[k]||0)+(+s.amount||0); });
-  TAX.forEach(t => { const k = ym(t.paid_date); if(k) outMap[k]=(outMap[k]||0)+(+t.amount||0); });
+  TAX.forEach(t => { const k = ym(t.date); if(k) outMap[k]=(outMap[k]||0)+(+t.amount||0); });
 
   const allKeys = Array.from(new Set([...Object.keys(inMap), ...Object.keys(outMap)])).sort();
 
@@ -625,7 +692,7 @@ function renderOverview(){
   document.getElementById('kpiTotalCount').textContent = SETTLEMENTS_MONTHLY.filter(s => s.year_month === thisMonth).length + "개 입점처 정산";
   document.getElementById('kpiThisOut').textContent = fmt(thisOut);
   const shipCnt = SHIPMENTS.filter(s => ym(s.shipped_on) === thisMonth).length;
-  const taxCnt  = TAX.filter(t => ym(t.paid_date) === thisMonth).length;
+  const taxCnt  = TAX.filter(t => ym(t.date) === thisMonth).length;
   document.getElementById('kpiThisOutBd').textContent = `발송 ${shipCnt}건 · 고정·세금 ${taxCnt}건`;
   const netEl = document.getElementById('kpiThisNet');
   netEl.textContent = fmt(thisNet);
@@ -925,7 +992,7 @@ function renderTax(){
         <td>${categoryTag(t.category)}</td>
         <td class="tnum big mono">${t.amount.toLocaleString()}</td>
         <td><small style="color:var(--sub)">—</small></td>
-        <td><a class="edit">편집</a></td>
+        <td><a class="edit" data-tax-id="${t.id}" style="cursor:pointer">편집</a></td>
       </tr>`).join('');
   });
 
@@ -944,6 +1011,95 @@ function renderTax(){
       <td colspan="2" style="padding:11px 10px;color:rgba(255,255,255,.7);font-size:11px">사무실 ${office.toLocaleString()} · 세금 ${tax.toLocaleString()}</td>
     </tr></tfoot>`;
   document.getElementById('taxTable').innerHTML = html;
+
+  // 편집 버튼 바인딩
+  document.querySelectorAll('#taxTable a.edit[data-tax-id]').forEach(a => {
+    a.addEventListener('click', e => { e.preventDefault(); openTaxEdit(parseInt(a.dataset.taxId)); });
+  });
+}
+
+// ====================== TAX: 새 항목 / 편집 / 삭제 ======================
+function openTaxNew(){
+  document.getElementById('taxQuickAdd').style.display = 'block';
+  document.getElementById('taxQItem').value = '';
+  document.getElementById('taxQAmt').value = '';
+  document.getElementById('taxQMemo').value = '';
+  document.getElementById('taxQCat').value = '사무실';
+  const d = new Date();
+  document.getElementById('taxQDate').value = d.toISOString().slice(0,10);
+  document.getElementById('taxQItem').focus();
+  document.getElementById('taxQuickAdd').scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+async function saveTaxNew(){
+  const item = document.getElementById('taxQItem').value.trim();
+  const date = document.getElementById('taxQDate').value;
+  const category = document.getElementById('taxQCat').value;
+  const amount = parseInt(document.getElementById('taxQAmt').value) || 0;
+  const memo = document.getElementById('taxQMemo').value.trim() || null;
+
+  if (!item) { alert('항목명을 입력하세요'); return; }
+  if (!date) { alert('납부일을 선택하세요'); return; }
+  if (!amount) { alert('금액을 입력하세요'); return; }
+  if (!window._bizSb) { alert('데이터 연결 안됨 — 새로고침'); return; }
+
+  const { data, error } = await window._bizSb.from('tax_payments')
+    .insert({item, date, category, amount, memo})
+    .select().single();
+  if (error) { alert('저장 실패: ' + error.message); return; }
+
+  TAX.unshift(data);
+  document.getElementById('taxQuickAdd').style.display = 'none';
+  renderTax();
+  renderOverview();
+}
+
+let _taxEditId = null;
+function openTaxEdit(id){
+  const t = TAX.find(x => x.id === id);
+  if (!t) return;
+  _taxEditId = id;
+  document.getElementById('taxEItem').value = t.item || '';
+  document.getElementById('taxEDate').value = t.date || '';
+  document.getElementById('taxECat').value = t.category || '사무실';
+  document.getElementById('taxEAmt').value = t.amount || 0;
+  document.getElementById('taxEMemo').value = t.memo || '';
+  document.getElementById('taxEditModal').style.display = 'flex';
+}
+function closeTaxEdit(){
+  document.getElementById('taxEditModal').style.display = 'none';
+  _taxEditId = null;
+}
+async function saveTaxEdit(){
+  if (_taxEditId === null) return;
+  const patch = {
+    item: document.getElementById('taxEItem').value.trim(),
+    date: document.getElementById('taxEDate').value,
+    category: document.getElementById('taxECat').value,
+    amount: parseInt(document.getElementById('taxEAmt').value) || 0,
+    memo: document.getElementById('taxEMemo').value.trim() || null,
+  };
+  if (!patch.item || !patch.date) { alert('항목명·납부일 필수'); return; }
+  if (!window._bizSb) { alert('데이터 연결 안됨'); return; }
+  const { data, error } = await window._bizSb.from('tax_payments').update(patch).eq('id', _taxEditId).select().single();
+  if (error) { alert('수정 실패: ' + error.message); return; }
+  const i = TAX.findIndex(x => x.id === _taxEditId);
+  if (i >= 0) TAX[i] = data;
+  closeTaxEdit();
+  renderTax();
+  renderOverview();
+}
+async function deleteTaxEdit(){
+  if (_taxEditId === null) return;
+  const t = TAX.find(x => x.id === _taxEditId);
+  if (!confirm(`"${t?.item}" 삭제할까요?`)) return;
+  if (!window._bizSb) return;
+  const { error } = await window._bizSb.from('tax_payments').delete().eq('id', _taxEditId);
+  if (error) { alert('삭제 실패: ' + error.message); return; }
+  TAX = TAX.filter(x => x.id !== _taxEditId);
+  closeTaxEdit();
+  renderTax();
+  renderOverview();
 }
 
 // ====================== ROUTING & EVENTS ======================
@@ -1021,6 +1177,20 @@ document.getElementById('settlementSearch').addEventListener('input', e => {
 document.getElementById('taxSearch').addEventListener('input', e => {
   tSearch = e.target.value.trim();
   renderTax();
+});
+
+// 세금·관리비: 새 항목 / 편집 모달
+document.getElementById('taxNewBtn').addEventListener('click', openTaxNew);
+document.getElementById('taxQCancel').addEventListener('click', () => {
+  document.getElementById('taxQuickAdd').style.display = 'none';
+});
+document.getElementById('taxQSave').addEventListener('click', saveTaxNew);
+document.getElementById('taxECancel').addEventListener('click', closeTaxEdit);
+document.getElementById('taxECancel2').addEventListener('click', closeTaxEdit);
+document.getElementById('taxESave').addEventListener('click', saveTaxEdit);
+document.getElementById('taxEDelete').addEventListener('click', deleteTaxEdit);
+document.getElementById('taxEditModal').addEventListener('click', e => {
+  if (e.target.id === 'taxEditModal') closeTaxEdit();
 });
 
 // ====================== VENDOR MODAL ======================
