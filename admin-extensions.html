@@ -160,9 +160,10 @@ td .nm small{display:block;color:var(--sub);font-weight:500;font-size:11.5px;mar
     <nav class="sb-nav" style="padding-top:8px">
       <div class="sb-grp">
         <h5>고객<i class="en">Customer</i></h5>
-        <a class="on" data-go="members"><span class="ico">👥</span>회원 관리<span class="badge">1,842</span></a>
-        <a data-go="reviews"><span class="ico">⭐</span>리뷰 관리<span class="badge">12</span></a>
-        <a><span class="ico">💬</span>Q&A 답변<span class="badge">8</span></a>
+        <a class="on" data-go="members"><span class="ico">👥</span>회원 관리</a>
+        <a data-go="admins"><span class="ico">👑</span>관리자 권한</a>
+        <a data-go="reviews"><span class="ico">⭐</span>리뷰 관리</a>
+        <a><span class="ico">💬</span>Q&A 답변</a>
       </div>
       <div class="sb-grp">
         <h5>마케팅<i class="en">Marketing</i></h5>
@@ -221,6 +222,37 @@ td .nm small{display:block;color:var(--sub);font-weight:500;font-size:11.5px;mar
               <tr><td><input type="checkbox"></td><td><span class="nm">유빈*<small>yoo***@daum.net</small></span></td><td><span class="pill">실버</span></td><td>2026-02-10</td><td class="tnum">60일 전</td><td class="tnum">₩42,500<br><small style="color:var(--sub)">5건</small></td><td class="tnum">820P</td><td><span class="pill warn">휴면 임박</span></td><td class="row-act"><a>상세</a><a>리마인드</a></td></tr>
               <tr><td><input type="checkbox"></td><td><span class="nm">agency*<small>ad***@studio.kr</small></span></td><td><span class="pill ink">기업</span></td><td>2025-11-04</td><td class="tnum">1주 전</td><td class="tnum">₩1,840,000<br><small style="color:var(--sub)">3건 (대량)</small></td><td class="tnum">—</td><td><span class="pill">활성</span></td><td class="row-act"><a>상세</a><a>메일</a></td></tr>
             </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ======= 관리자 권한 ======= -->
+      <section class="sect" data-s="admins">
+        <div class="page-h">
+          <div><h1>관리자 권한<i class="en">Admin Access</i></h1>
+            <div class="lead">사이트 어드민 페이지에 들어올 수 있는 계정을 관리해요. 이메일로 회원을 찾아 권한을 부여하거나 회수합니다.</div>
+          </div>
+        </div>
+
+        <div class="card" style="padding:18px 20px;margin-bottom:18px">
+          <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">
+            <div style="flex:1;min-width:240px">
+              <label style="display:block;font-size:11.5px;color:var(--sub);font-weight:700;margin-bottom:5px;letter-spacing:.04em;text-transform:uppercase">이메일로 추가</label>
+              <input id="adAddEmail" type="email" placeholder="예: 3eotty@gmail.com" style="width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:5px;font-size:13.5px;font-family:inherit;outline:none">
+            </div>
+            <button class="btn btn-p" id="adAddBtn">＋ 관리자로 추가</button>
+          </div>
+          <div style="font-size:11.5px;color:var(--sub);margin-top:8px">⚠️ 해당 이메일이 회원가입을 먼저 해야 추가 가능합니다. (auth.users 에 존재해야 함)</div>
+        </div>
+
+        <div class="card" style="padding:0">
+          <div style="padding:14px 18px;border-bottom:1px solid var(--line);font-weight:700;display:flex;align-items:center;gap:8px">
+            <span>👑 현재 관리자</span>
+            <span style="font-size:11.5px;color:var(--sub);font-weight:600" id="adCount"></span>
+          </div>
+          <table>
+            <thead><tr><th>이메일</th><th>닉네임</th><th>가입일</th><th style="text-align:right">권한 회수</th></tr></thead>
+            <tbody id="adRows"><tr><td colspan="4" style="padding:24px;text-align:center;color:var(--sub)">불러오는 중…</td></tr></tbody>
           </table>
         </div>
       </section>
@@ -424,8 +456,10 @@ td .nm small{display:block;color:var(--sub);font-weight:500;font-size:11.5px;mar
   </div>
 </div>
 
+<script src="assets/app.js"></script>
+<script src="assets/admin-guard.js"></script>
 <script>
-const labels={members:"회원 관리",reviews:"리뷰 관리",notices:"공지·이벤트 관리",coupons:"쿠폰 관리"};
+const labels={members:"회원 관리",admins:"관리자 권한",reviews:"리뷰 관리",notices:"공지·이벤트 관리",coupons:"쿠폰 관리"};
 document.addEventListener('click',e=>{
   const go=e.target.closest('[data-go]');if(!go)return;
   e.preventDefault();
@@ -434,6 +468,70 @@ document.addEventListener('click',e=>{
   document.querySelectorAll('.sb a').forEach(a=>a.classList.toggle('on',a.dataset.go===k));
   document.getElementById('crumbNow').textContent=labels[k]||"";
   document.querySelector('.content').scrollTop=0;
+  if(k==='admins') loadAdmins();
+});
+
+// ===== 관리자 권한 관리 =====
+let adClient=null;
+async function getAdClient(){
+  if(adClient) return adClient;
+  await SEOTI.api.isAdmin(); // ensure Supabase loaded
+  const URL='https://wzmtcomawebufylojffx.supabase.co';
+  const KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6bXRjb21hd2VidWZ5bG9qZmZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NTg5MjcsImV4cCI6MjA5NTQzNDkyN30.6P0ZSLTU7XPudr9Ove2S0Nc5XO7pdb87LUVDdVJKmEM';
+  adClient=window.supabase.createClient(URL,KEY,{auth:{persistSession:true,autoRefreshToken:true,storageKey:'sb-wzmtcomawebufylojffx-auth-token'}});
+  return adClient;
+}
+
+async function loadAdmins(){
+  const rowsEl=document.getElementById('adRows');
+  rowsEl.innerHTML='<tr><td colspan="4" style="padding:24px;text-align:center;color:var(--sub)">불러오는 중…</td></tr>';
+  try{
+    const c=await getAdClient();
+    const {data,error}=await c.from('profiles').select('id,nickname,is_admin,created_at').eq('is_admin',true).order('created_at',{ascending:true});
+    if(error)throw error;
+    // 이메일은 auth.users — RLS 로 직접 못 봄. profile.nickname 만 표시. 본인 이메일은 user_metadata 에서.
+    if(!data.length){rowsEl.innerHTML='<tr><td colspan="4" style="padding:24px;text-align:center;color:var(--sub)">관리자가 없습니다. 위에서 추가하세요.</td></tr>';return;}
+    document.getElementById('adCount').textContent=`(${data.length}명)`;
+    const me=SEOTI.state().user;
+    rowsEl.innerHTML=data.map(p=>{
+      const isMe=me && me.id===p.id;
+      const dt=new Date(p.created_at).toLocaleDateString('ko-KR');
+      return `<tr><td><span class="nm">${isMe?'<span style="color:var(--accent);font-weight:800">(나)</span> ':''}<small>${p.id.slice(0,8)}…</small></span></td><td>${esc(p.nickname||'—')}</td><td>${dt}</td><td style="text-align:right">${isMe?'<span style="color:var(--sub);font-size:11.5px">자기 자신은 회수 불가</span>':`<button class="btn" data-revoke="${p.id}">회수</button>`}</td></tr>`;
+    }).join('');
+  }catch(e){
+    rowsEl.innerHTML=`<tr><td colspan="4" style="padding:24px;text-align:center;color:var(--bad)">불러오기 실패 — ${esc(e.message||e)}</td></tr>`;
+  }
+}
+function esc(s){return String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+document.getElementById('adAddBtn')?.addEventListener('click',async()=>{
+  const email=document.getElementById('adAddEmail').value.trim().toLowerCase();
+  if(!email.includes('@')){SEOTI.toast('이메일을 확인해주세요','warn');return;}
+  const btn=document.getElementById('adAddBtn');btn.disabled=true;btn.textContent='추가 중…';
+  try{
+    const c=await getAdClient();
+    // auth.users 는 anon RLS 로 접근 불가 → RPC 필요. 임시: profiles 의 nickname 또는 id 로만 검색.
+    // 해결: 이메일로 검색하는 RPC 함수를 Supabase 에 미리 만들어야 함. (아래 SQL 참고)
+    const {data,error}=await c.rpc('promote_admin_by_email',{p_email:email});
+    if(error)throw error;
+    if(!data){SEOTI.toast('해당 이메일로 가입된 회원이 없어요 — 본인 가입 후 다시 시도','warn');return;}
+    SEOTI.toast(`${email} → 관리자 추가 완료`,'success');
+    document.getElementById('adAddEmail').value='';
+    loadAdmins();
+  }catch(e){SEOTI.toast('실패: '+(e.message||e),'error');}
+  finally{btn.disabled=false;btn.textContent='＋ 관리자로 추가';}
+});
+
+document.getElementById('adRows')?.addEventListener('click',async e=>{
+  const btn=e.target.closest('[data-revoke]');if(!btn)return;
+  if(!confirm('이 사용자의 관리자 권한을 회수할까요?'))return;
+  btn.disabled=true;
+  try{
+    const c=await getAdClient();
+    const {error}=await c.from('profiles').update({is_admin:false}).eq('id',btn.dataset.revoke);
+    if(error)throw error;
+    SEOTI.toast('권한 회수됨','info');loadAdmins();
+  }catch(e){SEOTI.toast('실패: '+e.message,'error');btn.disabled=false;}
 });
 </script>
 <script src="assets/admin-nav.js"></script>

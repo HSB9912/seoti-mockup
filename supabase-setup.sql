@@ -27,6 +27,41 @@ DROP POLICY IF EXISTS "profiles_self_update" ON public.profiles;
 CREATE POLICY "profiles_self_update" ON public.profiles
   FOR UPDATE USING (auth.uid() = id);
 
+-- 관리자는 다른 사용자의 is_admin 을 토글할 수 있음
+DROP POLICY IF EXISTS "profiles_admin_update" ON public.profiles;
+CREATE POLICY "profiles_admin_update" ON public.profiles
+  FOR UPDATE TO authenticated
+  USING (EXISTS (SELECT 1 FROM public.profiles p WHERE p.id = auth.uid() AND p.is_admin = true))
+  WITH CHECK (EXISTS (SELECT 1 FROM public.profiles p WHERE p.id = auth.uid() AND p.is_admin = true));
+
+-- 이메일로 관리자 승급 (auth.users 는 anon 접근 불가라 SECURITY DEFINER 필요)
+CREATE OR REPLACE FUNCTION public.promote_admin_by_email(p_email text)
+RETURNS boolean
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, auth
+AS $$
+DECLARE
+  v_caller_admin boolean;
+  v_target_id    uuid;
+BEGIN
+  -- 호출자 본인이 관리자인지 확인
+  SELECT is_admin INTO v_caller_admin FROM public.profiles WHERE id = auth.uid();
+  IF NOT COALESCE(v_caller_admin, false) THEN
+    RAISE EXCEPTION '관리자만 호출 가능';
+  END IF;
+  -- 대상 회원 찾기
+  SELECT id INTO v_target_id FROM auth.users WHERE LOWER(email) = LOWER(p_email) LIMIT 1;
+  IF v_target_id IS NULL THEN RETURN false; END IF;
+  -- 승급
+  UPDATE public.profiles SET is_admin = true WHERE id = v_target_id;
+  RETURN true;
+END;
+$$;
+
+REVOKE ALL ON FUNCTION public.promote_admin_by_email(text) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.promote_admin_by_email(text) TO authenticated;
+
 -- 회원가입 시 profiles 자동 생성
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger
