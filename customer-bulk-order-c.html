@@ -324,7 +324,7 @@ function render(){
       <div class="thumb">
         ${q?`<span class="qty-bubble">✓ ${q}개</span>`:''}
         ${stk(p.s)}
-        <img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/${p.img}.png">
+        <img referrerpolicy="no-referrer" src="https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/${p.img}.png">
       </div>
       <div class="card-body">
         <div class="card-cat">${p.c}</div>
@@ -358,7 +358,7 @@ function updateCart(){
   else{dl.innerHTML=keys.map(k=>{
     const p=products[k];
     return `<div class="di">
-      <div class="tn"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/${p.img}.png"></div>
+      <div class="tn"><img referrerpolicy="no-referrer" src="https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/${p.img}.png"></div>
       <div class="m"><b>서티 ${p.n}</b><small>₩${p.p.toLocaleString()}</small></div>
       <div class="q">
         <button data-act="−" data-i="${k}">−</button>

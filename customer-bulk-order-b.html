@@ -307,7 +307,7 @@ function render(){
   document.getElementById('rows').innerHTML=list.map(p=>{
     const i=products.indexOf(p),q=cart[i]||0;
     return `<div class="row ${q?'sel':''} ${p.s===0?'out':''}">
-      <div class="tn"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/${p.img}.png"></div>
+      <div class="tn"><img referrerpolicy="no-referrer" src="https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/${p.img}.png"></div>
       <div class="meta"><b>서티 ${p.n}</b><small>${p.c} · 재고 ${p.s}${stk(p.s)?' ':''}</small> ${stk(p.s)}</div>
       <div class="price">₩${p.p.toLocaleString()}</div>
       <div class="qty">

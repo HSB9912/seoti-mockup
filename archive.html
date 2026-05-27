@@ -223,12 +223,12 @@ function render() {
     const tall = view === 'dense' && p.tall ? ' tall' : '';
     if (view === 'dense') {
       return `<div class="item${tall}" data-i="${i}">
-        <img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/${p.img}.png">
+        <img referrerpolicy="no-referrer" src="https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/${p.img}.png">
         <div class="hover">${p.t} · ${p.dt}</div>
       </div>`;
     } else {
       return `<div class="item" data-i="${i}">
-        <div class="ph-img"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/${p.img}.png"></div>
+        <div class="ph-img"><img referrerpolicy="no-referrer" src="https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/${p.img}.png"></div>
         <div class="meta"><span class="dt">2026.${p.dt}</span><span class="tag">${p.t}</span></div>
       </div>`;
     }
@@ -252,7 +252,7 @@ grid.addEventListener('click', e => {
   const it = e.target.closest('[data-i]');
   if (!it) return;
   const p = photos[+it.dataset.i];
-  lbImg.src = `https://sosorowa.com/web/product/medium/${p.img}.png`;
+  lbImg.src = `https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/${p.img}.png`;
   lb.classList.add('on');
 });
 document.getElementById('lbClose').onclick = () => lb.classList.remove('on');

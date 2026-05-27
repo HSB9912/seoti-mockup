@@ -59,16 +59,27 @@
   }
 
   // ============ IMAGE URL HELPER ============
-  // 현재: sosorowa CDN 사용 (실제 작가 제품 이미지)
-  // 향후 Cloudflare Images로 교체될 부분
+  // Cloudflare R2 적용 — 미업로드 이미지는 기존 sosorowa로 자동 fallback (아래 핸들러)
+  const R2_BASE = 'https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev';
+  const LEGACY_BASE = 'https://sosorowa.com/web/product/medium';
+
   function img(path, variant) {
-    variant = variant || 'medium';
     if (!path) return '';
     if (path.startsWith('http')) return path;
-    // TODO: Cloudflare 연동 시
-    // return `https://imagedelivery.net/<ACCOUNT_HASH>/${path}/${variant}`;
-    return `https://sosorowa.com/web/product/${variant}/${path}.png`;
+    // R2 우선 — 없으면 fallback handler가 sosorowa로 대체
+    return `${R2_BASE}/${path}.png`;
   }
+
+  // R2에 아직 업로드 안 된 이미지는 자동으로 sosorowa로 폴백
+  // (마이그레이션 기간용 — 이미지 모두 옮긴 뒤엔 이 블록 제거 가능)
+  document.addEventListener('error', (e) => {
+    const el = e.target;
+    if (el.tagName !== 'IMG') return;
+    if (!el.src || !el.src.includes('r2.dev')) return;
+    if (el.dataset.r2Fallback) return; // 무한 루프 방지
+    el.dataset.r2Fallback = '1';
+    el.src = el.src.replace(R2_BASE, LEGACY_BASE);
+  }, true);
 
   // ============ API (mock — Supabase 자리) ============
   const api = {

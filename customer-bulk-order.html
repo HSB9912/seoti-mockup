@@ -452,7 +452,7 @@ function render(){
       <div class="ph-img">
         <span class="qty-pill">✓ ${q}개 담음</span>
         ${stk(p.s)}
-        <img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/${p.img}.png" alt="${p.n}">
+        <img referrerpolicy="no-referrer" src="https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/${p.img}.png" alt="${p.n}">
       </div>
       <div class="pc-foot">
         <div><div class="nm">서티 ${p.n}</div><div class="ct">${p.c}</div></div>
@@ -475,7 +475,7 @@ function renderCart(){
   else{el.innerHTML=keys.map(k=>{
     const p=products[k];
     return `<div class="item">
-      <div class="tn"><img referrerpolicy="no-referrer" src="https://sosorowa.com/web/product/medium/${p.img}.png"></div>
+      <div class="tn"><img referrerpolicy="no-referrer" src="https://pub-6ba2dfe4988449599bacbbd4fb5c7443.r2.dev/${p.img}.png"></div>
       <div class="mid"><b>서티 ${p.n}</b><small>₩${p.p.toLocaleString()} · ${p.c}</small></div>
       <div class="qx">×${cart[k]}</div>
       <button class="rm" data-rm="${k}">✕</button>
