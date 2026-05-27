@@ -470,6 +470,7 @@ function renderVendors(){
     if (s.status === "확인 필요") vendorStats[s.vendor].pending++;
   });
 
+  const empty = !VENDORS.length;
   const html = `
     <thead><tr>
       <th class="check"><input type="checkbox"></th>
@@ -483,15 +484,15 @@ function renderVendors(){
       <th></th>
     </tr></thead>
     <tbody>
-    ${VENDORS.map(v => {
+    ${empty ? `<tr><td colspan="9" style="padding:50px;text-align:center;color:var(--sub)">입점처 데이터를 불러오는 중이에요. 표시되지 않으면 관리자 로그인 상태인지 확인해주세요.</td></tr>` : VENDORS.map(v => {
       const st = vendorStats[v.name] || {count:0, total:0, pending:0};
       return `
       <tr data-vendor="${v.name}" style="cursor:pointer" title="클릭하면 이 입점처의 정산만 보입니다">
         <td class="check"><input type="checkbox"></td>
-        <td><span class="nm">${v.name}</span><br><small style="color:var(--sub);font-size:11px" class="mono">${v.biz_no}</small></td>
-        <td>${v.manager}<br><small style="color:var(--sub);font-size:11px">${v.address ? v.address.split(' ').slice(0,2).join(' ') : '—'}</small></td>
-        <td><small>${v.biz_type}</small><br><small style="color:var(--sub);font-size:11px">${v.biz_category}</small></td>
-        <td><small class="mono">${v.email}</small></td>
+        <td><span class="nm">${v.name}</span><br><small style="color:var(--sub);font-size:11px" class="mono">${v.biz_no||'—'}</small></td>
+        <td>${v.manager||'—'}<br><small style="color:var(--sub);font-size:11px">${v.address ? v.address.split(' ').slice(0,2).join(' ') : '—'}</small></td>
+        <td><small>${v.biz_type||'—'}</small><br><small style="color:var(--sub);font-size:11px">${v.biz_category||'—'}</small></td>
+        <td><small class="mono">${v.email||'—'}</small></td>
         <td>${v.commission ? `<span class="tag" style="background:#fff5e7;color:var(--accent);font-weight:800">${v.commission}%</span>` : `<span class="tag muted">미정</span>`}</td>
         <td class="tnum big mono">${st.total ? "₩"+st.total.toLocaleString() : "—"}</td>
         <td><small>${st.count}건${st.pending ? ` <span class="tag bad" style="font-size:10px">⚠ ${st.pending}</span>` : ''}</small></td>
